@@ -189,7 +189,7 @@ Earned across two projects. These worked. Please don't rediscover them the hard 
 ## The method
 
 - **He writes every line of code himself.** Explain the concept and the shape in plain language; he writes it. **No skeleton files with `TODO(you)` blanks** above `seed` level. He asked for this directly after saying *"I feel like I'm not learning, you're just doing stuff for me."*
-- **Watch the file for his save by polling.** Never ask him to paste code into chat, and don't rely on him saying "done" — he has said "done" when nothing saved. He asked for this repeatedly (*"you're not watching"*, *"I want you to always watch"*) and shouldn't have to ask again.
+- **Watch the file for his save by polling.** Never ask him to paste code into chat, and don't rely on him saying "done" — he has said "done" when nothing saved. He asked for this repeatedly (*"you're not watching"*, *"I want you to always watch"*) and shouldn't have to ask again. ⚠️ It slipped a *third* time on 2026-08-07 — said "save and I'll check" without arming the poll. He caught it: *"you're still not checking, please fix yourself."* **The fix: arm the watch in the same turn as the write instruction, every time — never say "I'll check" as a promise for later.**
 - **Predict before running.** Ask what he expects, then run it. Wrong predictions are the best teaching moments and he handles them well.
 - **One question at a time.** Free recall in plain chat, never multiple choice.
 - **He runs the commands himself** in his own terminal and reports what he sees.

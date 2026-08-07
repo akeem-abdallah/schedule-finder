@@ -95,40 +95,40 @@ Shipped 2026-08-05. Full history with detailed evidence lives in
 ## Section 1 — React foundations
 
 ### node-and-npm
-- status: seed
+- status: practicing
 - depends-on: none
-- introduced: —
-- last-reviewed: —
-- evidence: —
+- introduced: 2026-08-07
+- last-reviewed: 2026-08-07
+- evidence: correctly predicted `node_modules/` would appear after `npm install`. On the quiz "difference between `package.json` and `node_modules/`" he answered cleanly and unprompted: *"package.json is what I asked for, node_modules is what actually got installed"* — a clean pass, no correction needed
 <!-- Bridge: same relationship as pip and requirements.txt, which he already met -->
 
 ### vite
-- status: seed
+- status: introduced
 - depends-on: node-and-npm
-- introduced: —
-- last-reviewed: —
-- evidence: —
+- introduced: 2026-08-07
+- last-reviewed: 2026-08-07
+- evidence: scaffolded the project and ran the dev server himself, noticed and accepted the port-5173-not-5000 difference without confusion. No explicit explain-back check was done on Vite itself, so capped at `introduced`
 
 ### jsx
-- status: seed
+- status: practicing
 - depends-on: none
-- introduced: —
-- last-reviewed: —
-- evidence: —
+- introduced: 2026-08-07
+- last-reviewed: 2026-08-07
+- evidence: wrote a hardcoded `<h1>` + `<ul>`/`<li>` list from a plain-language spec (no skeleton given). Self-corrected a real JSX mistake unprompted — wrapped his title in stray quote marks, saw them render literally, and fixed it himself: *"quotes because I removed them"*
 
 ### react-components
-- status: seed
+- status: practicing
 - depends-on: jsx
-- introduced: —
-- last-reviewed: —
-- evidence: —
+- introduced: 2026-08-07
+- last-reviewed: 2026-08-07
+- evidence: first attempt at `Course.jsx` was an empty stub — said plainly *"Idk how to make the function"*. Given a parallel example (a `Greeting` component, not the answer itself), he adapted it correctly, then on his own follow-up fixed a missing `export default` and a missing closing brace without being told exactly what was wrong, just that something was missing. Also caught himself that list items inside a `<ul>` should be `<li>` not `<p>` once it was named
 
 ### react-props
-- status: seed
+- status: practicing
 - depends-on: react-components
-- introduced: —
-- last-reviewed: —
-- evidence: —
+- introduced: 2026-08-07
+- last-reviewed: 2026-08-07
+- evidence: 🔴 first answer to "what's a prop?" was wrong — *"its like self from python"* (confused an object's own reference with data passed in from outside) — corrected with the function-argument comparison. Second attempt, *"It's a placeholder for data from the outside"*, was graded as vague, not a pass: "placeholder" implies something unfilled, when a prop is the actual value already flowing in. Precise version was given directly. Real first-contact struggle, correctly capped at `practicing` — good early review candidate
 
 ## Section 2 — The interactive shortlist
 

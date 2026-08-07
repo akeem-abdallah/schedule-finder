@@ -15,20 +15,31 @@ Entries stay **one line** forever. They record *why a file exists*, not what's i
 - learning/knowledge-graph.md — known (2026-08-06) — the living map of what he actually knows; it decides what gets quizzed
 - learning/file-map.md — known (2026-08-06) — this file: why every file in the repo exists
 
-Nothing else exists yet. The project has not been scaffolded.
+### / (root) — scaffolded 2026-08-07 via `npm create vite@latest`
+- package.json — known (2026-08-07) — packages this project needs plus run commands (`npm run dev`); React's equivalent of `requirements.txt` → [[node-and-npm]]
+- package-lock.json — known (2026-08-07) — generated — exact versions actually installed, never hand-edited
+- node_modules/ — known (2026-08-07) — generated — where npm put the downloaded packages; gitignored by the Vite template itself, rebuildable from `package.json` → [[node-and-npm]]
+- .gitignore — known (2026-08-07) — Vite-generated; already excludes `node_modules/` and build junk
+- index.html — known (2026-08-07) — the one real HTML page; React mounts into it → [[vite]]
+- vite.config.js — known (2026-08-07) — Vite's dev-server/build configuration → [[vite]]
+- .oxlintrc.json — parked (section 7-ish, whenever linting comes up) — config for Oxlint, the linter picked during scaffolding
+- README.md — parked (section 9) — still Vite's default placeholder; gets replaced with the real one → [[readme-portfolio-framing]]
+- public/ — parked — static assets served as-is (favicon, icon sprite); not toured in depth
+
+### /src
+- src/App.jsx — known (2026-08-07) — the root component; written and debugged by Akeem himself, renders the hardcoded course list via `Course` → [[jsx]], [[react-components]]
+- src/Course.jsx — known (2026-08-07) — a reusable component taking a course's `code`/`title` as props, authored by Akeem → [[react-components]], [[react-props]]
+- src/main.jsx — known (2026-08-07) — finds `<div id="root">` in `index.html` and tells React to render `App` into it; the one-time handoff from plain HTML to React. Wrapped in `StrictMode`, a dev-only double-run check → [[useeffect]]
+- src/App.css, src/index.css — parked — styling shipped by the Vite template, untouched so far
+- src/assets/ — parked — template image assets (logos, hero image); likely deleted once real styling starts
+
+Nothing else exists yet.
 
 ---
 
 ## Coming later — pre-parked so they're never mystery boxes
 
 Not on disk yet. Listed so that when a command creates them, the lesson can tour them rather than let them pile up unexplained. **Delete an entry from here and add it above once it actually exists.**
-
-### Section 1 will create
-- `package.json` — the list of frontend packages this project asks for, plus the commands to run it. The React equivalent of `requirements.txt`, which he already understands → [[node-and-npm]]
-- `package-lock.json` — generated — records the *exact* versions actually installed, so another machine gets an identical setup. Never hand-edited
-- `node_modules/` — generated — where npm puts the packages it downloaded. Enormous, machine-made, always rebuildable from `package.json`. **Must be gitignored before the first commit** → [[node-and-npm]]
-- `index.html`, `src/`, `vite.config.js` — the React app itself and its build configuration → [[vite]], [[jsx]]
-- `.gitignore` — tells git never to track `node_modules/`, `.env`, and Python caches. He built one of these last project and learned that adding a *already-tracked* file to it doesn't untrack it
 
 ### Section 4 will create
 - The parser script — fetches AURAK's page and turns its HTML table into structured course data → [[html-parsing]]

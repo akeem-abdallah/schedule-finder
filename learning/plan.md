@@ -34,16 +34,16 @@ If Akeem re-opens one of these himself, that's his call — engage with it. Just
 
 ## Sections
 
-### 1. React foundations  [ ] not started
+### 1. React foundations  [x] done 2026-08-07
 **Deliverable:** A React page running on your machine, showing a hardcoded list of courses.
 **Concepts:** node-and-npm, vite, jsx, react-components, react-props
 
 **Tasks:**
-- [ ] 1.1 Init git repo, scaffold with `npm create vite@latest`, gitignore `node_modules/` before first commit
-- [ ] 1.2 Run the dev server, tour the generated files (`index.html`, `src/`, `vite.config.js`, `package.json`)
-- [ ] 1.3 Replace the default page with a hardcoded list of courses, written directly in JSX
-- [ ] 1.4 Split the list into a `Course` component, passing each course in as props
-- [ ] 1.5 Commit — deliverable reached
+- [x] 1.1 Init git repo, scaffold with `npm create vite@latest`, gitignore `node_modules/` before first commit
+- [x] 1.2 Run the dev server, tour the generated files (`index.html`, `src/`, `vite.config.js`, `package.json`)
+- [x] 1.3 Replace the default page with a hardcoded list of courses, written directly in JSX
+- [x] 1.4 Split the list into a `Course` component, passing each course in as props
+- [x] 1.5 Commit — deliverable reached
 
 **Notes for the lesson:**
 - `npm create vite@latest` is the current standard path. Vite's dev server runs on port **5173**, not 5000 — expect confusion, since he associates "local server" with Flask's 5000.
@@ -51,6 +51,19 @@ If Akeem re-opens one of these himself, that's his call — engage with it. Just
 - `node_modules/` is a permanent one-liner in the file map: machine-made, never edited, rebuildable from `package.json`.
 - Good understanding check: **what's the difference between `package.json` and `node_modules/`?** (What you asked for vs. what actually got installed — the same relationship as `requirements.txt` and site-packages, which he already met.)
 - Don't explain hooks, state, or effects yet. This section is *only* getting something on screen.
+
+> ### ⚠️ Applies to sections 1–3 and 6: separate "React confusion" from "JavaScript gap"
+> **React is JavaScript.** He will write *more* JS here than in the matrix app, not less — `.map()`, arrow functions, destructuring, spread, template literals, closures.
+>
+> His JavaScript sits at **`practicing`**, not solid. Known gaps from project #1: got `if` syntax wrong three times, used raw element IDs as if they were variables, needed promises explained twice. **React will expose these rather than hide them.**
+>
+> **So when he's stuck, diagnose which it is before explaining:**
+> - *"Why does `courses.map(c => <Course ... />)` work?"* → **a JavaScript question** (arrow functions, array methods). Teach it as JS, and say so — *"this is JavaScript, not React."*
+> - *"Why didn't the page update when I changed the variable?"* → **a React question** (state and re-rendering).
+>
+> Conflating the two is how learners conclude React is hard when they're actually stuck on arrow functions. Naming which layer the confusion lives in is often the whole fix.
+>
+> Context, if he asks whether picking React was a mistake — he asked twice on 2026-08-06 after seeing generic advice online: **no.** He built a full app in plain JS first, deliberately, and personally hit the bug React exists to prevent (manually syncing DOM and data, and losing track). The prerequisite is done.
 
 ### 2. The interactive shortlist  [ ] not started
 **Deliverable:** Pick a subject, pick a course, add it to your list, remove it — all working, with made-up data.
