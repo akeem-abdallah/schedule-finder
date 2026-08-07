@@ -69,6 +69,14 @@ If Akeem re-opens one of these himself, that's his call — engage with it. Just
 **Deliverable:** Pick a subject, pick a course, add it to your list, remove it — all working, with made-up data.
 **Concepts:** react-state, event-handling-in-react, controlled-inputs, rendering-lists, derived-state
 
+**Tasks:**
+- [x] 2.1 Hardcode fake subjects/courses as data (no UI change yet)
+- [x] 2.2 Subject dropdown wired to `useState`
+- [x] 2.3 Course dropdown that depends on the selected subject
+- [ ] 2.4 "Add" button — adds the selected course to a shortlist array in state
+- [ ] 2.5 Render the shortlist, each with a "Remove" button
+- [ ] 2.6 Commit — deliverable reached
+
 **Notes for the lesson:**
 - This is the conceptual jump of the whole project: **he stops changing the page directly and starts changing data, letting React re-render.** Contrast it explicitly with his `createElement`/`appendChild` work in the matrix app — he knows the old way well, which makes the comparison land.
 - **Controlled inputs** need both `value` and `onChange`; missing `onChange` produces an input that won't type, which is baffling if you haven't seen it.
@@ -85,7 +93,11 @@ If Akeem re-opens one of these himself, that's his call — engage with it. Just
 - **Correct order: make it work, then make it fast.** Start with the naive version — represent times as minutes-since-midnight, compare ranges. Get correct results. *Then* introduce bitmasks as an optimisation he can measure against the naive version.
 - **Cap results at ~50 and stop generating.** Not a nice-to-have — without it, 8 courses × 5 sections is ~390,000 combinations and the page hangs.
 - Prune *during* generation (abandon a partial schedule the moment it conflicts), never generate-then-filter.
-- ⚠️ **He must not read the AUS scheduler's source before attempting this himself.** Agreed explicitly. It's the one piece of this project he can solve alone, and seeing a finished solution first destroys that.
+- 🚫 **This rule binds the agent, not just Akeem: do not read, fetch, or summarise the AUS scheduler's source code before he has produced a working generator himself.**
+  - **Not allowed until then:** opening their GitHub, describing their approach, or letting their design shape the hints you give. A summary from you is *worse* than him reading it — it arrives as "here's how to do it" rather than as something he chose to look up.
+  - **Fine:** the UI description already in `project.md` (dropdowns, shortlist, weekly grid, freshness timestamp). That's the whole reference; there's no need to visit the site at all.
+  - **After** he has a working generator, reading their source is genuinely useful — comparing two solutions to the same problem is good learning. The rule is time-bound, not permanent.
+  - **Why:** the combination algorithm is the one piece of this project he is best equipped to solve alone (NeetCode 150, A-level CS). Seeing a finished solution first spends that for nothing.
 - The weekly grid is CSS Grid — he did a 2×2 grid last project, this is the same property at larger scale.
 
 ### 4. The parser  [ ] not started

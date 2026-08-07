@@ -133,42 +133,47 @@ Shipped 2026-08-05. Full history with detailed evidence lives in
 ## Section 2 — The interactive shortlist
 
 ### react-state
-- status: seed
+- status: practicing
 - depends-on: react-components
-- introduced: —
-- last-reviewed: —
-- evidence: —
-<!-- The conceptual jump of the project: stop changing the page, start changing data.
-     Contrast explicitly with his createElement/appendChild work -->
+- introduced: 2026-08-07
+- last-reviewed: 2026-08-07
+- evidence: initially asked to stop and rebuild from scratch (*"start from useState, I didn't even understand that yet"*). After a plain-variable-vs-state contrast, correctly predicted unprompted: *"it would set selectedSubject to CMP and re-render the page"*. Also correctly reasoned that `useState("")` sets the starting value only, changed later only via the setter
 
 ### event-handling-in-react
-- status: seed
+- status: practicing
 - depends-on: react-state
-- introduced: —
-- last-reviewed: —
-- evidence: —
-<!-- event-listeners is his one `understood` concept — build directly on it -->
+- introduced: 2026-08-07
+- last-reviewed: 2026-08-07
+- evidence: bridged to `addEventListener` (his one `understood` concept from project #1) mostly unprompted, though first framing was slightly off — *"setSelectedSubject is technically the listener"* (corrected: the arrow function passed to `onChange` is the listener; `setSelectedSubject` is what it calls inside). Pushed hard past the surface explanation of `key` all the way to asking for React's actual reconciliation mechanism, rejected a pseudocode answer explicitly (*"why pseudocode? please, you're sonnet 5"*), and confirmed only once given the real `Map`-based mechanism
 
 ### controlled-inputs
-- status: seed
+- status: practicing
 - depends-on: react-state
-- introduced: —
-- last-reviewed: —
-- evidence: —
+- introduced: 2026-08-07
+- last-reviewed: 2026-08-07
+- evidence: struggled initially or the `value={selectedSubject}` half (*"I don't get it"*), then correctly predicted the dropdown would show MATH selected if state held "MATH". Correctly concluded unprompted that `selectedSubject` "isn't related to the DOM... it's a separate variable" — the core of what makes it a controlled input
 
 ### rendering-lists
-- status: seed
+- status: practicing
 - depends-on: react-components
-- introduced: —
-- last-reviewed: —
-- evidence: —
+- introduced: 2026-08-07
+- last-reviewed: 2026-08-07
+- evidence: correctly predicted `.map()` over `subjects` would render all three as options, confirmed in the browser. Wanted much deeper-than-usual grounding on `key` — rejected a surface analogy and a pseudocode explanation in turn, only satisfied once shown React's real `Map.get()`/`.delete()` based reconciliation. Note for future sessions: he wants the actual mechanism, not a simplified stand-in, once he pushes back a second time
 
 ### derived-state
-- status: seed
+- status: practicing
 - depends-on: react-state
-- introduced: —
-- last-reviewed: —
-- evidence: —
+- introduced: 2026-08-07
+- last-reviewed: 2026-08-07
+- evidence: 🔴 hard first contact. Answered *"Idk"* on why deriving beats storing, then twice proposed storing the course list as its own `useState` (*"cant we just make a new const [selectedCode, setSelectedCodes]"*, then *"make a new state to update the dropdown"*), then stopped the lesson entirely — *"I dont understand ANYTHING that happened in 2.3, genuinely."* Rebuilt from zero via a paper-scanning analogy, after which he correctly described the two-step search, chose deriving over storing once the drift problem was made concrete, and predicted `.find()` returning `undefined` on no match plus the resulting crash on `.courses`. Real struggle-then-recover; the understanding is his, but it needed a full teardown to get there
+
+### stale-state-on-dependent-change
+- status: practicing
+- depends-on: react-state, derived-state
+- introduced: 2026-08-07
+- last-reviewed: 2026-08-07
+- evidence: predicted the course dropdown would visually reset when switching subjects (correct), but a debug line revealed `selectedCode` was still `"104"` underneath — the display was blank only because no matching option existed. Once shown the gap, he named the fix himself unprompted: *"call setSelectedCode("") in there too"*. Also hit and fixed a real JS syntax error on the way — an arrow function with two statements needs its own `{ }` body
+<!-- The bug class: a state variable silently outliving the thing it depended on -->
 
 ## Section 3 — The algorithm and the grid
 

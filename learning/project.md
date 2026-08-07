@@ -178,7 +178,11 @@ https://eums.aurak.ac.ae/Public/Schedule?h42blu9ygNZPnBJmMbXuWAu8XR3hS4tcKtMIP6x
 
 Its authors are credited with public GitHub profiles in the footer, so the source may be readable.
 
-> ⚠️ **Agreed discipline: he reads their source only *after* attempting the combination generation himself.** That algorithm is the one piece of this project he's best equipped to solve alone; seeing a finished solution first would waste it.
+> 🚫 **This discipline binds the agent too, not only Akeem.**
+> **Until he has a working generator (section 3): do not read, fetch, or summarise their source code**, and don't let their design shape the hints you give. An agent summary is *worse* than him reading it himself — it arrives as "here's how to do it" rather than as something he chose to look up.
+> **You don't need to visit the site.** The UI description above is the whole reference.
+> **Afterwards it's genuinely useful** — comparing two solutions to the same problem is good learning. The rule is time-bound, not permanent.
+> **Why:** that algorithm is the one piece of this project he's best equipped to solve alone. Seeing a finished solution first spends that for nothing.
 
 ---
 

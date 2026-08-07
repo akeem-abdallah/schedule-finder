@@ -27,7 +27,7 @@ Entries stay **one line** forever. They record *why a file exists*, not what's i
 - public/ — parked — static assets served as-is (favicon, icon sprite); not toured in depth
 
 ### /src
-- src/App.jsx — known (2026-08-07) — the root component; written and debugged by Akeem himself, renders the hardcoded course list via `Course` → [[jsx]], [[react-components]]
+- src/App.jsx — known (2026-08-07) — the root component; holds the fake `subjects` data and the cascading subject/course dropdowns, all written and debugged by Akeem → [[jsx]], [[react-components]], [[react-state]], [[controlled-inputs]], [[rendering-lists]], [[derived-state]]
 - src/Course.jsx — known (2026-08-07) — a reusable component taking a course's `code`/`title` as props, authored by Akeem → [[react-components]], [[react-props]]
 - src/main.jsx — known (2026-08-07) — finds `<div id="root">` in `index.html` and tells React to render `App` into it; the one-time handoff from plain HTML to React. Wrapped in `StrictMode`, a dev-only double-run check → [[useeffect]]
 - src/App.css, src/index.css — parked — styling shipped by the Vite template, untouched so far
