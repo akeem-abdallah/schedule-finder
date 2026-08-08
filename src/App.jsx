@@ -41,32 +41,44 @@ const subjects = [
 // rerun when a state setter is called. example: "setSelectedSubject"
 function App() {
 
-    const [selectedSubject, setSelectedSubject] = useState("") 
+    const [rows, setRows] = useState([{ id: 1, subject: "", code: "" }])
 
-    const currentSubject = subjects.find((s) => s.subject === selectedSubject) // finds the currentSubject after each rerun using selectedSubject
-    const courses = currentSubject ? currentSubject.courses : [] // courses is [] instead of undefined
-
-    const [selectedCode, setSelectedCode] = useState("")
+    function updateRow(id, field, value) {
+        setRows(rows.map((row) => row.id === id ? { ...row, [field]: value } : row))
+    }
 
     return (
         <>
             <h1>AURAK Schedule Finder</h1>
 
-            <select value={selectedSubject} onChange={(e) => { setSelectedSubject(e.target.value); setSelectedCode("") }}>
-                <option value="">-- pick a subject --</option>
-                {subjects.map((s) => (
-                    <option key={s.subject} value={s.subject}>{s.subject}</option>
-                ))}
-            </select>
+            {rows.map((row) => {
 
-            <select value={selectedCode} onChange={(e) => setSelectedCode(e.target.value)}>
-                <option value="">-- pick a course --</option>
-                {courses.map((c) => (   
-                    <option key={c.code} value={c.code}>{c.code} - {c.description}</option>
-                ))} {/*  */}
-            </select>
+                const currentSubject = subjects.find((s) => s.subject === row.subject)
+                const courses = currentSubject ? currentSubject.courses : []
 
-            <p>selectedSubject is: "{selectedSubject}" selectedCode is: "{selectedCode}"</p>
+                return (
+
+                    <div key={row.id}>
+                    
+                        <select value={row.subject} onChange={(e) => updateRow(row.id, "subject", e.target.value) }>
+                            <option value="">-- pick a subject --</option>
+                            {subjects.map((s) => (
+                                <option key={s.subject} value={s.subject}>{s.subject}</option>
+                            ))}
+                        </select>
+
+                        <select value={row.code} onChange={(e) => updateRow(row.id, "code", e.target.value) }>
+                            <option value="">-- pick a course --</option>
+                            {courses.map((c) => (   
+                                <option key={c.code} value={c.code}>{c.code} - {c.description}</option>
+                            ))}
+                        </select>
+
+                    </div>
+
+                )
+            })}
+
 
         </> 
     )

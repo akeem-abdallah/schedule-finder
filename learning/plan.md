@@ -73,9 +73,18 @@ If Akeem re-opens one of these himself, that's his call — engage with it. Just
 - [x] 2.1 Hardcode fake subjects/courses as data (no UI change yet)
 - [x] 2.2 Subject dropdown wired to `useState`
 - [x] 2.3 Course dropdown that depends on the selected subject
-- [ ] 2.4 "Add" button — adds the selected course to a shortlist array in state
-- [ ] 2.5 Render the shortlist, each with a "Remove" button
-- [ ] 2.6 Commit — deliverable reached
+- [x] 2.4 Convert the two standalone state variables into an array of rows (`[{subject, code}]`), rendering one dropdown pair per row
+- [ ] 2.5 "Add" button appends an empty row; "Remove" deletes one row from the middle
+- [ ] 2.6 "Submit" button reads all rows and shows the chosen courses
+- [ ] 2.7 Commit — deliverable reached
+
+> **Design changed 2026-08-08 at Akeem's request.** Originally a browse-then-shortlist UI (pick one course,
+> click Add, it joins a list). He replaced it with **N editable dropdown pairs**: "Add" spawns another
+> empty subject+course pair, every pair stays editable, and "Submit" is when the selections get used.
+> Closer to how students actually think ("I want these six"), and closer to the AUS tool.
+> **Cost, named at the time:** `selectedSubject`/`selectedCode` as two standalone variables can't hold N rows,
+> so section 2's state moves into an array of row objects. **Payoff:** `key` becomes load-bearing for real —
+> rows carrying live selections get removed from the middle, which is exactly the trace he worked through.
 
 **Notes for the lesson:**
 - This is the conceptual jump of the whole project: **he stops changing the page directly and starts changing data, letting React re-render.** Contrast it explicitly with his `createElement`/`appendChild` work in the matrix app — he knows the old way well, which makes the comparison land.

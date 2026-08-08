@@ -269,6 +269,7 @@ Twice in one day, a five-minute check caught something that would have cost days
 - **`pytest` runs as a bare command** — PATH was permanently fixed on 2026-08-05 by appending `C:\Users\akeem\AppData\Roaming\Python\Python314\Scripts`. New pip-installed tools may need the same treatment.
 - **Editor: full Visual Studio 2026, not VS Code.** Different products — give Visual Studio-specific instructions.
 - He renamed the last project's folder mid-session to match its GitHub repo. **If files seem to vanish, check for a rename before concluding anything.**
+- **Fixed 2026-08-08:** `npm run dev` crashed with `EBUSY` on `.vs/.../*.vsidx` when Visual Studio was open on the same project — Vite's file watcher choked on VS's locked index file. Fixed permanently via `vite.config.js`: `server: { watch: { ignored: ['**/.vs/**'] } }`. If a fresh clone or new project hits this again, that's the fix.
 
 ---
 

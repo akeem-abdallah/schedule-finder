@@ -158,7 +158,7 @@ Shipped 2026-08-05. Full history with detailed evidence lives in
 - depends-on: react-components
 - introduced: 2026-08-07
 - last-reviewed: 2026-08-07
-- evidence: correctly predicted `.map()` over `subjects` would render all three as options, confirmed in the browser. Wanted much deeper-than-usual grounding on `key` — rejected a surface analogy and a pseudocode explanation in turn, only satisfied once shown React's real `Map.get()`/`.delete()` based reconciliation. Note for future sessions: he wants the actual mechanism, not a simplified stand-in, once he pushes back a second time
+- evidence: correctly predicted `.map()` over `subjects` would render all three as options, confirmed in the browser. Wanted much deeper-than-usual grounding on `key` — rejected a surface analogy and a pseudocode explanation in turn, only satisfied once shown React's real `Map.get()`/`.delete()` based reconciliation. Note for future sessions: he wants the actual mechanism, not a simplified stand-in, once he pushes back a second time. 2026-08-08: hit a real "adjacent JSX elements" error returning two `<select>`s with no wrapper inside a `.map()`; didn't recall the one-root-element rule unprompted (said "idk"), but once reminded, fixed it himself and correctly placed `key` on the new wrapping element
 
 ### derived-state
 - status: practicing
@@ -174,6 +174,14 @@ Shipped 2026-08-05. Full history with detailed evidence lives in
 - last-reviewed: 2026-08-07
 - evidence: predicted the course dropdown would visually reset when switching subjects (correct), but a debug line revealed `selectedCode` was still `"104"` underneath — the display was blank only because no matching option existed. Once shown the gap, he named the fix himself unprompted: *"call setSelectedCode("") in there too"*. Also hit and fixed a real JS syntax error on the way — an arrow function with two statements needs its own `{ }` body
 <!-- The bug class: a state variable silently outliving the thing it depended on -->
+
+### immutable-array-updates
+- status: practicing
+- depends-on: react-state
+- introduced: 2026-08-08
+- last-reviewed: 2026-08-08
+- evidence: introduced when the shortlist design changed (Akeem's request) from two standalone variables to an array of row objects. Initially misdescribed `setRows` as selectively patching changed rows — corrected to "total replace, never selective." Once corrected, correctly hand-traced the spread+computed-key expression for a worked example (`{ id: 1, subject: "MATH", code: "" }`), and correctly identified the ternary's bare `: row` branch as "hand back this row unchanged" after one nudge. Also correctly reasoned, unprompted, that `key={row.id}` belongs on the wrapping `<div>` "because it's the div that repeats, not the selects individually" — direct application of the `key` mechanism from 2.3. Immediately after the task was marked done, said plainly *"I honestly didn't understand anything in rows.map((row) => {"* — a full second teardown was needed, rebuilding `.map()`'s single-execution behavior, the `{ }`-requires-`return` rule, and closures (why each row's `onChange` remembers its own `row`) from scratch. He didn't recall closures from project #1 unprompted. Real understanding by the end, but it took two full passes on the same day
+<!-- New leaf not in the original plan — added when the browse-then-shortlist design became N editable dropdown rows -->
 
 ## Section 3 — The algorithm and the grid
 
