@@ -43,7 +43,7 @@ function App() {
 
     const [selectedSubject, setSelectedSubject] = useState("") 
 
-    const currentSubject = subjects.find((s) => s.subject === selectedSubject) // finds the currentSubject after each rerun
+    const currentSubject = subjects.find((s) => s.subject === selectedSubject) // finds the currentSubject after each rerun using selectedSubject
     const courses = currentSubject ? currentSubject.courses : [] // courses is [] instead of undefined
 
     const [selectedCode, setSelectedCode] = useState("")

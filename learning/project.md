@@ -198,6 +198,7 @@ Earned across two projects. These worked. Please don't rediscover them the hard 
 - **One question at a time.** Free recall in plain chat, never multiple choice.
 - **He runs the commands himself** in his own terminal and reports what he sees.
 - **Break something on purpose occasionally** — roughly every third lesson. Reading errors calmly is a skill worth building.
+- **Pair built-in methods with their from-scratch mechanism.** When introducing `.find()`, `.map()`, hooks, or similar abstractions, show the manual loop/step-by-step version alongside the shorthand, proactively — not just when asked. He said directly (2026-08-07): *"I prefer seeing the whole mechanism, it helps a lot."* His DSA background makes a loop land faster than an analogy.
 
 ## 🔴 Correct vague answers bluntly — "roughly right" is not right
 
