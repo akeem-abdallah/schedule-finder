@@ -47,6 +47,15 @@ function App() {
         setRows(rows.map((row) => row.id === id ? { ...row, [field]: value } : row))
     }
 
+    function addRow() {
+        const nextId = rows.length === 0 ? 1 : Math.max(...rows.map((r) => r.id)) + 1
+        setRows([...rows, { id: nextId, subject: "", code: "" }])
+    }
+
+    function removeRow(id) {
+        setRows(rows.filter((row) => row.id !== id))
+    }
+
     return (
         <>
             <h1>AURAK Schedule Finder</h1>
@@ -58,15 +67,17 @@ function App() {
 
                 return (
 
-                    <div key={row.id}>
-                    
-                        <select value={row.subject} onChange={(e) => updateRow(row.id, "subject", e.target.value) }>
+                    <div key={row.id} className="row">
+
+                        <p>Course:</p>
+                        <select value={row.subject} onChange={(e) => setRows(rows.map((r) => r.id === row.id ? { ...r, subject: e.target.value, code: "" } : r)) }>
                             <option value="">-- pick a subject --</option>
                             {subjects.map((s) => (
                                 <option key={s.subject} value={s.subject}>{s.subject}</option>
                             ))}
                         </select>
 
+                        <p>Code:</p>
                         <select value={row.code} onChange={(e) => updateRow(row.id, "code", e.target.value) }>
                             <option value="">-- pick a course --</option>
                             {courses.map((c) => (   
@@ -74,11 +85,14 @@ function App() {
                             ))}
                         </select>
 
+                        <button onClick={() => removeRow(row.id)}>Remove</button>
+
                     </div>
 
                 )
             })}
 
+            <button onClick={addRow}>+ Add</button>
 
         </> 
     )
