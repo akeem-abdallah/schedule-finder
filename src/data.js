@@ -10,15 +10,15 @@ export const subjects = [
                     {
                         section: "1", instructor: "Dr. Ahmed",
                         meetings: [
-                            { day: "Mon", start: "09:00AM", end: "10:15AM" },
-                            { day: "Wed", start: "09:00AM", end: "10:15AM" },
+                            { day: "Mon", start: "09:00", end: "10:15" },
+                            { day: "Wed", start: "09:00", end: "10:15" },
                         ],
                     },
                     {
                         section: "2", instructor: "Dr. Khan",
                         meetings: [
-                            { day: "Tue", start: "11:00AM", end: "12:15PM" },
-                            { day: "Thu", start: "11:00AM", end: "12:15PM" },
+                            { day: "Tue", start: "11:00", end: "12:15" },
+                            { day: "Thu", start: "11:00", end: "12:15" },
                         ],
                     },
                 ],
@@ -29,15 +29,15 @@ export const subjects = [
                     {
                         section: "1", instructor: "Dr. Jay",
                         meetings: [
-                            { day: "Tue", start: "10:30AM", end: "11:45AM" },
-                            { day: "Thu", start: "10:30AM", end: "11:45AM" },
+                            { day: "Tue", start: "10:30", end: "11:45" },
+                            { day: "Thu", start: "10:30", end: "11:45" },
                         ],
                     },
                     {
                         section: "2", instructor: "Dr. Bilal",
                         meetings: [
-                            { day: "Mon", start: "01:30PM", end: "02:45PM" },
-                            { day: "Wed", start: "01:30PM", end: "02:45PM" },
+                            { day: "Mon", start: "13:30", end: "14:45" },
+                            { day: "Wed", start: "13:30", end: "14:45" },
                         ],
                     },
                 ],
@@ -48,19 +48,19 @@ export const subjects = [
                     {
                         section: "1", instructor: "Dr. Omar",
                         meetings: [
-                            { day: "Mon", start: "09:00AM", end: "11:30AM" },
+                            { day: "Mon", start: "09:00", end: "11:30" },
                         ],
                     },
                     {
                         section: "2", instructor: "Dr. Emad",
                         meetings: [
-                            { day: "Tue", start: "03:00PM", end: "05:30PM" },
+                            { day: "Tue", start: "15:00", end: "17:30" },
                         ],
                     },
                     {
                         section: "3", instructor: "Dr. Adeel",
                         meetings: [
-                            { day: "Tue", start: "01:30PM", end: "04:00PM" },
+                            { day: "Tue", start: "13:30", end: "16:00" },
                         ],
                     },
                 ],
@@ -79,15 +79,15 @@ export const subjects = [
                     {
                         section: "1", instructor: "Dr. Farah",
                         meetings: [
-                            { day: "Mon", start: "09:00AM", end: "09:50AM" },
-                            { day: "Wed", start: "09:00AM", end: "09:50AM" },
+                            { day: "Mon", start: "09:00", end: "10:15" },
+                            { day: "Wed", start: "09:00", end: "10:15" },
                         ],
                     },
                     {
                         section: "2", instructor: "Dr. Nasser",
                         meetings: [
-                            { day: "Tue", start: "09:00AM", end: "10:15AM" },
-                            { day: "Thu", start: "09:00AM", end: "10:15AM" },
+                            { day: "Tue", start: "09:00", end: "10:15" },
+                            { day: "Thu", start: "09:00", end: "10:15" },
                         ],
                     },
                 ],
@@ -98,15 +98,15 @@ export const subjects = [
                     {
                         section: "1", instructor: "Dr. Layla",
                         meetings: [
-                            { day: "Mon", start: "11:00AM", end: "12:15PM" },
-                            { day: "Wed", start: "11:00AM", end: "12:15PM" },
+                            { day: "Mon", start: "11:00", end: "12:15" },
+                            { day: "Wed", start: "11:00", end: "12:15" },
                         ],
                     },
                     {
                         section: "2", instructor: "Dr. Hassan",
                         meetings: [
-                            { day: "Tue", start: "01:30PM", end: "02:45PM" },
-                            { day: "Thu", start: "01:30PM", end: "02:45PM" },
+                            { day: "Tue", start: "13:30", end: "14:45" },
+                            { day: "Thu", start: "13:30", end: "14:45" },
                         ],
                     },
                 ],
@@ -117,13 +117,13 @@ export const subjects = [
                     {
                         section: "1", instructor: "Dr. Salim",
                         meetings: [
-                            { day: "Wed", start: "02:00PM", end: "04:30PM" },
+                            { day: "Wed", start: "14:00", end: "16:30" },
                         ],
                     },
                     {
                         section: "2", instructor: "Dr. Rania",
                         meetings: [
-                            { day: "Thu", start: "02:00PM", end: "04:30PM" },
+                            { day: "Thu", start: "14:00", end: "16:30" },
                         ],
                     },
                 ],
@@ -142,15 +142,15 @@ export const subjects = [
                     {
                         section: "1", instructor: "Dr. Yousef",
                         meetings: [
-                            { day: "Mon", start: "10:00AM", end: "10:50AM" },
-                            { day: "Wed", start: "10:00AM", end: "10:50AM" },
+                            { day: "Mon", start: "10:00", end: "11:15" },
+                            { day: "Wed", start: "10:00", end: "11:15" },
                         ],
                     },
                     {
                         section: "2", instructor: "Dr. Huda",
                         meetings: [
-                            { day: "Tue", start: "09:00AM", end: "10:15AM" },
-                            { day: "Thu", start: "09:00AM", end: "10:15AM" },
+                            { day: "Tue", start: "09:00", end: "10:15" },
+                            { day: "Thu", start: "09:00", end: "10:15" },
                         ],
                     },
                 ],
@@ -161,15 +161,15 @@ export const subjects = [
                     {
                         section: "1", instructor: "Dr. Tariq",
                         meetings: [
-                            { day: "Mon", start: "01:00PM", end: "01:50PM" },
-                            { day: "Wed", start: "01:00PM", end: "01:50PM" },
+                            { day: "Mon", start: "13:00", end: "14:15" },
+                            { day: "Wed", start: "13:00", end: "14:15" },
                         ],
                     },
                     {
                         section: "2", instructor: "Dr. Sara",
                         meetings: [
-                            { day: "Tue", start: "11:00AM", end: "12:15PM" },
-                            { day: "Thu", start: "11:00AM", end: "12:15PM" },
+                            { day: "Tue", start: "11:00", end: "12:15" },
+                            { day: "Thu", start: "11:00", end: "12:15" },
                         ],
                     },
                 ],
@@ -180,14 +180,15 @@ export const subjects = [
                     {
                         section: "1", instructor: "Dr. Imran",
                         meetings: [
-                            { day: "Mon", start: "03:00PM", end: "04:15PM" },
-                            { day: "Wed", start: "03:00PM", end: "04:15PM" },
+                            { day: "Mon", start: "15:00", end: "16:15" },
+                            { day: "Wed", start: "15:00", end: "16:15" },
                         ],
                     },
                     {
                         section: "2", instructor: "Dr. Nour",
                         meetings: [
-                            { day: "Fri", start: "09:00AM", end: "11:30AM" },
+                            { day: "Tue", start: "09:00", end: "10:15" },
+                            { day: "Thu", start: "09:00", end: "10:15" },
                         ],
                     },
                 ],

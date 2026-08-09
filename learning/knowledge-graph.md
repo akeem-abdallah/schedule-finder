@@ -202,12 +202,20 @@ Shipped 2026-08-05. Full history with detailed evidence lives in
 <!-- Bridges to import { useState } from 'react' — same brace syntax, own file instead of a library -->
 
 ### time-conflict-detection
-- status: seed
+- status: practicing
 - depends-on: none
-- introduced: —
-- last-reviewed: —
-- evidence: —
-<!-- ⭐ His home turf. Give room, don't scaffold. Naive version first, optimise second -->
+- introduced: 2026-08-09
+- last-reviewed: 2026-08-09
+- evidence: pushed back on "home turf" framing (*"I only solved 15 neetcode questions"*), correctly — more scaffolding was used than the plan assumed. First attempt at the overlap logic was over-complicated (*"compare startA/startB, startA/endB, endA/startB, endA/endB"*). Guided to the "when do they NOT overlap" reframe, correctly derived both halves himself unprompted (`endA <= startB`, then the mirror `endB <= startA`). Said "yes" to understanding the OR→AND negation, but asked to explain it back, revealed real confusion (tried to negate the already-negated expression) — the "yes" was correctly not trusted. Rebuilt with concrete numbers (540–615 vs 660–735, etc.) instead of letters; then correctly predicted three real cases cold: a back-to-back non-conflict (touching boundaries, `615==615`), and after I over-compressed a same-day check into an ambiguous two-meeting example and he wrongly said "true", correctly predicted both a clean different-day non-conflict and a same-day conflict once the meetings were unambiguous. Confirmed both against the actual running function in the browser console. **Confirms the section 2 calibration prediction exactly:** his logic was right every time; every real mistake in the code itself was JavaScript syntax (`AND` instead of `&&`, missing `const` on four assignments) — named as such at the time
+<!-- Predicted split (design correct, JS syntax the friction) held up in practice -->
+
+### strict-mode-variable-declaration
+- status: practicing
+- depends-on: none
+- introduced: 2026-08-09
+- last-reviewed: 2026-08-09
+- evidence: wrote `startA = timeToMinutes(...)` with no `const`/`let` — never hit this before because he's always declared his variables. Asked what happens on that line, described what `timeToMinutes` computes (correct but not the question) rather than the missing-declaration issue — a real gap, not a vague dodge. Explained: ES modules run in strict mode, so assigning to an undeclared name throws `ReferenceError`, not a silent global. He then correctly added `const` to all four lines unprompted alongside adding the missing `return true`/`return false` — a correct fill-in, evidence enough for `practicing` even though the *why* wasn't explained back in his own words
+<!-- New leaf, not in original section 3 concept list -->
 
 ### bitmask-representation
 - status: seed

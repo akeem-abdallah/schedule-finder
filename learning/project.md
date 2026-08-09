@@ -16,7 +16,7 @@
 ## About me
 
 - **Akeem.** B.Sc. Computer Science at AURAK (Ras Al Khaimah, UAE).
-- **Strength: algorithms.** A-level CS, NeetCode 150. This project deliberately puts its hardest logic there.
+- **Strength: algorithms.** A-level CS. **Correction, 2026-08-09:** "NeetCode 150" overstated it — he's actually solved ~15 problems. Real foundation, but section 3 should get more scaffolding than "give him the problem and get out of the way" implied. Check in sooner, hint sooner.
 - **Goal:** AI/ML engineer long-term; a portfolio strong enough for general IT/junior roles now.
 - **Already shipped a full-stack app** — Eisenhower Matrix, `D:\Claude\eisenhower-matrix`, live on Render. HTML/CSS/JS, Flask, SQLite, REST API, 4 pytest tests, gunicorn, README. Nine sections in **6 days** against a 32-day budget. He can walk through it end to end unprompted.
 

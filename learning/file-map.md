@@ -28,7 +28,8 @@ Entries stay **one line** forever. They record *why a file exists*, not what's i
 
 ### /src
 - src/App.jsx — known (2026-08-07, extended 2026-08-08/09) — the root component; imports `subjects` from `data.js`, holds an editable array of subject/course dropdown rows (add/remove/submit), and validation (incomplete rows, duplicates), all written and debugged by Akeem → [[jsx]], [[react-components]], [[react-state]], [[controlled-inputs]], [[rendering-lists]], [[derived-state]], [[immutable-array-updates]], [[form-validation-with-array-methods]], [[named-exports]]
-- src/data.js — known (2026-08-09) — the fake `subjects` data, now with real `sections`/`meetings` (day + start/end time) to test conflicts against; CSCI written by Akeem, PHYS/MATH mirrored by the agent at his request once he'd established the pattern → [[named-exports]]
+- src/data.js — known (2026-08-09) — the fake `subjects` data, now with real `sections`/`meetings` (day + start/end time, 24-hour) to test conflicts against; CSCI written by Akeem, PHYS/MATH mirrored by the agent at his request once he'd established the pattern → [[named-exports]]
+- src/schedule.js — known (2026-08-09) — the algorithm module, kept separate from data and UI; `timeToMinutes` and `meetingsConflict` written by Akeem (skeleton + guidance from the agent) → [[time-conflict-detection]], [[strict-mode-variable-declaration]]
 - src/Course.jsx — known (2026-08-07) — a reusable component taking a course's `code`/`title` as props, authored by Akeem → [[react-components]], [[react-props]]
 - src/main.jsx — known (2026-08-07) — finds `<div id="root">` in `index.html` and tells React to render `App` into it; the one-time handoff from plain HTML to React. Wrapped in `StrictMode`, a dev-only double-run check → [[useeffect]]
 - src/App.css — known (2026-08-08) — a `.row` flexbox rule Akeem wrote to lay each dropdown row out horizontally, replacing the template's original (now-empty) styles

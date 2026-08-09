@@ -108,7 +108,7 @@ dropping one update (stale closure over `rows`).
 
 **Tasks:**
 - [x] 3.1 Expand the fake course data so each course has sections with real meeting times (day + start/end) — something to actually collide against
-- [ ] 3.2 Write the conflict check between two meetings — naive version, minutes-since-midnight range comparison
+- [x] 3.2 Write the conflict check between two meetings — naive version, minutes-since-midnight range comparison
 - [ ] 3.3 Backtracking generator — build valid section combinations one course at a time, pruning on conflict during generation, capped at ~50
 - [ ] 3.4 Bitmask optimisation — encode a section's weekly occupancy as a bitmask, replace the range comparison with `a & b`, measure against the naive version
 - [ ] 3.5 Weekly grid — CSS Grid shell for the calendar (days across, time down)
