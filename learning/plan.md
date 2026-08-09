@@ -75,7 +75,7 @@ If Akeem re-opens one of these himself, that's his call — engage with it. Just
 - [x] 2.3 Course dropdown that depends on the selected subject
 - [x] 2.4 Convert the two standalone state variables into an array of rows (`[{subject, code}]`), rendering one dropdown pair per row
 - [x] 2.5 "Add" button appends an empty row; "Remove" deletes one row from the middle
-- [ ] 2.6 "Submit" button reads all rows and shows the chosen courses
+- [x] 2.6 "Submit" button reads all rows and shows the chosen courses
 - [ ] 2.7 Commit — deliverable reached
 
 > **Design changed 2026-08-08 at Akeem's request.** Originally a browse-then-shortlist UI (pick one course,

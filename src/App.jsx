@@ -56,6 +56,31 @@ function App() {
         setRows(rows.filter((row) => row.id !== id))
     }
 
+    const [error, setError] = useState("")
+    const [submitted, setSubmitted] = useState(null)
+
+    const combos = rows.map((row) => row.subject + row.code)
+    const hasDuplicates = new Set(combos).size !== combos.length
+
+    function handleSubmit() {
+        setSubmitted(null)
+        const incomplete = rows.some((row) => row.subject === "" || row.code === "")
+        
+        if (rows.length === 0) {
+            setError("Please add at least one course")
+            
+        } else if (incomplete) {
+            setError("Please fill in all fields")
+
+        } else if (hasDuplicates) {
+            setError("Please remove all duplicates")
+
+        } else {
+            setError("")
+            setSubmitted(rows)
+        }
+    }
+
     return (
         <>
             <h1>AURAK Schedule Finder</h1>
@@ -93,6 +118,18 @@ function App() {
             })}
 
             <button onClick={addRow}>+ Add</button>
+
+            <button onClick={handleSubmit}>Submit</button>
+
+            {error && <p>{error}</p>}
+
+            {submitted && (
+                <ul>
+                    {submitted.map((row) => (
+                        <li key={row.id}>{row.subject} {row.code}</li>
+                    ))}
+                </ul>
+            )}
 
         </> 
     )

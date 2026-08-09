@@ -27,11 +27,13 @@ Entries stay **one line** forever. They record *why a file exists*, not what's i
 - public/ — parked — static assets served as-is (favicon, icon sprite); not toured in depth
 
 ### /src
-- src/App.jsx — known (2026-08-07) — the root component; holds the fake `subjects` data and the cascading subject/course dropdowns, all written and debugged by Akeem → [[jsx]], [[react-components]], [[react-state]], [[controlled-inputs]], [[rendering-lists]], [[derived-state]]
+- src/App.jsx — known (2026-08-07, extended 2026-08-08/09) — the root component; holds the fake `subjects` data, an editable array of subject/course dropdown rows (add/remove/submit), and validation (incomplete rows, duplicates), all written and debugged by Akeem → [[jsx]], [[react-components]], [[react-state]], [[controlled-inputs]], [[rendering-lists]], [[derived-state]], [[immutable-array-updates]], [[form-validation-with-array-methods]]
 - src/Course.jsx — known (2026-08-07) — a reusable component taking a course's `code`/`title` as props, authored by Akeem → [[react-components]], [[react-props]]
 - src/main.jsx — known (2026-08-07) — finds `<div id="root">` in `index.html` and tells React to render `App` into it; the one-time handoff from plain HTML to React. Wrapped in `StrictMode`, a dev-only double-run check → [[useeffect]]
-- src/App.css, src/index.css — parked — styling shipped by the Vite template, untouched so far
-- src/assets/ — parked — template image assets (logos, hero image); likely deleted once real styling starts
+- src/App.css — known (2026-08-08) — a `.row` flexbox rule Akeem wrote to lay each dropdown row out horizontally, replacing the template's original (now-empty) styles
+- src/index.css — parked — emptied of template styles, not yet replaced with anything real
+- src/assets/ — deleted 2026-08-07 (template image assets, no longer applicable)
+- .vs/ — generated — Visual Studio's own project cache/index; gitignored, never tracked, machine-rebuildable. Locks a file while VS is open, which crashed both Vite's dev server and `git add` until both were told to ignore it
 
 Nothing else exists yet.
 
