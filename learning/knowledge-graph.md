@@ -193,6 +193,38 @@ Shipped 2026-08-05. Full history with detailed evidence lives in
 
 ## Section 3 — The algorithm and the grid
 
+### controlled-checkboxes
+- status: practicing
+- depends-on: controlled-inputs
+- introduced: 2026-08-09
+- last-reviewed: 2026-08-09
+- evidence: built the section-picker checkbox list. First pass had several real mistakes at once — `customizingCourse.subjects` (wrong field name, should be `.sections`), no `key` on the mapped `<label>`, `onChange={}` (empty, invalid), and label text placed inside `<input>...</input>` (an `<input>` is a void element, can't wrap children). Corrected each once named individually, including recalling unprompted that `<input>` needed to self-close once told it was a void element like `<img>`. Correctly identified `key={s.section}` himself when asked to recall the pattern from his own `<option>` dropdowns rather than being told directly
+<!-- Not in original section 3 concept list — added when the section picker became a task -->
+
+### jsx-fragments
+- status: practicing
+- depends-on: rendering-lists
+- introduced: 2026-08-09
+- last-reviewed: 2026-08-09
+- evidence: 🔴 real struggle. Wrote `{rows.map(...)} <div>...</div>` as two siblings inside plain `{}`, which isn't valid — `{}` in JSX is a single-value slot, not a multi-child container the way `<>...</>` is. My own instruction to "swap `{` for `<>`" was imprecise (there was no matching `}` to swap, a `</>` needed inserting), which contributed to a second break when he tried to apply it himself and deleted a brace the `.map()` call actually needed. Once both were fixed and explained precisely, he independently and correctly wrapped a new 3-sibling block (Back button, header, checkbox list) in `<>...</>` **without being told to** later in the same session — strong proactive-application evidence, not just following an instruction
+<!-- Not in original section 3 concept list -->
+
+### array-reference-equality
+- status: introduced
+- depends-on: none
+- introduced: 2026-08-09
+- last-reviewed: 2026-08-09
+- evidence: wrote `row.sections === []`, which is always `false` since `===` on arrays checks identity (same object in memory), not contents — `[]` on the right creates a brand-new array every time. Said *"idk"* when asked to predict the result rather than guessing. Given the real mechanism (identity vs. value comparison, contrasted with `.length === 0` which he'd already used correctly one line above) and correctly applied the fix on the first attempt afterward, including separately catching and fixing an inverted ternary branch order in the same line on his own once asked to trace both cases by hand. Capped at `introduced` since the mechanism was told, not self-derived — good candidate for a cold re-check
+<!-- Not in original section 3 concept list -->
+
+### array-membership-toggle
+- status: practicing
+- depends-on: immutable-array-updates
+- introduced: 2026-08-09
+- last-reviewed: 2026-08-09
+- evidence: 🔴 hardest struggle of the session. First attempt at the checkbox toggle handler was a garbled, unparseable mix of `.find()`/`.filter()`/ternary with mismatched parens — immediately followed by *"idk what im doing"*, a full stop-and-rebuild. Rebuilt entirely in plain language with concrete array traces (`["1"]` + click "2" → `["1","2"]`; then click "1" → `["2"]`), including a genuine and well-reasoned tangent question about whether `checked` and the toggle logic could desync (answered by tying back to `controlled-inputs`: the array is the only source of truth for both, so they can't drift apart). After the rebuild, correctly and unprompted stated the rule himself: *"if the section is already in the array, filter it out. if its not in the array, add it in."* Translating to code, made one further mistake — wrote `{s.section}` (JSX-embedding habit) inside a plain array literal instead of the bare value — self-corrected once told the `{}` was building an invalid object, not embedding a value. Real, hard-won understanding by the end of a difficult stretch
+<!-- Not in original section 3 concept list -->
+
 ### named-exports
 - status: introduced
 - depends-on: none

@@ -109,11 +109,12 @@ dropping one update (stale closure over `rows`).
 **Tasks:**
 - [x] 3.1 Expand the fake course data so each course has sections with real meeting times (day + start/end) — something to actually collide against
 - [x] 3.2 Write the conflict check between two meetings — naive version, minutes-since-midnight range comparison
-- [ ] 3.3 Backtracking generator — build valid section combinations one course at a time, pruning on conflict during generation, capped at ~50
-- [ ] 3.4 Bitmask optimisation — encode a section's weekly occupancy as a bitmask, replace the range comparison with `a & b`, measure against the naive version
-- [ ] 3.5 Weekly grid — CSS Grid shell for the calendar (days across, time down)
-- [ ] 3.6 Wire it together — Generate button, render a combination into the grid, page through results
-- [ ] 3.7 Commit — deliverable reached
+- [x] 3.3 Section picker — box-per-course main view with a summary line, a "Customize" panel per course (checkbox list of its sections, Back), row state gains a `sections` array (unplanned addition, added 2026-08-09 at Akeem's request)
+- [ ] 3.4 Backtracking generator — build valid section combinations one course at a time, pruning on conflict during generation, capped at ~50
+- [ ] 3.5 Bitmask optimisation — encode a section's weekly occupancy as a bitmask, replace the range comparison with `a & b`, measure against the naive version
+- [ ] 3.6 Weekly grid — CSS Grid shell for the calendar (days across, time down)
+- [ ] 3.7 Wire it together — Generate button, render a combination into the grid, page through results
+- [ ] 3.8 Commit — deliverable reached
 
 **Notes for the lesson:**
 - ⭐ **This is Akeem's home turf** (NeetCode 150, A-level CS). Give him much more room here than elsewhere — describe the problem and let him solve it. Scaffolding this section would waste the one part he's best equipped for.
