@@ -65,7 +65,7 @@ If Akeem re-opens one of these himself, that's his call — engage with it. Just
 >
 > Context, if he asks whether picking React was a mistake — he asked twice on 2026-08-06 after seeing generic advice online: **no.** He built a full app in plain JS first, deliberately, and personally hit the bug React exists to prevent (manually syncing DOM and data, and losing track). The prerequisite is done.
 
-### 2. The interactive shortlist  [ ] not started
+### 2. The interactive shortlist  [x] done 2026-08-09
 **Deliverable:** Pick a subject, pick a course, add it to your list, remove it — all working, with made-up data.
 **Concepts:** react-state, event-handling-in-react, controlled-inputs, rendering-lists, derived-state
 
@@ -76,7 +76,16 @@ If Akeem re-opens one of these himself, that's his call — engage with it. Just
 - [x] 2.4 Convert the two standalone state variables into an array of rows (`[{subject, code}]`), rendering one dropdown pair per row
 - [x] 2.5 "Add" button appends an empty row; "Remove" deletes one row from the middle
 - [x] 2.6 "Submit" button reads all rows and shows the chosen courses
-- [ ] 2.7 Commit — deliverable reached
+- [x] 2.7 Commit — deliverable reached
+
+**What actually shipped:** editable subject/course dropdown rows with `+ Add` and per-row `Remove`, a
+`Submit` that validates four cases (no rows / incomplete row / duplicate course / success) and lists the
+chosen courses. Flexbox row layout in `App.css`. Two real bugs found and fixed by Akeem: `Math.max()`
+returning `-Infinity` on an empty array (duplicate ids), and two `updateRow` calls in one handler silently
+dropping one update (stale closure over `rows`).
+
+**Concepts actually covered** — the planned five, plus two unplanned:
+`immutable-array-updates` and `form-validation-with-array-methods` (`.some()`, `Set`, `.filter()`).
 
 > **Design changed 2026-08-08 at Akeem's request.** Originally a browse-then-shortlist UI (pick one course,
 > click Add, it joins a list). He replaced it with **N editable dropdown pairs**: "Add" spawns another
@@ -97,6 +106,15 @@ If Akeem re-opens one of these himself, that's his call — engage with it. Just
 **Deliverable:** Click Generate and page through valid schedule combinations on a weekly calendar. **The working tool — just with fake courses.**
 **Concepts:** time-conflict-detection, bitmask-representation, backtracking-with-pruning, result-capping, css-grid-layout
 
+**Tasks:**
+- [x] 3.1 Expand the fake course data so each course has sections with real meeting times (day + start/end) — something to actually collide against
+- [ ] 3.2 Write the conflict check between two meetings — naive version, minutes-since-midnight range comparison
+- [ ] 3.3 Backtracking generator — build valid section combinations one course at a time, pruning on conflict during generation, capped at ~50
+- [ ] 3.4 Bitmask optimisation — encode a section's weekly occupancy as a bitmask, replace the range comparison with `a & b`, measure against the naive version
+- [ ] 3.5 Weekly grid — CSS Grid shell for the calendar (days across, time down)
+- [ ] 3.6 Wire it together — Generate button, render a combination into the grid, page through results
+- [ ] 3.7 Commit — deliverable reached
+
 **Notes for the lesson:**
 - ⭐ **This is Akeem's home turf** (NeetCode 150, A-level CS). Give him much more room here than elsewhere — describe the problem and let him solve it. Scaffolding this section would waste the one part he's best equipped for.
 - **Correct order: make it work, then make it fast.** Start with the naive version — represent times as minutes-since-midnight, compare ranges. Get correct results. *Then* introduce bitmasks as an optimisation he can measure against the naive version.
@@ -108,6 +126,29 @@ If Akeem re-opens one of these himself, that's his call — engage with it. Just
   - **After** he has a working generator, reading their source is genuinely useful — comparing two solutions to the same problem is good learning. The rule is time-bound, not permanent.
   - **Why:** the combination algorithm is the one piece of this project he is best equipped to solve alone (NeetCode 150, A-level CS). Seeing a finished solution first spends that for nothing.
 - The weekly grid is CSS Grid — he did a 2×2 grid last project, this is the same property at larger scale.
+
+> #### 🎯 Calibration from section 2 (2026-08-09) — read this before starting
+> Section 2 gave a sharp, evidence-backed read on where the difficulty will actually sit here.
+>
+> **The algorithm will not be the hard part. The JavaScript will be.** Asked how to detect duplicate
+> courses, he answered *"use a hash set to track seen ones"* instantly, unprompted — then wrote the check
+> and wired it in himself, first try. Fastest, cleanest thing he did all session. In the *same session* he
+> needed two full teardowns of `.map()` and three separate passes on spread (`...`).
+>
+> **So expect this split:** he designs the backtracking correctly in plain terms within minutes, then
+> loses real time to array/closure/spread syntax while implementing it. **Name which layer he's stuck on,
+> out loud, every time** — *"this is JavaScript, not the algorithm"* — because conflating the two will
+> make him think he's bad at the one thing he's genuinely excellent at.
+>
+> **Give him the problem statement and get out of the way.** Do not scaffold the search. Where he'll need
+> help is turning correct pseudocode into working JS — help there, not with the logic.
+>
+> **Shaky going in, worth one cold review question first:** spread (`...`) — three passes and he still
+> opened the next-day recall with a vague *"it makes a copy out of something."* Closures were also not
+> recalled unprompted from project #1, and backtracking leans on them.
+>
+> **Solid now, no need to re-teach:** `.map()`, `.filter()`, `.find()`, `.some()`, `Set`, ternaries,
+> `key`, immutable array updates, React state and what triggers a re-render.
 
 ### 4. The parser  [ ] not started
 **Deliverable:** A Python script that prints 700 real courses pulled from AURAK's live schedule page.

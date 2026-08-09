@@ -26,7 +26,9 @@ After that project his knowledge graph sat almost entirely at `practicing`. **Ex
 
 **Comfortable:** Python basics, Flask routes, SQL (SQLite), REST/JSON, `fetch`, DOM manipulation, CSS (a full from-scratch redesign), git/GitHub, pytest basics, deploying to Render.
 
-**Never touched:** React, FastAPI, PostgreSQL as a server, any ORM, migrations, scheduled jobs, deploying more than one service, CORS, environment secrets (he has only used `$PORT`, which isn't sensitive).
+**Never touched:** FastAPI, PostgreSQL as a server, any ORM, migrations, scheduled jobs, deploying more than one service, CORS, environment secrets (he has only used `$PORT`, which isn't sensitive).
+
+**React, as of 2026-08-09** (sections 1–2 done — this supersedes "never touched"): components, props, JSX, `useState`, controlled inputs, event handlers, rendering lists with `key`, derived vs. stored state, and immutable array updates — all at `practicing`. He has built a working multi-row form with validation. **The gap that remains is plain JavaScript, not React** — spread (`...`), closures, and arrow-function syntax are what actually slow him down. See the section 3 calibration note in `plan.md`.
 
 **Weak spots to watch for:**
 - **Confuses GitHub / live / localhost URLs.** Three similar-looking things meaning different things — cost several passes on the last README.
@@ -71,7 +73,7 @@ An AURAK student who has never met Akeem opens a link on their phone during regi
 - **Raise refresh to ~30 min** during registration week
 
 ### Parking lot (v2+)
-Displaying seat counts (prefer coarse **Open / Almost full / Full**) · accounts and saved schedules · no-8am filter · days-off preference · instructor preference · sharing a schedule · calendar export · multiple semesters · mobile polish
+Displaying seat counts (prefer coarse **Open / Almost full / Full**) · accounts and saved schedules · no-8am filter · days-off preference · instructor preference · sharing a schedule · calendar export · multiple semesters · mobile polish · **error messages as a popup that fades out** (his idea, 2026-08-09 — parked because it needs `setTimeout`, not yet taught; plain inline message for now)
 
 ---
 
@@ -194,6 +196,21 @@ Earned across two projects. These worked. Please don't rediscover them the hard 
 
 - **He writes every line of code himself.** Explain the concept and the shape in plain language; he writes it. **No skeleton files with `TODO(you)` blanks** above `seed` level. He asked for this directly after saying *"I feel like I'm not learning, you're just doing stuff for me."*
 - **Watch the file for his save by polling.** Never ask him to paste code into chat, and don't rely on him saying "done" — he has said "done" when nothing saved. He asked for this repeatedly (*"you're not watching"*, *"I want you to always watch"*) and shouldn't have to ask again. ⚠️ It slipped a *third* time on 2026-08-07 — said "save and I'll check" without arming the poll. He caught it: *"you're still not checking, please fix yourself."* **The fix: arm the watch in the same turn as the write instruction, every time — never say "I'll check" as a promise for later.**
+  - **Use the `Monitor` tool with a live elapsed-time counter — and say NOTHING between ticks.** Settled 2026-08-09 after three attempts. What he wants to see is a running clock proving the watch is alive:
+    ```
+    Polling for a save (0min 15sec)
+    Polling for a save (0min 30sec)
+    ```
+    ⚠️ **The thing that ruined this before was not the counter — it was the agent replying to every tick** with "(still watching)", which is what filled his screen and made him send a screenshot asking *"can you please fix this, what are you doing."* Each Monitor stdout line arrives as a task notification; **do not answer them.** Emit no text between ticks. The counter lines display themselves.
+  ```bash
+  f="path/to/file"; orig=$(stat -c %Y "$f"); s=0
+  while [ $s -lt 300 ]; do sleep 15; s=$((s+15))
+    cur=$(stat -c %Y "$f")
+    if [ "$cur" != "$orig" ]; then echo "Saved after $((s/60))min $((s%60))sec"; exit 0; fi
+    echo "Polling for a save ($((s/60))min $((s%60))sec)"
+  done; echo "No save detected after 5 min"
+  ```
+- **He edits the file between turns without being asked.** He adds comments in his own words, tries extra edge cases, reverts things to see what happens. **Always `Read` the file before responding to "done" or "I saved it"** — don't assume it matches what you last dictated. On 2026-08-09 he added a whole fourth validation branch (`rows.length === 0`) on his own initiative.
 - **Predict before running.** Ask what he expects, then run it. Wrong predictions are the best teaching moments and he handles them well.
 - **One question at a time.** Free recall in plain chat, never multiple choice.
 - **He runs the commands himself** in his own terminal and reports what he sees.
@@ -230,6 +247,27 @@ When he answers a check, grade it precisely:
 
 Protect his willingness to say it. It's rarer than it should be, and it's the reason he actually learns rather than accumulating working code he can't account for.
 
+### ⚠️ It arrives *after* the task looks finished — watch for it there
+
+Both times on 2026-08-08 it came **immediately after working code and a passed check**, not during the struggle:
+
+- *"I honestly didn't understand anything in rows.map((row) => {"* — said right after 2.4 was marked done, tested green in the browser
+- *"I dont understand ANYTHING that happened in 2.3, genuinely"* — after several "yes" answers in a row
+
+**So a string of "yes" answers is not evidence.** He will say yes to each small step and still not have the whole. Two habits that catch it earlier:
+1. After the incremental yeses, ask him to **explain the assembled thing back**, not just confirm the last piece.
+2. **Don't close a task on "yes" alone.** A prediction he gets right, or a bug he diagnoses, is worth more than five confirmations.
+
+Budget for the teardown — it took a second full pass on the same day, twice. That is normal for him and it works; the understanding was real by the end.
+
+### How he asks for depth — escalate concreteness, don't restate
+
+A recurring ladder this session. Each rung means *the previous form didn't land*, so **change the form, don't repeat it louder**:
+
+> analogy → *"give me an example"* → *"rewrite the function normally"* → *"show me the difference with and without"* → *"explain more, this is too short"* → **the real mechanism, real API names**
+
+Jumping straight to the concrete rungs saves everyone time. See the `.find()` sequence (analogy → named function → hand-written `for` loop) and the `key` sequence (name-tag analogy → rejected → pseudocode → **rejected hard** → React's real `Map.get()`/`.delete()` reconciler, accepted).
+
 ## Communication
 
 - **Terse. Blunt is preferred.** Give a recommendation, not an exhaustive survey. He'll ask for alternatives if he wants them.
@@ -238,6 +276,11 @@ Protect his willingness to say it. It's rarer than it should be, and it's the re
 - **He changes his mind, pushes back, and is often right.** He killed the Django decision by noticing the MVP needs no accounts, and he was correct. Treat pushback as signal, not friction.
 - **He escalates the model when he wants deeper thinking** — respond by actually thinking harder, not by writing more.
 - **Commit messages: he writes them himself.** He asked once for them to be written for him; that was declined with a reason and he accepted. Give git commands as a **single PowerShell line** with `;` separators — he asked for copy-paste-ready one-liners.
+- **🔴 End EVERY completed task with the commit line — unprompted, no exceptions.** Not just at section deliverables. He noticed it being skipped mid-session on 2026-08-08 and escalated the model over it: *"you also stopped asking me to commit, I noticed you're drifting off, I set you to opus 5 to correct yourself."* Then: *"give me the commit line, I want it every single time."* The exact shape he wants:
+  ```powershell
+  git add -A; git commit -m "YOUR MESSAGE HERE"
+  ```
+- **He escalates the model when the method slips, and he is usually right about *why*.** Twice on 2026-08-08. Treat a mid-session model switch as a bug report about process discipline, not a request for longer answers — go re-read the slipped rule and fix it, don't write more.
 - **🚫 Do not raise Netcraft Plus.** Not a project anchor, not a framing device, not a scheduling constraint. He asked several times, and finally: *"forget about netcraft plus, I beg."*
 
 ## Verify before scoping — this repeatedly paid off
@@ -260,6 +303,9 @@ Twice in one day, a five-minute check caught something that would have cost days
 - Skipping predict-before-run
 - Marking a concept `understood` the same day it was introduced (never correct — cap first contact at `practicing`)
 - Long option surveys where a recommendation was asked for
+- **Not giving the commit line at the end of a task** — he caught this one himself and escalated over it
+- **Closing a task on a run of "yes" answers** with no prediction, explain-back, or bug diagnosed
+- **Answering a second "I don't get it" with the same explanation reworded** instead of dropping to a more concrete form
 
 ## Environment gotchas (Windows 11)
 

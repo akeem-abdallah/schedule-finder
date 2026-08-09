@@ -1,42 +1,7 @@
 import './App.css'
 import Course from './Course'
 import { useState } from 'react'
-
-const subjects = [
-
-    {
-        subject: "CSCI",
-        courses: [
-
-            { code: "104", description: "Introduction to Computing" },
-            { code: "112", description: "Introduction to Computer Programming" },
-            { code: "113", description: "Introduction to Computer Programming Lab" },
-
-        ],
-    },
-
-    {
-        subject: "PHYS",
-        courses: [
-
-            { code: "095", description: "Introductory Physics" },
-            { code: "110", description: "University Physics I" },
-            { code: "111", description: "University Physics I Lab" },
-
-        ],
-    },
-
-    {
-        subject: "MATH",
-        courses: [
-
-            { code: "095", description: "Precalculus" },
-            { code: "113", description: "Calculus I" },
-            { code: "114", description: "Calculus II" },
-
-        ],
-    },
-]
+import { subjects } from './data'
 
 // rerun when a state setter is called. example: "setSelectedSubject"
 function App() {

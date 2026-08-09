@@ -193,6 +193,14 @@ Shipped 2026-08-05. Full history with detailed evidence lives in
 
 ## Section 3 — The algorithm and the grid
 
+### named-exports
+- status: introduced
+- depends-on: none
+- introduced: 2026-08-09
+- last-reviewed: 2026-08-09
+- evidence: when `subjects` was pulled out of `App.jsx` into its own `data.js` (`export const subjects = [...]`), asked what would happen with `import subjects from './data'` (no braces) instead of the named-export form actually used. Answered *"idk"* — honest, no guess offered. Given the real mechanism: no-braces asks for the *default* export, `data.js` has none, so `subjects` comes back `undefined` and the first `.map()`/`.find()` on it crashes. Contrasted with `Course.jsx`'s `export default Course`, which is why that import has no braces. He then confirmed the app still ran correctly with the actual (correct) import, but that's behavioural confirmation, not an explanation in his own words — capped at `introduced`, good re-check candidate next session
+<!-- Bridges to import { useState } from 'react' — same brace syntax, own file instead of a library -->
+
 ### time-conflict-detection
 - status: seed
 - depends-on: none
