@@ -78,15 +78,6 @@ If Akeem re-opens one of these himself, that's his call — engage with it. Just
 - [ ] 2.6 "Submit" button reads all rows and shows the chosen courses
 - [ ] 2.7 Commit — deliverable reached
 
-> **First thing next session:** decide and fix the `updateRow` inconsistency. Right now the code select
-> uses `updateRow(id, field, value)` (single field), but the subject select bypasses it entirely with an
-> inline `setRows(rows.map(...))` that sets two fields at once (needed to reset `code` when `subject`
-> changes — two separate `updateRow` calls silently drop one update due to stale-closure `rows`, verified
-> live 2026-08-08). Akeem's own framing: **"we need to always use updateRow, or just don't use it at
-> all."** Two real options — refactor `updateRow(id, changes)` to take an object (so both call sites use
-> it uniformly), or delete `updateRow` and inline `setRows(rows.map(...))` everywhere. Pick one, don't
-> leave it split.
-
 > **Design changed 2026-08-08 at Akeem's request.** Originally a browse-then-shortlist UI (pick one course,
 > click Add, it joins a list). He replaced it with **N editable dropdown pairs**: "Add" spawns another
 > empty subject+course pair, every pair stays editable, and "Submit" is when the selections get used.
