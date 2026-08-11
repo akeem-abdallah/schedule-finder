@@ -153,36 +153,75 @@ dropping one update (stale closure over `rows`).
 > **Solid now, no need to re-teach:** `.map()`, `.filter()`, `.find()`, `.some()`, `Set`, ternaries,
 > `key`, immutable array updates, React state and what triggers a re-render.
 
-### 4. Making it feel real  [ ] not started
-**Deliverable:** The app works on a phone, looks like a real tool rather than a prototype, and can filter out the classes a student doesn't want.
-**Concepts:** responsive-design, css-design-tokens, settimeout-and-cleanup, toast-notifications, deferred-rendering, localstorage-persistence, section-level-filtering
+### 4. Usable on a phone  [ ] not started
+**Deliverable:** A live URL you can open on your own phone and actually use, with the rough edges filed off.
+**Concepts:** responsive-design, settimeout-and-cleanup, toast-notifications, deferred-rendering, event-listener-cleanup
 
 > **Added 2026-08-11, at Akeem's request** — his reasoning: finish the frontend while React context is still loaded, rather than switching to Python for sections 5–7 and coming back cold. Sound argument, and it also unparks the fade-out error popup idea he had on 2026-08-09 (parked at the time because it needed `setTimeout`, which hadn't been taught).
 
-**Scope, re-sorted 2026-08-11** after Akeem asked for an honest sort. The sorting test used: *does this change whether a student can use the tool, or does it just look better?*
+> ✂️ **Cut down 2026-08-11, same day it was created.** It grew to ~12 items across three rounds of scoping; Akeem then said plainly *"I feel like section 4 is too much"* — and he was right. The deadline math: ~20 days to semester, and sections 5–10 (parser, Postgres, SQLAlchemy, Alembic, FastAPI, CORS, tests, deployment) are where this project's actual learning goals live. Spending a third of the remaining time on polish against fake data was the wrong trade.
+>
+> **The specific insight worth keeping:** every item on the original list had a clear "done" *except styling/design tokens*. Design is open-ended — it can quietly eat a section without ever finishing. That was the real sprawl risk, not the item count.
 
-**In:** mobile/responsive · basic styling (design tokens as a refactor *during* styling, not upfront) · "clear all" · toast errors · loading state · localStorage persistence · footer · **the time-window filter** (pulled forward from v1.1) · **early Vercel deploy** · disabled pagination at boundaries · first-run hint line · arrow-key paging.
-**Out:** total credits (→ after section 5 — hand-adding fake credits to a dozen courses is throwaway work when the parser reads the real "No. of Credits" column two sections later) · button icons (cosmetic, and an icon package is a rabbit hole — do last or drop) · header (an `<h1>` already exists; adds nothing).
-**Still v1.1:** excluded-days and break-window filters, and the rest of the panel.
-**Considered and parked:** a download/screenshot button — needs a rendering library, and the phone's own screenshot already works.
+**In (this is the whole section — ~2 days):**
+1. **Early Vercel deploy** — first, before the mobile work
+2. **Mobile/responsive** — the one genuinely blocking item
+3. **Three tiny fixes** — "clear all" · disabled Previous/Next at boundaries · first-run hint line
+4. **Toast errors + loading state** — one lesson, same mechanism
+5. **Arrow-key paging** — same cleanup discipline as the toast, practiced twice
 
-⚠️ **This is a large section — roughly 12 items.** Akeem chose the scope deliberately across two rounds (2026-08-11), with the ~20-days-to-semester constraint named. Three of the four late additions are genuinely tiny (disabled buttons, hint line, arrow keys); the Vercel deploy is the only substantial one. Don't re-litigate it, but don't let it sprawl further either.
+**Moved out, nothing dropped:** full styling/design-token pass → v1.1 · localStorage persistence → v1.1 · time-window filter → v1.1 (rejoining the rest of the filter panel) · total credits → v1.1 · button icons → parking lot · header → parking lot · download/screenshot button → parking lot.
 
 **Notes for the lesson:**
-- ⚠️ **Named going in: this polishes against *fake* data.** Real AURAK data has much longer descriptions ("Arabic Language and Culture for Non-Native Learners I"), ~700 rows, and many more subjects. The CSS *structure* will survive section 7's swap to real data; some tuning (block text overflow, dropdown length) will need revisiting. Accepted cost, not a surprise.
-- 🔑 **Mobile is the only genuinely blocking item.** `project.md` says "usable on a phone," and `body { padding: 24px 450px 0 450px }` currently makes the app unusable below ~1000px wide. Everything else in this section is either learning value or polish.
-- ⭐ **Why the time-window filter is here and not in v1.1:** "no classes before 9am" is worth more to a real AURAK student than everything else in this section except mobile — it's the feature students would tell each other about. It's also cheap: section-level, so it prunes each course's candidate list *before* generation (making the search faster, not slower), and the overlap check already exists.
-- **The toast is where `setTimeout` lands** — his first timer, and the first place cleanup matters (a toast dismissed early shouldn't have a stale timer firing later). Product-wise it's pure polish (the inline error already works); the real payoff is that `setTimeout` + cleanup is the exact mental model `useEffect` needs in section 7. Buying a section-7 concept early, at a discount.
+- 🔑 **Mobile is the only genuinely blocking item.** `project.md` says "usable on a phone," and `body { padding: 24px 450px 0 450px }` currently makes the app unusable below ~1000px wide. Do the *minimum that stops it being broken on a phone* — resist turning this into the full design pass that just got deferred.
+- 🚀 **Vercel deploy goes first, before the mobile work.** The reason is specific, not "ship early": a desktop browser's device emulator misrepresents touch targets, font rendering, and how the grid feels under a thumb. A live URL makes the mobile work testable on his actual phone instead of guesswork. It also splits section 9's deployment into an easy half (static frontend — no env vars, no CORS, no backend) and a hard half. **Section 9 already updated to expect this.**
+- **The toast is where `setTimeout` lands** — his first timer, and the first place cleanup matters (a toast dismissed early shouldn't have a stale timer firing later). Product-wise it's pure polish (the inline error already works); the real payoff is that `setTimeout` + cleanup is the exact mental model `useEffect` needs in section 7. Buying a section-7 concept early, at a discount — which is why it survived the cut.
 - ⚠️ **The loading state needs deferred rendering, not just a label.** Akeem's first instinct (2026-08-11) was that a plain label set before generation would show. It won't — React batches state updates, so the handler runs to completion before any repaint and `loading` goes true→false unpainted. Needs `setTimeout(..., 0)` around the generation so the handler returns and React paints first. He accepted the correction. **Worth more than it looks:** since he declined the result cap, a large shortlist could freeze the page, and this is the only thing distinguishing "thinking" from "broken."
-- **Design tokens as a refactor, not a first task** — extract `--color-primary` etc. once the styling work makes the repetition visible. Naming colors before choosing them is backwards.
+- **Arrow keys pair deliberately with the toast** — a `keydown` listener on `window` needs the same cleanup discipline as `setTimeout`. Teach it as the same idea seen twice, not as a new concept.
+- **Disabled Previous/Next is closer to a real bug than polish.** At "1 of 9", Previous silently does nothing — the bounds check works but gives no feedback, which reads as broken. Tiny fix, and it surfaces his existing `setIndex` bounds logic in the UI.
+- **First-run hint line** — a cold visitor sees one empty dropdown row and no explanation. One sentence orients them. Matters disproportionately because the goal is *real student adoption*, and adoption fails at first contact more than anywhere else.
 - He's driven every design decision in section 3 himself (chip vs. panel layouts, centering, hour-label placement, color-coding). **Give him the same room here** — describe mechanisms, let him make the calls.
-- 🚫 **No AURAK logo or branding** (`project.md`). He clarified he meant button icons, not a logo, so this isn't at risk — just don't let it drift. The footer is the natural home for the disclaimer section 10 requires.
+- 🚫 **No AURAK logo or branding** (`project.md`).
 
-**The four additions (all agreed 2026-08-11):**
-- 🚀 **Early Vercel deploy — do this *before* the mobile work, not after.** The reason is specific and not "ship early": a desktop browser's device emulator misrepresents touch targets, font rendering, and how the grid feels under a thumb. A live URL makes the mobile work testable on his actual phone instead of guesswork. Also splits section 9's deployment into an easy half (static frontend — no env vars, no CORS, no backend) and a hard half, rather than meeting all of it at once at the end. **Section 9 must be updated to say the Vercel deploy is already done** — see its notes.
-- **Disable Previous/Next at the boundaries.** At "1 of 9", Previous silently does nothing — the bounds check works but gives no feedback, which reads as broken. Closer to a real bug than to polish. Tiny fix (`disabled` attribute), and it makes the existing `setIndex` bounds logic visible in the UI.
-- **First-run hint line.** A cold visitor sees one empty dropdown row and no explanation. One sentence ("Pick your courses, get every schedule where nothing clashes") orients them. Matters disproportionately because the stated goal is *real student adoption*, and adoption fails at first contact more than anywhere else.
-- **Arrow keys for paging.** Left/right between schedules. Pairs deliberately with the toast lesson: a `keydown` listener on `window` needs the same cleanup discipline as `setTimeout`, so the concept gets practiced twice in one section instead of once. Teach it as the same idea, not a new one.
+> #### 🎯 Calibration from section 3 (2026-08-11) — read this before starting
+> Section 3 was the biggest section so far (9 tasks, 3 days, the whole algorithm + grid). What it showed:
+>
+> **The section-2 prediction held exactly: his logic is right, his syntax isn't.** He designed the
+> backtracking correctly, predicted combination counts with correct reasoning (*"3x2 = 6"*), derived the
+> overlap condition himself, and diagnosed real layout bugs unprompted. Every genuine loss of time was
+> plain JavaScript: a missing `Math.` prefix, an array passed where a scalar was needed, a nested
+> `timeToMinutes(timeToMinutes(...))` that would have crashed, `&&` vs `&`, `{}` vs `<>`.
+> **Keep naming which layer he's stuck on, out loud.**
+>
+> **Concrete numbers rescue him; more explanation does not.** Every recovery in this section came from
+> dropping to real values — `timeToMinutes("10:15")` → `615` → `Math.floor(615/60)` → `10`; a toy 8-slot
+> bitmask; `countdown(3)` traced call by call. Abstract re-explanation reliably failed first. When he says
+> he's lost, **shrink the example, don't expand the prose.**
+>
+> ⚠️ **"I don't understand" still arrives *after* things work.** It happened twice in section 3, both times
+> after a task was already marked done and verified green (*"I don't understand anything you just did"*
+> about bitmasks; *"I understand everything completely except generateSchedules"*). This is his most
+> valuable habit — he now routinely asks for a full walkthrough after a feature works. **Budget for it and
+> protect it.** Those follow-up sessions produced his best explanations of the whole project.
+>
+> **He catches real bugs himself.** The blank page on zero results, the stretched columns, the
+> missing-middle-day looking broken, the wrong `onClick` shape. Let him find them; ask what he's seeing
+> before diagnosing.
+>
+> ⚠️ **He over-scopes, then self-corrects if asked honestly.** Section 4 grew to ~12 items across three
+> rounds before he said *"I feel like section 4 is too much"* — and he was right. **Give him the honest
+> read the first time**, including the deadline math, rather than agreeing and letting him discover it.
+>
+> 🔴 **The one method failure this section, don't repeat it:** building the section picker, I wrote ~50
+> lines of structure (a ternary, two `.find()` chains, new JSX) and left one `TODO(you)`. He stopped it
+> hard — *"No, bad, I want to learn everything, revert everything back, what are you doing?"* — and the
+> work was reverted and rebuilt one small piece at a time. **When a feature has several structural pieces,
+> decompose it across turns from the start.** A TODO blank inside a big block you wrote is not the same as
+> a small block he wrote in full.
+>
+> **Solid now, no need to re-teach:** `.map()`/`.filter()`/`.find()`/`.some()`/`.slice()`, `Set`, spread,
+> ternaries, `key`, immutable array updates, `for...of` and classic `for` loops, recursion with a base case,
+> CSS Grid with explicit `gridColumn`/`gridRow`, React state and what triggers a re-render.
 
 ### 5. The parser  [ ] not started
 **Deliverable:** A Python script that prints 700 real courses pulled from AURAK's live schedule page.
@@ -260,11 +299,14 @@ dropping one update (stale closure over `rows`).
 
 Build immediately after section 10, not "someday". These are Akeem's stated priorities.
 
-- **The rest of the advanced filter panel.** The **time window** was pulled forward into section 4 on 2026-08-11 (highest student value of anything on either list). What remains here, both **section-level** — they run *before* generation, shrinking each course's candidate list, making the search faster rather than slower:
+- ⭐ **The advanced filter panel** — the highest-value item in v1.1, and the one students would actually tell each other about. All three are **section-level**: they run *before* generation, shrinking each course's candidate list, so they make the search faster rather than slower.
+  - **A time window** ("nothing before X, nothing after Y") — covers "no 8am classes" and "nothing after 5pm" in one control. *Was pulled into section 4 on 2026-08-11 and moved back the same day when section 4 was cut down: it's a feature, not a blocker, and features can ship in v1.1.*
   - **Exclude specific days.**
   - **A protected break window** (his idea, e.g. no classes 12:00–13:00). 💡 Nearly free to build: encode the break as a mask and reuse `masksConflict` — a section is excluded if any meeting overlaps it, which is the exact check he already wrote in section 3.
   - **Explicitly rejected 2026-08-11:** "max days on campus" and instructor filters. Don't re-propose.
   - 📝 Worth teaching when built: **section-level** filters (these) prune before generation and speed it up; **schedule-level** filters (max days on campus, minimum gap between classes) can only be checked on a finished schedule, so they can't prune. Different mechanism, different cost.
+- **The full styling / design-token pass** — moved out of section 4 on 2026-08-11. Section 4 does only the minimum that stops the app being broken on a phone. ⚠️ **This is the item that ate section 4 and will do it again if unwatched:** design has no natural "done." Two reasons it belongs here and not earlier — an unstyled app with real data beats a styled app with fake data, and real data (long course descriptions, ~700 rows, many subjects) is what you actually want to design against. Extract CSS custom properties (`--color-primary` etc.) as a *refactor once the repetition is visible*, not as an upfront task; naming colors before choosing them is backwards.
+- **Remembering the shortlist across refreshes** (`localStorage`) — moved out of section 4 on 2026-08-11. New concept, moderate work, pure convenience. Independent of where the data comes from, so nothing about section 7 invalidates it. ⚠️ One real edge case when built: a saved shortlist can reference a course code that no longer exists next semester — handle the miss rather than crashing.
 - **Total credits per schedule** — moved out of section 4 on 2026-08-11. Real student value, but it needs a `credits` field, and hand-adding fake ones would be thrown away when section 5's parser reads the real "No. of Credits" column. Cheap and correct once real data exists.
 - **Exclude sections that are already full** — makes the output actionable. A schedule containing a section nobody can register for is a wasted result.
 - **Server-side filtering** — query params, ORM filters, indexes. *Honestly a learning goal at 700 rows, not a performance need.* It does give the backend a real job again after client-side generation reduced it to a data dump.

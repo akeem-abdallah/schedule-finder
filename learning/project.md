@@ -28,7 +28,9 @@ After that project his knowledge graph sat almost entirely at `practicing`. **Ex
 
 **Never touched:** FastAPI, PostgreSQL as a server, any ORM, migrations, scheduled jobs, deploying more than one service, CORS, environment secrets (he has only used `$PORT`, which isn't sensitive).
 
-**React, as of 2026-08-09** (sections 1–2 done — this supersedes "never touched"): components, props, JSX, `useState`, controlled inputs, event handlers, rendering lists with `key`, derived vs. stored state, and immutable array updates — all at `practicing`. He has built a working multi-row form with validation. **The gap that remains is plain JavaScript, not React** — spread (`...`), closures, and arrow-function syntax are what actually slow him down. See the section 3 calibration note in `plan.md`.
+**React, as of 2026-08-11** (sections 1–3 done — this supersedes "never touched"): components, props, JSX, `useState`, controlled inputs (including checkboxes), event handlers, rendering lists with `key`, `Fragment` with and without keys, derived vs. stored state, immutable array updates, multi-way view swapping via conditional state, and CSS Grid with fully explicit item placement — all at `practicing`. He has built a working schedule generator end to end: an editable multi-row shortlist with per-course section narrowing, a recursive backtracking search over bitmask-encoded weekly occupancy, and a dynamically-sized weekly calendar with paginated results.
+
+**The gap that remains is still plain JavaScript, not React, and section 3 confirmed it precisely.** His *logic* was right nearly every time; the friction was always syntax. Recurring slips worth expecting: a missing `Math.` prefix, passing an array where a single value is needed, nested calls with the wrong argument type, `&&` vs `&`, and `{}` vs `<>` in JSX. See the section 4 calibration note in `plan.md`.
 
 **Weak spots to watch for:**
 - **Confuses GitHub / live / localhost URLs.** Three similar-looking things meaning different things — cost several passes on the last README.
@@ -68,16 +70,18 @@ An AURAK student who has never met Akeem opens a link on their phone during regi
 - Deployed, live URL, usable on a phone
 
 ### v1.1 — build immediately after, not "someday"
-- **The rest of the filter panel** — excluded days and a protected break window. *The time window filter was pulled forward into section 4 (highest student value).* Detail and the section-level-vs-schedule-level teaching note are in `plan.md`
-- **Total credits per schedule** — moved out of section 4; needs the real `credits` field the parser supplies
+- ⭐ **The advanced filter panel** — a time window ("nothing before X, nothing after Y"), excluded days, and a protected break window. Highest-value item here. Detail and the section-level-vs-schedule-level teaching note are in `plan.md`
+- **The full styling / design-token pass** — section 4 does only the minimum to work on a phone. ⚠️ Design has no natural "done"; it's what over-grew section 4. Better against real data anyway
+- **Remembering the shortlist across refreshes** (`localStorage`)
+- **Total credits per schedule** — needs the real `credits` field the parser supplies
 - **Exclude sections that are already full** — makes the output actionable
 - **Server-side filtering** — query params, ORM filters, indexes. *Honestly a learning goal at 700 rows, not a performance need*
 - **Raise refresh to ~30 min** during registration week
 
 ### Parking lot (v2+)
-Displaying seat counts (prefer coarse **Open / Almost full / Full**) · accounts and saved schedules · sharing a schedule · calendar export · multiple semesters
+Displaying seat counts (prefer coarse **Open / Almost full / Full**) · accounts and saved schedules · sharing a schedule · calendar export · multiple semesters · button icons *(cosmetic; an icon package is a rabbit hole)* · a page header *(an `<h1>` already exists)* · a download/screenshot button *(needs a rendering library; the phone's own screenshot works)*
 
-**Promoted out of the parking lot 2026-08-11**, at Akeem's request. Into the new **section 4 ("Making it feel real")**: **error messages as a popup that fades out** (his idea, 2026-08-09 — was parked because it needs `setTimeout`) and **mobile polish** (never really optional — "usable on a phone" is in the MVP). Into **v1.1**: the **no-8am** and **days-off** filters, generalised into one time window plus an excluded-days control. **Instructor preference stays parked** — he rejected it explicitly on 2026-08-11.
+**Scoping history, 2026-08-11.** Out of the parking lot into **section 4 ("Usable on a phone")**: **fade-out error popups** (his idea, 2026-08-09 — was parked pending `setTimeout`) and **mobile polish** (never really optional — "usable on a phone" is in the MVP). Into **v1.1**: the **no-8am** and **days-off** filters, generalised into one time window plus an excluded-days control. **Still parked:** instructor preference and max-days-on-campus — he rejected both explicitly.
 
 ---
 
