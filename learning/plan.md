@@ -116,7 +116,7 @@ dropping one update (stale closure over `rows`).
 - [x] 3.7 Wire it together — Submit swaps the main view to the grid (same pattern as `customizingID`), generates schedules on submit, renders the current one into the grid cells, and adds pagination — `<`/`>` arrows, a "1 of 6" label, and a Back button to return to the list. **Data-shape fix along the way:** `getEligibleSections` now enriches each section with `courseCode`/`courseDescription`, since sections alone didn't carry a reference back to their parent course once inside `results`. **Real bug fixed mid-task:** class blocks that span multiple rows were disrupting CSS Grid's auto-placement for the background cells (hour labels, placeholders) that came after them in DOM order — fixed by giving every cell an explicit `gridColumn`/`gridRow` instead of relying on auto-flow for any of them
 - [x] 3.8 Exact-time positioning — grid switched from 12 hourly rows to 48 fifteen-minute rows (`DAY_START` exported so `App.jsx` can compute exact slots); class blocks now start/end at their real time instead of rounding to the nearest hour. Deferred out of 3.7, 2026-08-11, at Akeem's request
 - [x] 3.9 Dynamic grid sizing — shrink the grid to the actual used range now that real schedules exist. Days: always show Mon–Thu as a baseline, extending further only if real data needs it (revised 2026-08-11 from "only show used days," which looked broken with a day missing from the middle). Time: floor/ceil the earliest/latest real class to the nearest hour, no extra padding (simplified 2026-08-11 from the original "pad ~1hr" idea)
-- [ ] 3.10 Commit — deliverable reached
+- [x] 3.10 Commit — deliverable reached
 
 **Notes for the lesson:**
 - ⭐ **This is Akeem's home turf** (NeetCode 150, A-level CS). Give him much more room here than elsewhere — describe the problem and let him solve it. Scaffolding this section would waste the one part he's best equipped for.
@@ -171,6 +171,16 @@ dropping one update (stale closure over `rows`).
 5. **Arrow-key paging** — same cleanup discipline as the toast, practiced twice
 
 **Moved out, nothing dropped:** full styling/design-token pass → v1.1 · localStorage persistence → v1.1 · time-window filter → v1.1 (rejoining the rest of the filter panel) · total credits → v1.1 · button icons → parking lot · header → parking lot · download/screenshot button → parking lot.
+
+**Tasks:**
+- [x] 4.1 Deploy to Vercel as-is (fake data, current state) — first live URL, testable on his phone
+- [ ] 4.2 Mobile/responsive fixes — replace the fixed `450px` side padding so the app works below ~1000px wide
+- [ ] 4.3 Three tiny fixes — "clear all", disabled Previous/Next at boundaries, first-run hint line
+- [ ] 4.4 Toast errors + loading state — `setTimeout` + cleanup, deferred rendering for the loading label
+- [ ] 4.5 Arrow-key paging — `keydown` listener on `window`, same cleanup discipline as the toast
+- [ ] 4.6 Commit — deliverable reached
+
+**Live URL (as of 2026-08-11):** https://schedule-finder-delta.vercel.app — deployed in 4.1, still on fake data
 
 **Notes for the lesson:**
 - 🔑 **Mobile is the only genuinely blocking item.** `project.md` says "usable on a phone," and `body { padding: 24px 450px 0 450px }` currently makes the app unusable below ~1000px wide. Do the *minimum that stops it being broken on a phone* — resist turning this into the full design pass that just got deferred.

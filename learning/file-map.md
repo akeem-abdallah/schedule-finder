@@ -45,25 +45,25 @@ Nothing else exists yet.
 
 Not on disk yet. Listed so that when a command creates them, the lesson can tour them rather than let them pile up unexplained. **Delete an entry from here and add it above once it actually exists.**
 
-### Section 4 will create
+### Section 5 will create
 - The parser script — fetches AURAK's page and turns its HTML table into structured course data → [[html-parsing]]
 - A saved copy of AURAK's HTML — kept locally so debugging doesn't hit their server repeatedly, and reused as the test fixture in section 7 → [[testing-a-parser]]
 
-### Section 5 will create
+### Section 6 will create
 - `.env` — 🔑 **the database connection string lives here. Gitignored from the very first commit, before it ever holds a real value.** His first real secret → [[environment-secrets]]
 - `requirements.txt` — the Python packages this project needs. He wrote one last project
 - SQLAlchemy model definitions — the three tables described as Python classes → [[sqlalchemy-models]], [[orm-relationships]]
 - `alembic/` and `alembic.ini` — migration history: a versioned record of every schema change, replacing last project's "delete the database and restart" → [[alembic-migrations]]
 
-### Section 6 will create
+### Section 7 will create
 - The FastAPI application — routes serving course data as JSON → [[fastapi-routes]], [[pydantic-models]]
 
-### Section 7 will create
+### Section 8 will create
 - Test files — checking the parser against the saved HTML, and the algorithm against hand-worked examples → [[testing-a-parser]], [[testing-the-algorithm]]
 - `__pycache__/` — generated — Python's compiled-bytecode cache. Gitignore it; he hit exactly this last project and had to untrack it after the fact
 
-### Section 8 will create
+### Section 9 will create
 - `.github/workflows/` — the YAML file telling GitHub Actions to run the refresh on a schedule → [[github-actions]], [[yaml-workflows]]
 
-### Section 9 will create
+### Section 10 will create
 - `README.md` — the repo's front door: what it is, the live URL, tech stack, how to run it, and the disclaimer → [[readme-portfolio-framing]], [[disclaimer-and-unofficial-framing]]

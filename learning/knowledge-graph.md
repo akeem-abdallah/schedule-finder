@@ -329,7 +329,17 @@ Shipped 2026-08-05. Full history with detailed evidence lives in
 - evidence: correctly derived `grid-template-columns: 60px repeat(7, 1fr)` and the row equivalent from a plain-language description of 8 columns/13 rows, after correctly working out the 8×13 dimension itself (initially said 7×12, self-corrected once asked where day names and hour labels would go). One real slip: wrote `repeat(13, 1fr)` for rows, double-counting the header row that was already the separate `40px` — self-corrected once it was traced through. Struggled genuinely on the nested-`.map()` JSX (said "I don't get it" on the day-header map, needed a direct side-by-side comparison to the `<option>` pattern he already knew), and made a real content bug in the placeholder cells (rendered `{day}` in every cell instead of leaving them empty) — self-corrected once named. First real use of `Fragment` with an explicit `key` (vs. the `<>` shorthand, which can't take props) for grouping a label + 7 placeholder cells per row. Also drove a genuine design refinement himself — asked for the hour labels to sit at the top of their row like a real calendar app rather than centered, correctly predicting/confirming the fix (`align-items: start`) worked by checking the browser. **Follow-up styling pass, same day:** flagged real UX problems himself (rows too compact, labels visually detached from their lines) — root cause was no explicit `height` on the grid, so `1fr` rows had no real space to divide, which was explained and fixed by him (`height: 600px`). That fix then caused a genuine regression (`align-items: start` shrinking each cell to its own content, breaking row-height consistency and producing a double-line effect) — he removed it correctly once the mechanism was traced through, and separately diagnosed (with a screenshot) that double-digit hour labels were wrapping because the label column was too narrow, correctly identifying that padding was the wrong fix and a wider column was the right one. **3.7 wiring pass:** diagnosed unprompted why pagination buttons were stacking vertically (a block-level `<p>` breaking the flex flow), and independently applied `justify-content: center` (no explanation needed) once told it was the property for horizontal centering in a flex container
 <!-- He built a 2×2 grid last project — same property, larger scale -->
 
-## Section 4 — The parser
+## Section 4 — Usable on a phone
+
+### static-build-deployment
+- status: introduced
+- depends-on: why-client-side-generation
+- introduced: 2026-08-11
+- last-reviewed: 2026-08-11
+- evidence: asked to predict what clicking Vercel's Deploy button would do, answered *"It's gonna run my react on vercel"* — graded as wrong, not vague: conflated deploying a static frontend with running a live server process (the mental model that's correct for his Flask app on Render, not for this). Corrected with the real mechanism: Vercel runs `npm install` + `vite build`, which compiles JSX/JS into plain static HTML/CSS/JS files, then serves those files with no Node process running per-request — same as handing it a folder of plain HTML. Not yet restated in his own words; good re-check candidate once section 6/9 make the FastAPI contrast concrete (a backend that *does* stay running)
+<!-- New leaf, not in original section 4 concept list -->
+
+## Section 5 — The parser
 
 ### http-requests-python
 - status: seed
@@ -360,7 +370,7 @@ Shipped 2026-08-05. Full history with detailed evidence lives in
 - evidence: —
 <!-- The Day/Time/Room field. Where nearly all parsing effort goes, and why Meeting is its own table -->
 
-## Section 5 — The database
+## Section 6 — The database
 
 ### postgres-server
 - status: seed
@@ -414,7 +424,7 @@ Shipped 2026-08-05. Full history with detailed evidence lives in
 - last-reviewed: —
 - evidence: —
 
-## Section 6 — Connecting the halves
+## Section 7 — Connecting the halves
 
 ### fastapi-routes
 - status: seed
@@ -462,7 +472,7 @@ Shipped 2026-08-05. Full history with detailed evidence lives in
 - evidence: —
 <!-- Will be confusing. The error message doesn't say "you need CORS" -->
 
-## Section 7 — Tests and safety rails
+## Section 8 — Tests and safety rails
 
 ### pytest-recap
 - status: seed
@@ -493,7 +503,7 @@ Shipped 2026-08-05. Full history with detailed evidence lives in
 - last-reviewed: —
 - evidence: —
 
-## Section 8 — Going live
+## Section 9 — Going live
 
 ### github-actions
 - status: seed
@@ -537,7 +547,7 @@ Shipped 2026-08-05. Full history with detailed evidence lives in
 - last-reviewed: —
 - evidence: —
 
-## Section 9 — Wrapping the MVP
+## Section 10 — Wrapping the MVP
 
 ### mvp-review
 - status: seed
