@@ -68,12 +68,16 @@ An AURAK student who has never met Akeem opens a link on their phone during regi
 - Deployed, live URL, usable on a phone
 
 ### v1.1 — build immediately after, not "someday"
+- **The rest of the filter panel** — excluded days and a protected break window. *The time window filter was pulled forward into section 4 (highest student value).* Detail and the section-level-vs-schedule-level teaching note are in `plan.md`
+- **Total credits per schedule** — moved out of section 4; needs the real `credits` field the parser supplies
 - **Exclude sections that are already full** — makes the output actionable
 - **Server-side filtering** — query params, ORM filters, indexes. *Honestly a learning goal at 700 rows, not a performance need*
 - **Raise refresh to ~30 min** during registration week
 
 ### Parking lot (v2+)
-Displaying seat counts (prefer coarse **Open / Almost full / Full**) · accounts and saved schedules · no-8am filter · days-off preference · instructor preference · sharing a schedule · calendar export · multiple semesters · mobile polish · **error messages as a popup that fades out** (his idea, 2026-08-09 — parked because it needs `setTimeout`, not yet taught; plain inline message for now)
+Displaying seat counts (prefer coarse **Open / Almost full / Full**) · accounts and saved schedules · sharing a schedule · calendar export · multiple semesters
+
+**Promoted out of the parking lot 2026-08-11**, at Akeem's request. Into the new **section 4 ("Making it feel real")**: **error messages as a popup that fades out** (his idea, 2026-08-09 — was parked because it needs `setTimeout`) and **mobile polish** (never really optional — "usable on a phone" is in the MVP). Into **v1.1**: the **no-8am** and **days-off** filters, generalised into one time window plus an excluded-days control. **Instructor preference stays parked** — he rejected it explicitly on 2026-08-11.
 
 ---
 

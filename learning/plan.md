@@ -102,8 +102,8 @@ dropping one update (stale closure over `rows`).
 - State updates are not immediate. Reading a state variable right after setting it gives the *old* value. This will bite; let it, then explain.
 - Hardcode 5–6 fake courses with a handful of sections. Enough to test conflicts in section 3, small enough to reason about.
 
-### 3. The algorithm and the grid  [ ] not started
-**Deliverable:** Click Generate and page through valid schedule combinations on a weekly calendar. **The working tool — just with fake courses.**
+### 3. The algorithm and the grid  [x] done 2026-08-11
+**Deliverable:** Click Submit and page through valid schedule combinations on a weekly calendar. **The working tool — just with fake courses.** **Revised 2026-08-11** — no separate Generate button; Submit both validates and generates, swapping to the grid view the same way `customizingID` swaps to the section-customize panel.
 **Concepts:** time-conflict-detection, bitmask-representation, backtracking-with-pruning, result-capping, css-grid-layout
 
 **Tasks:**
@@ -112,9 +112,11 @@ dropping one update (stale closure over `rows`).
 - [x] 3.3 Section picker — box-per-course main view with a summary line, a "Customize" panel per course (checkbox list of its sections, Back), row state gains a `sections` array (unplanned addition, added 2026-08-09 at Akeem's request)
 - [x] 3.4 Bitmask representation — encode each section's weekly occupancy as bits (15-min slots), verify against the existing naive `meetingsConflict`. **Reordered before the generator 2026-08-10 at Akeem's request** — he asked to build the optimised version directly rather than naive-then-optimise, so the mask is now a prerequisite. **Real slot layout used, not a guess** — checked AURAK's live schedule page mid-lesson and found 7 days (Mon–Sun, not 6) and an 08:00–20:00 range (not 07:00–22:00), so `DAYS`/`DAY_START`/`SLOTS_PER_DAY` are calibrated to the actual data source
 - [x] 3.5 Backtracking generator — recursion carrying an accumulated occupancy mask (O(1) check per candidate), courses ordered fewest-candidates-first. No result cap for now — reversed 2026-08-10 at Akeem's request (see note below)
-- [ ] 3.6 Weekly grid — CSS Grid shell for the calendar (days across, time down)
-- [ ] 3.7 Wire it together — Generate button, render a combination into the grid, page through results
-- [ ] 3.8 Commit — deliverable reached
+- [x] 3.6 Weekly grid — CSS Grid shell for the calendar (days across, time down). Fixed 08:00–20:00 × 7-day grid for now, 12-hour display (real conversion function, not just a guess at formatting)
+- [x] 3.7 Wire it together — Submit swaps the main view to the grid (same pattern as `customizingID`), generates schedules on submit, renders the current one into the grid cells, and adds pagination — `<`/`>` arrows, a "1 of 6" label, and a Back button to return to the list. **Data-shape fix along the way:** `getEligibleSections` now enriches each section with `courseCode`/`courseDescription`, since sections alone didn't carry a reference back to their parent course once inside `results`. **Real bug fixed mid-task:** class blocks that span multiple rows were disrupting CSS Grid's auto-placement for the background cells (hour labels, placeholders) that came after them in DOM order — fixed by giving every cell an explicit `gridColumn`/`gridRow` instead of relying on auto-flow for any of them
+- [x] 3.8 Exact-time positioning — grid switched from 12 hourly rows to 48 fifteen-minute rows (`DAY_START` exported so `App.jsx` can compute exact slots); class blocks now start/end at their real time instead of rounding to the nearest hour. Deferred out of 3.7, 2026-08-11, at Akeem's request
+- [x] 3.9 Dynamic grid sizing — shrink the grid to the actual used range now that real schedules exist. Days: always show Mon–Thu as a baseline, extending further only if real data needs it (revised 2026-08-11 from "only show used days," which looked broken with a day missing from the middle). Time: floor/ceil the earliest/latest real class to the nearest hour, no extra padding (simplified 2026-08-11 from the original "pad ~1hr" idea)
+- [ ] 3.10 Commit — deliverable reached
 
 **Notes for the lesson:**
 - ⭐ **This is Akeem's home turf** (NeetCode 150, A-level CS). Give him much more room here than elsewhere — describe the problem and let him solve it. Scaffolding this section would waste the one part he's best equipped for.
@@ -151,18 +153,49 @@ dropping one update (stale closure over `rows`).
 > **Solid now, no need to re-teach:** `.map()`, `.filter()`, `.find()`, `.some()`, `Set`, ternaries,
 > `key`, immutable array updates, React state and what triggers a re-render.
 
-### 4. The parser  [ ] not started
+### 4. Making it feel real  [ ] not started
+**Deliverable:** The app works on a phone, looks like a real tool rather than a prototype, and can filter out the classes a student doesn't want.
+**Concepts:** responsive-design, css-design-tokens, settimeout-and-cleanup, toast-notifications, deferred-rendering, localstorage-persistence, section-level-filtering
+
+> **Added 2026-08-11, at Akeem's request** — his reasoning: finish the frontend while React context is still loaded, rather than switching to Python for sections 5–7 and coming back cold. Sound argument, and it also unparks the fade-out error popup idea he had on 2026-08-09 (parked at the time because it needed `setTimeout`, which hadn't been taught).
+
+**Scope, re-sorted 2026-08-11** after Akeem asked for an honest sort. The sorting test used: *does this change whether a student can use the tool, or does it just look better?*
+
+**In:** mobile/responsive · basic styling (design tokens as a refactor *during* styling, not upfront) · "clear all" · toast errors · loading state · localStorage persistence · footer · **the time-window filter** (pulled forward from v1.1) · **early Vercel deploy** · disabled pagination at boundaries · first-run hint line · arrow-key paging.
+**Out:** total credits (→ after section 5 — hand-adding fake credits to a dozen courses is throwaway work when the parser reads the real "No. of Credits" column two sections later) · button icons (cosmetic, and an icon package is a rabbit hole — do last or drop) · header (an `<h1>` already exists; adds nothing).
+**Still v1.1:** excluded-days and break-window filters, and the rest of the panel.
+**Considered and parked:** a download/screenshot button — needs a rendering library, and the phone's own screenshot already works.
+
+⚠️ **This is a large section — roughly 12 items.** Akeem chose the scope deliberately across two rounds (2026-08-11), with the ~20-days-to-semester constraint named. Three of the four late additions are genuinely tiny (disabled buttons, hint line, arrow keys); the Vercel deploy is the only substantial one. Don't re-litigate it, but don't let it sprawl further either.
+
+**Notes for the lesson:**
+- ⚠️ **Named going in: this polishes against *fake* data.** Real AURAK data has much longer descriptions ("Arabic Language and Culture for Non-Native Learners I"), ~700 rows, and many more subjects. The CSS *structure* will survive section 7's swap to real data; some tuning (block text overflow, dropdown length) will need revisiting. Accepted cost, not a surprise.
+- 🔑 **Mobile is the only genuinely blocking item.** `project.md` says "usable on a phone," and `body { padding: 24px 450px 0 450px }` currently makes the app unusable below ~1000px wide. Everything else in this section is either learning value or polish.
+- ⭐ **Why the time-window filter is here and not in v1.1:** "no classes before 9am" is worth more to a real AURAK student than everything else in this section except mobile — it's the feature students would tell each other about. It's also cheap: section-level, so it prunes each course's candidate list *before* generation (making the search faster, not slower), and the overlap check already exists.
+- **The toast is where `setTimeout` lands** — his first timer, and the first place cleanup matters (a toast dismissed early shouldn't have a stale timer firing later). Product-wise it's pure polish (the inline error already works); the real payoff is that `setTimeout` + cleanup is the exact mental model `useEffect` needs in section 7. Buying a section-7 concept early, at a discount.
+- ⚠️ **The loading state needs deferred rendering, not just a label.** Akeem's first instinct (2026-08-11) was that a plain label set before generation would show. It won't — React batches state updates, so the handler runs to completion before any repaint and `loading` goes true→false unpainted. Needs `setTimeout(..., 0)` around the generation so the handler returns and React paints first. He accepted the correction. **Worth more than it looks:** since he declined the result cap, a large shortlist could freeze the page, and this is the only thing distinguishing "thinking" from "broken."
+- **Design tokens as a refactor, not a first task** — extract `--color-primary` etc. once the styling work makes the repetition visible. Naming colors before choosing them is backwards.
+- He's driven every design decision in section 3 himself (chip vs. panel layouts, centering, hour-label placement, color-coding). **Give him the same room here** — describe mechanisms, let him make the calls.
+- 🚫 **No AURAK logo or branding** (`project.md`). He clarified he meant button icons, not a logo, so this isn't at risk — just don't let it drift. The footer is the natural home for the disclaimer section 10 requires.
+
+**The four additions (all agreed 2026-08-11):**
+- 🚀 **Early Vercel deploy — do this *before* the mobile work, not after.** The reason is specific and not "ship early": a desktop browser's device emulator misrepresents touch targets, font rendering, and how the grid feels under a thumb. A live URL makes the mobile work testable on his actual phone instead of guesswork. Also splits section 9's deployment into an easy half (static frontend — no env vars, no CORS, no backend) and a hard half, rather than meeting all of it at once at the end. **Section 9 must be updated to say the Vercel deploy is already done** — see its notes.
+- **Disable Previous/Next at the boundaries.** At "1 of 9", Previous silently does nothing — the bounds check works but gives no feedback, which reads as broken. Closer to a real bug than to polish. Tiny fix (`disabled` attribute), and it makes the existing `setIndex` bounds logic visible in the UI.
+- **First-run hint line.** A cold visitor sees one empty dropdown row and no explanation. One sentence ("Pick your courses, get every schedule where nothing clashes") orients them. Matters disproportionately because the stated goal is *real student adoption*, and adoption fails at first contact more than anywhere else.
+- **Arrow keys for paging.** Left/right between schedules. Pairs deliberately with the toast lesson: a `keydown` listener on `window` needs the same cleanup discipline as `setTimeout`, so the concept gets practiced twice in one section instead of once. Teach it as the same idea, not a new one.
+
+### 5. The parser  [ ] not started
 **Deliverable:** A Python script that prints 700 real courses pulled from AURAK's live schedule page.
 **Concepts:** http-requests-python, html-parsing, data-cleaning, multi-value-fields
 
 **Notes for the lesson:**
 - Back in Python — comfortable ground after three React sections. Good pacing.
 - `requests` + `BeautifulSoup`. The page is **server-rendered static HTML**, so no browser automation is needed. Verified 2026-08-06.
-- 💡 **Save one copy of the HTML to a local file early and develop against that.** Two reasons: you're not hitting AURAK's server on every run while debugging, and that saved file becomes the test fixture in section 7. Do this in the first task of the section, not as an afterthought.
+- 💡 **Save one copy of the HTML to a local file early and develop against that.** Two reasons: you're not hitting AURAK's server on every run while debugging, and that saved file becomes the test fixture in section 8. Do this in the first task of the section, not as an afterthought.
 - **The real difficulty is `Day/Time/Room`** — it spans multiple lines when a section meets more than once a week. That single field is where nearly all the parsing effort goes, and it's what makes the `Meeting` table necessary.
 - Expect the parse to be wrong several times. That's normal and worth saying out loud so it doesn't read as failure.
 
-### 5. The database  [ ] not started
+### 6. The database  [ ] not started
 **Deliverable:** Run the script, then look at 700 real rows sitting in Supabase.
 **Concepts:** postgres-server, connection-strings, environment-secrets, sqlalchemy-models, orm-relationships, alembic-migrations, idempotent-full-replace
 
@@ -174,7 +207,7 @@ dropping one update (stale closure over `rows`).
 - **Full replace inside one transaction**: parse everything, then atomically clear and reinsert. Simpler than upserts at 700 rows, and makes re-running the job safe. Store the fetch timestamp in the same transaction.
 - Good understanding check: **why does re-running the loader twice have to be safe?** (Because a scheduled job will run it unattended, forever, and nobody will be watching.)
 
-### 6. Connecting the halves  [ ] not started
+### 7. Connecting the halves  [ ] not started
 **Deliverable:** Your React app showing real AURAK courses instead of the fake ones.
 **Concepts:** fastapi-routes, pydantic-models, sqlalchemy-queries, fetch-in-react, useeffect, cors
 
@@ -183,25 +216,26 @@ dropping one update (stale closure over `rows`).
 - **FastAPI's auto-generated docs at `/docs` are a genuine gift for a learner.** Show them early. He can click endpoints and see real responses without writing any frontend code, which separates "is my API broken?" from "is my React broken?"
 - **Pydantic response models** replace the hand-rolled validation he wrote in Flask (`if "text" not in data`). Make that connection — it's the same problem solved properly.
 - ⚠️ **CORS lands here and it will be confusing.** The error message doesn't say "you need CORS." Expect one frustrating session. FastAPI's `CORSMiddleware` fixes it in about four lines.
-- 💡 Vite's dev proxy can sidestep CORS *in development*. Tempting — but it hides the problem until deployment, where it reappears with no dev server to help. **Recommend meeting CORS properly here rather than deferring it to section 8.**
+- 💡 Vite's dev proxy can sidestep CORS *in development*. Tempting — but it hides the problem until deployment, where it reappears with no dev server to help. **Recommend meeting CORS properly here rather than deferring it to section 9.**
 - `useEffect` is where beginners get hurt. React's StrictMode deliberately double-invokes effects in development, so a fetch appearing to run twice is *expected*, not a bug. Say this before he sees it and panics.
 
-### 7. Tests and safety rails  [ ] not started
+### 8. Tests and safety rails  [ ] not started
 **Deliverable:** One command that checks your parser and your algorithm still work.
 **Concepts:** pytest-recap, testing-a-parser, testing-the-algorithm, fixtures
 
 **Notes for the lesson:**
 - He wrote four pytest tests last project, so the tooling is recall, not new learning. **`pytest` runs as a bare command on his machine** — PATH was fixed permanently on 2026-08-05.
-- **Test the parser against the saved HTML fixture from section 4.** This is the highest-value test in the project: parsing is where bugs hide, and the parser runs unattended every day where nobody sees it fail.
+- **Test the parser against the saved HTML fixture from section 5.** This is the highest-value test in the project: parsing is where bugs hide, and the parser runs unattended every day where nobody sees it fail.
 - **Test the algorithm with small hand-checked inputs** — two courses, known conflicts, a schedule count you worked out on paper. His DSA background makes this natural.
 - ⚠️ Last project he wrote correct, passing test code he could not explain, and said so himself. **Watch for it here.** Ask him to explain what each test would catch before moving on.
 
-### 8. Going live  [ ] not started
+### 9. Going live  [ ] not started
 **Deliverable:** A URL an AURAK student can open on their phone, with data that refreshes itself daily.
 **Concepts:** github-actions, yaml-workflows, scheduled-jobs, secrets-in-ci, deploying-two-services, custom-domain *(optional)*
 
 **Notes for the lesson:**
-- **Three deploys, so do them one at a time and verify each** before starting the next: Render (API) → Vercel (React) → GitHub Actions (refresh).
+- ⚠️ **Vercel is already deployed** — done early in section 4 (2026-08-11) so the mobile work could be tested on a real phone. So this section is **two new deploys, not three**: Render (API) → GitHub Actions (refresh), plus *reconnecting* the existing Vercel frontend to the real API instead of fake data. Don't re-teach the Vercel setup; do verify the redeploy picks up the API URL.
+- **Do the remaining deploys one at a time and verify each** before starting the next.
 - Render start command is uvicorn bound to `$PORT` — same environment-variable idea he already met with gunicorn.
 - **Production CORS must include the real Vercel domain.** Localhost working proves nothing about production. Expect this to break once.
 - **GitHub Actions secrets** hold the database URL. Same concept as `.env`, different place — connect them explicitly.
@@ -209,7 +243,7 @@ dropping one update (stale closure over `rows`).
 - Custom domain is optional and belongs at the end. Vercel handles HTTPS automatically.
 - **Known and accepted:** Render's free tier sleeps, ~1 min cold start. It hurts least during registration week when real traffic keeps it warm. Show a loading state.
 
-### 9. Wrapping the MVP  [ ] not started
+### 10. Wrapping the MVP  [ ] not started
 **Deliverable:** MVP checklist fully checked, a README, and the app in front of an actual AURAK student.
 **Concepts:** mvp-review, readme-portfolio-framing, disclaimer-and-unofficial-framing, demo-practice
 
@@ -224,8 +258,14 @@ dropping one update (stale closure over `rows`).
 
 ## After the MVP — v1.1
 
-Build immediately after section 9, not "someday". These are Akeem's stated priorities.
+Build immediately after section 10, not "someday". These are Akeem's stated priorities.
 
+- **The rest of the advanced filter panel.** The **time window** was pulled forward into section 4 on 2026-08-11 (highest student value of anything on either list). What remains here, both **section-level** — they run *before* generation, shrinking each course's candidate list, making the search faster rather than slower:
+  - **Exclude specific days.**
+  - **A protected break window** (his idea, e.g. no classes 12:00–13:00). 💡 Nearly free to build: encode the break as a mask and reuse `masksConflict` — a section is excluded if any meeting overlaps it, which is the exact check he already wrote in section 3.
+  - **Explicitly rejected 2026-08-11:** "max days on campus" and instructor filters. Don't re-propose.
+  - 📝 Worth teaching when built: **section-level** filters (these) prune before generation and speed it up; **schedule-level** filters (max days on campus, minimum gap between classes) can only be checked on a finished schedule, so they can't prune. Different mechanism, different cost.
+- **Total credits per schedule** — moved out of section 4 on 2026-08-11. Real student value, but it needs a `credits` field, and hand-adding fake ones would be thrown away when section 5's parser reads the real "No. of Credits" column. Cheap and correct once real data exists.
 - **Exclude sections that are already full** — makes the output actionable. A schedule containing a section nobody can register for is a wasted result.
 - **Server-side filtering** — query params, ORM filters, indexes. *Honestly a learning goal at 700 rows, not a performance need.* It does give the backend a real job again after client-side generation reduced it to a data dump.
 - **Raise refresh to ~30 min** during registration week, daily otherwise. Deliberately not earlier: frequency only matters once seats are shown or filtered on, so the two ship together.

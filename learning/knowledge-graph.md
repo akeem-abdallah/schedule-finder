@@ -205,8 +205,8 @@ Shipped 2026-08-05. Full history with detailed evidence lives in
 - status: practicing
 - depends-on: rendering-lists
 - introduced: 2026-08-09
-- last-reviewed: 2026-08-09
-- evidence: 🔴 real struggle. Wrote `{rows.map(...)} <div>...</div>` as two siblings inside plain `{}`, which isn't valid — `{}` in JSX is a single-value slot, not a multi-child container the way `<>...</>` is. My own instruction to "swap `{` for `<>`" was imprecise (there was no matching `}` to swap, a `</>` needed inserting), which contributed to a second break when he tried to apply it himself and deleted a brace the `.map()` call actually needed. Once both were fixed and explained precisely, he independently and correctly wrapped a new 3-sibling block (Back button, header, checkbox list) in `<>...</>` **without being told to** later in the same session — strong proactive-application evidence, not just following an instruction
+- last-reviewed: 2026-08-11
+- evidence: 🔴 real struggle. Wrote `{rows.map(...)} <div>...</div>` as two siblings inside plain `{}`, which isn't valid — `{}` in JSX is a single-value slot, not a multi-child container the way `<>...</>` is. My own instruction to "swap `{` for `<>`" was imprecise (there was no matching `}` to swap, a `</>` needed inserting), which contributed to a second break when he tried to apply it himself and deleted a brace the `.map()` call actually needed. Once both were fixed and explained precisely, he independently and correctly wrapped a new 3-sibling block (Back button, header, checkbox list) in `<>...</>` **without being told to** later in the same session — strong proactive-application evidence, not just following an instruction. **2026-08-11:** first use of explicit `<Fragment key={...}>` (imported from `react`) instead of the `<>` shorthand, needed for grouping a label + 7 placeholder cells per grid row where a `key` was required — applied correctly on the first attempt once the reason shorthand fragments can't take a `key` was explained
 <!-- Not in original section 3 concept list -->
 
 ### array-reference-equality
@@ -270,7 +270,7 @@ Shipped 2026-08-05. Full history with detailed evidence lives in
 - depends-on: time-conflict-detection, bitmask-representation, classic-for-loops
 - introduced: 2026-08-11
 - last-reviewed: 2026-08-11
-- evidence: 🔴 the flagged risk from the previous session materialised exactly as predicted — asked to trace `solve(0, ...)` for a real 2-course example, said *"I have no idea"*, confirming the earlier *"I understand recursion, don't worry"* had been a bare assertion, not real understanding. Full stop-and-rebuild: correctly traced `countdown(2)` by hand (*"2, 1, done"*) on the first try; then, given a `pairUp` example with a loop inside the recursive call, correctly predicted the result of adding a third `colors` option **and explained why** unprompted — *"pairup will fire 3 times for the colors option before base case and 2 times for the sizes option before the base case, so 3x2 = 6."* That's real, from-first-principles understanding of recursive fan-out, not pattern-matching. Applying it to the actual `generateSchedules`/`solve` function, made two real bugs: the base-case condition compared `courseIndex` to the array itself instead of `.length` (self-corrected once asked to trace `0 <= orderedLists.length` by hand), and tried to reassign a `const` with `results = {...chosenSoFar}` instead of `results.push(chosenSoFar)` — this one he said outright *"I don't understand"* rather than guessing, and needed the real reason explained (plain local variable vs. React state, why mutation is fine here but never for `rows`). After both fixes, the recursive search itself was correct on the first attempt. Verified against real, hand-computed data — correctly predicted 3 valid combinations out of 4 for a 2-course case and identified which pair conflicts, then confirmed live in the browser
+- evidence: 🔴 the flagged risk from the previous session materialised exactly as predicted — asked to trace `solve(0, ...)` for a real 2-course example, said *"I have no idea"*, confirming the earlier *"I understand recursion, don't worry"* had been a bare assertion, not real understanding. Full stop-and-rebuild: correctly traced `countdown(2)` by hand (*"2, 1, done"*) on the first try; then, given a `pairUp` example with a loop inside the recursive call, correctly predicted the result of adding a third `colors` option **and explained why** unprompted — *"pairup will fire 3 times for the colors option before base case and 2 times for the sizes option before the base case, so 3x2 = 6."* That's real, from-first-principles understanding of recursive fan-out, not pattern-matching. Applying it to the actual `generateSchedules`/`solve` function, made two real bugs: the base-case condition compared `courseIndex` to the array itself instead of `.length` (self-corrected once asked to trace `0 <= orderedLists.length` by hand), and tried to reassign a `const` with `results = {...chosenSoFar}` instead of `results.push(chosenSoFar)` — this one he said outright *"I don't understand"* rather than guessing, and needed the real reason explained (plain local variable vs. React state, why mutation is fine here but never for `rows`). After both fixes, the recursive search itself was correct on the first attempt. Verified against real, hand-computed data — correctly predicted 3 valid combinations out of 4 for a 2-course case and identified which pair conflicts, then confirmed live in the browser. **Same-day follow-up:** said *"I understand everything completely except generateSchedules... not completely"* — honest, precise self-assessment (correctly distinguished the helper functions from the whole assembled thing). Full call-by-call trace with the real C1/C2/P1/P2 example landed cleanly, but explaining *what `accumulatedMask` represents* took two imprecise passes (*"different accumulated masks"*, then *"the masks that weren't conflicting so far"*) before correctly settling on it as an actual occupancy picture per search path, not a record of a passed check
 <!-- Recursion itself has no separate leaf — folded into this one, since it's the concept the plan named for this piece -->
 
 ### result-capping
@@ -280,12 +280,53 @@ Shipped 2026-08-05. Full history with detailed evidence lives in
 - last-reviewed: —
 - evidence: —
 
-### css-grid-layout
-- status: seed
+### bounded-index-navigation
+- status: practicing
+- depends-on: react-state
+- introduced: 2026-08-11
+- last-reviewed: 2026-08-11
+- evidence: built the pagination logic (`setIndex`) unprompted, ahead of where the lesson had gotten to. First version checked bounds against `currentIndex` itself (`currentIndex > 0 && currentIndex < results.length - 1`) rather than where the *new* index would land — meant movement got blocked entirely at both ends instead of only in the direction that would go out of range. Correctly self-diagnosed the symptom in his own words (*"it wont be incremented, and wont be decremented when the index is equal to results.length - 1"*) once asked to test it at the boundary, then correctly rewrote it to compute `newIndex` first and check that instead, after the shape was described rather than given verbatim. Also caught and fixed his own Next/Previous button mislabeling (wired to the wrong direction) without being told which one was wrong, just that something was
+<!-- New leaf, not in original section 3 concept list -->
+
+### arrow-function-object-literal
+- status: introduced
 - depends-on: none
-- introduced: —
-- last-reviewed: —
-- evidence: —
+- introduced: 2026-08-11
+- last-reviewed: 2026-08-11
+- evidence: wrote `eligible.map((s) => {...s, courseCode: ...})`, which JS parses as a function *body* (a block of statements) because it starts with `{`, not as the object literal he intended — a real, common gotcha. Told directly that returning an object literal from a concise arrow function needs to be wrapped in parentheses (`=> ({...})`) to disambiguate it from a block, and applied the fix correctly on the first attempt. Capped at `introduced` since the mechanism was told, not self-derived
+<!-- New leaf, not in original section 3 concept list -->
+
+### explicit-grid-item-placement
+- status: practicing
+- depends-on: css-grid-layout
+- introduced: 2026-08-11
+- last-reviewed: 2026-08-11
+- evidence: computed real CSS Grid placement math himself from a plain-language description — `gridColumn`/`gridRowStart` from `.indexOf() + 2` (skipping the header row/column), `durationHours` via `Math.ceil()` on a time difference so a class doesn't get cut short. Genuinely stuck on the first of these (*"idk what im doing"*), recovered with a fully concrete numeric walkthrough (`timeToMinutes("10:15")` → `615`, `Math.floor(615/60)` → `10`) rather than more abstract explanation, then completed the remaining three formulas independently. Separately hit a real CSS Grid auto-placement bug — spanning class blocks (explicitly positioned) were knocking auto-placed hour labels out of position, since auto-placement skips cells already claimed by explicit items regardless of DOM order. Understood the explanation and confirmed the fix (giving every background cell an explicit position too) worked by checking the browser, though the fix itself was written by the agent given the session's length at that point. **Follow-up same day:** independently applied the *outer* `.map()` index (`sectionIndex`, distinct from the inner meetings loop) to look up a stable color per section — `SECTION_COLORS[sectionIndex % SECTION_COLORS.length]` — written correctly on the first attempt once the idea (same section index across multiple meetings gives the same color) was described, without needing the exact expression given. **Task 3.8, generalizing the technique to finer granularity:** switching the grid from hourly to 15-minute rows, correctly wrote `startSlot`/`durationSlots`/`gridRowStart` (the exact-precision replacements for the earlier hour-rounded versions) entirely independently from a plain-language description, and correctly predicted a 75-minute class would span exactly 5 slots rather than overshooting to the next hour. Only missed wiring the final computed variables into the `gridRow` template string, which was named and fixed in one pass. **Task 3.9, dynamic sizing:** correctly diagnosed himself (unprompted) that both `1fr` columns and `1fr` rows would stretch to fill a fixed container size rather than shrinking with fewer tracks, and that the fix was the same one twice — fixed pixel sizes plus `width/height: fit-content`. Also caught, on his own, that "only show days with a class" reads as a bug (a day missing from the middle of the week), correcting the design to a baseline range instead. Real recurring syntax slips doing the actual computation — a nested `timeToMinutes(timeToMinutes(...))` call that would have crashed (passing a number where a string was expected), a missing `Math.` prefix on `floor`/`ceil`, and using the `activeHours` array where the single `startHour` number was needed — each caught and fixed in one pass once named specifically
+<!-- New leaf, not in original section 3 concept list -->
+<!-- New leaf, not in original section 3 concept list -->
+
+### js-truthy-falsy
+- status: practicing
+- depends-on: none
+- introduced: 2026-08-11
+- last-reviewed: 2026-08-11
+- evidence: found a real, self-reported bug — an empty results array (`[]`, when no valid schedule could be generated) still passed a plain `results ? (...)` truthiness check, showing the grid branch with no actual data and crashing to a blank page. Said *"idk"* honestly when asked whether `[]` is truthy or falsy, rather than guessing. Given the real rule (only `false, 0, "", null, undefined, NaN` are falsy — everything else, including empty arrays/objects, is truthy), correctly identified `results.length === 0` as the distinguishing check, and independently reasoned that it needed combining with a null-check first (same short-circuit `&&` pattern as `rowCourse && (...)`) to avoid crashing on `null.length`. Ultimately solved it more cleanly than the guided direction — checking emptiness once in `handleSubmit` and branching to `setError` there, instead of adding a whole new render branch
+<!-- New leaf, not in original section 3 concept list -->
+
+### array-slice
+- status: practicing
+- depends-on: none
+- introduced: 2026-08-11
+- last-reviewed: 2026-08-11
+- evidence: first use of `.slice()` in the project. Given a concrete trace (Mon at index 0, Thu at index 3, `DAYS.slice(0, 4)` → `["Mon","Tue","Wed","Thu"]`, explicitly naming why the second argument is `lastIndex + 1` rather than `lastIndex` since slice's end is exclusive), correctly wrote `DAYS.slice(firstIndex, lastIndex + 1)` on the first attempt
+<!-- New leaf, not in original section 3 concept list -->
+
+### css-grid-layout
+- status: practicing
+- depends-on: none
+- introduced: 2026-08-11
+- last-reviewed: 2026-08-11
+- evidence: correctly derived `grid-template-columns: 60px repeat(7, 1fr)` and the row equivalent from a plain-language description of 8 columns/13 rows, after correctly working out the 8×13 dimension itself (initially said 7×12, self-corrected once asked where day names and hour labels would go). One real slip: wrote `repeat(13, 1fr)` for rows, double-counting the header row that was already the separate `40px` — self-corrected once it was traced through. Struggled genuinely on the nested-`.map()` JSX (said "I don't get it" on the day-header map, needed a direct side-by-side comparison to the `<option>` pattern he already knew), and made a real content bug in the placeholder cells (rendered `{day}` in every cell instead of leaving them empty) — self-corrected once named. First real use of `Fragment` with an explicit `key` (vs. the `<>` shorthand, which can't take props) for grouping a label + 7 placeholder cells per row. Also drove a genuine design refinement himself — asked for the hour labels to sit at the top of their row like a real calendar app rather than centered, correctly predicting/confirming the fix (`align-items: start`) worked by checking the browser. **Follow-up styling pass, same day:** flagged real UX problems himself (rows too compact, labels visually detached from their lines) — root cause was no explicit `height` on the grid, so `1fr` rows had no real space to divide, which was explained and fixed by him (`height: 600px`). That fix then caused a genuine regression (`align-items: start` shrinking each cell to its own content, breaking row-height consistency and producing a double-line effect) — he removed it correctly once the mechanism was traced through, and separately diagnosed (with a screenshot) that double-digit hour labels were wrapping because the label column was too narrow, correctly identifying that padding was the wrong fix and a wider column was the right one. **3.7 wiring pass:** diagnosed unprompted why pagination buttons were stacking vertically (a block-level `<p>` breaking the flex flow), and independently applied `justify-content: center` (no explanation needed) once told it was the property for horizontal centering in a flex container
 <!-- He built a 2×2 grid last project — same property, larger scale -->
 
 ## Section 4 — The parser

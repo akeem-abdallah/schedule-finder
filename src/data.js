@@ -60,7 +60,7 @@ export const subjects = [
                     {
                         section: "3", instructor: "Dr. Adeel",
                         meetings: [
-                            { day: "Tue", start: "13:30", end: "16:00" },
+                            { day: "Fri", start: "13:30", end: "16:00" },
                         ],
                     },
                 ],
@@ -193,7 +193,103 @@ export const subjects = [
                     },
                 ],
             },
+        ],
 
+    },
+    {
+        subject: "BIO",
+        courses: [
+
+            {
+                code: "231", description: "General Microbiology Lab",
+                sections: [
+                    {
+                        section: "2", instructor: "John Martin",
+                        meetings: [
+                            { day: "Mon", start: "15:00", end: "17:30" },
+                        ],
+                    },
+                ],
+            },
+            {
+                code: "230", description: "General Microbiology",
+                sections: [
+                    {
+                        section: "1", instructor: "Asha Caroline Cryil",
+                        meetings: [
+                            { day: "Tue", start: "13:30", end: "14:45" },
+                            { day: "Thu", start: "13:30", end: "14:45" },
+                        ],
+                    },
+                ],
+            },
+        ],
+    },
+    {
+        subject: "CHEM",
+        courses: [
+
+            {
+                code: "215", description: "Organic Chemistry I",
+                sections: [
+                    {
+                        section: "1", instructor: "Shagufta Waseem",
+                        meetings: [
+                            { day: "Mon", start: "13:30", end: "14:45" },
+                            { day: "Wed", start: "13:30", end: "14:45" },
+                        ],
+                    },
+                ],
+            },
+            {
+
+                code: "216", description: "General Organic Chemistry Lab",
+                sections: [
+                    {
+                        section: "3", instructor: "Shagufta Waseem",
+                        meetings: [
+                            { day: "Wed", start: "15:00", end: "17:30" },
+                        ],
+                    },
+                ],
+            },
+        ],
+    },
+    {
+
+        subject: "ITEC",
+        courses: [
+
+            {
+                code: "130", description: "Fundamentals of Information Technology",
+                sections: [
+                    {
+                        section: "1", instructor: "Umar Adeel",
+                        meetings: [
+                            { day: "Tue", start: "10:30", end: "11:45" },
+                            { day: "Thu", start: "10:30", end: "11:45" },
+                        ],
+                    },
+                ],
+            },
+        ],
+    },
+    {
+        subject: "STAT",
+        courses: [
+
+            {
+                code: "100", description: "Introductory Probability and Statistics",
+                sections: [
+                    {
+                        section: "2", instructor: "TBA",
+                        meetings: [
+                            { day: "Tue", start: "16:30", end: "17:45" },
+                            { day: "Thu", start: "16:30", end: "17:45" },
+                        ],
+                    },
+                ],
+            },
         ],
     },
 ]

@@ -31,3 +31,40 @@ h1 {
 .checkboxes {
     display: block
 }
+
+.weekly-grid {
+    display: grid;
+    grid-template-rows: 40px repeat(48, 15px);
+    width: fit-content;
+    margin: 0 auto;
+}
+
+    .weekly-grid > div {
+        border-bottom: 1px solid #ccc;
+        padding: 0 0 0 0;
+    }
+
+.grid-header {
+    text-align: center;
+
+}
+
+.schedule-navigation {
+    display: flex;
+    gap: 15px;
+    align-items: center;
+    justify-content: center;
+}
+
+.class-block {
+    display: flex;
+    background-color: #f08080;
+    border-radius: 6px;
+    padding: 6px;
+    font-size: 12px;
+    overflow: hidden;
+    align-items: center;
+    justify-content: center;
+    font-weight: 700;
+    text-align: center;
+}
