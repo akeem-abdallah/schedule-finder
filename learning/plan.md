@@ -110,8 +110,8 @@ dropping one update (stale closure over `rows`).
 - [x] 3.1 Expand the fake course data so each course has sections with real meeting times (day + start/end) — something to actually collide against
 - [x] 3.2 Write the conflict check between two meetings — naive version, minutes-since-midnight range comparison
 - [x] 3.3 Section picker — box-per-course main view with a summary line, a "Customize" panel per course (checkbox list of its sections, Back), row state gains a `sections` array (unplanned addition, added 2026-08-09 at Akeem's request)
-- [ ] 3.4 Backtracking generator — build valid section combinations one course at a time, pruning on conflict during generation, capped at ~50
-- [ ] 3.5 Bitmask optimisation — encode a section's weekly occupancy as a bitmask, replace the range comparison with `a & b`, measure against the naive version
+- [x] 3.4 Bitmask representation — encode each section's weekly occupancy as bits (15-min slots), verify against the existing naive `meetingsConflict`. **Reordered before the generator 2026-08-10 at Akeem's request** — he asked to build the optimised version directly rather than naive-then-optimise, so the mask is now a prerequisite. **Real slot layout used, not a guess** — checked AURAK's live schedule page mid-lesson and found 7 days (Mon–Sun, not 6) and an 08:00–20:00 range (not 07:00–22:00), so `DAYS`/`DAY_START`/`SLOTS_PER_DAY` are calibrated to the actual data source
+- [x] 3.5 Backtracking generator — recursion carrying an accumulated occupancy mask (O(1) check per candidate), courses ordered fewest-candidates-first. No result cap for now — reversed 2026-08-10 at Akeem's request (see note below)
 - [ ] 3.6 Weekly grid — CSS Grid shell for the calendar (days across, time down)
 - [ ] 3.7 Wire it together — Generate button, render a combination into the grid, page through results
 - [ ] 3.8 Commit — deliverable reached
@@ -119,7 +119,7 @@ dropping one update (stale closure over `rows`).
 **Notes for the lesson:**
 - ⭐ **This is Akeem's home turf** (NeetCode 150, A-level CS). Give him much more room here than elsewhere — describe the problem and let him solve it. Scaffolding this section would waste the one part he's best equipped for.
 - **Correct order: make it work, then make it fast.** Start with the naive version — represent times as minutes-since-midnight, compare ranges. Get correct results. *Then* introduce bitmasks as an optimisation he can measure against the naive version.
-- **Cap results at ~50 and stop generating.** Not a nice-to-have — without it, 8 courses × 5 sections is ~390,000 combinations and the page hangs.
+- ~~Cap results at ~50 and stop generating~~ — **reversed 2026-08-10.** Akeem wants to skip this after the tradeoff was explained twice (total-university-dataset-size doesn't bound per-shortlist combinatorics; the real risk is the main thread freezing on the student's own phone during registration week, since generation is client-side). He wants to see a real freeze before capping it. Cheap to add back later — one length check inside the generation loop. If testing produces one, that's the moment to revisit, not before.
 - Prune *during* generation (abandon a partial schedule the moment it conflicts), never generate-then-filter.
 - 🚫 **This rule binds the agent, not just Akeem: do not read, fetch, or summarise the AUS scheduler's source code before he has produced a working generator himself.**
   - **Not allowed until then:** opening their GitHub, describing their approach, or letting their design shape the hints you give. A summary from you is *worse* than him reading it — it arrives as "here's how to do it" rather than as something he chose to look up.

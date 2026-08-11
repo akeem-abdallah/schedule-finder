@@ -250,21 +250,31 @@ Shipped 2026-08-05. Full history with detailed evidence lives in
 <!-- New leaf, not in original section 3 concept list -->
 
 ### bitmask-representation
-- status: seed
+- status: practicing
 - depends-on: time-conflict-detection
-- introduced: —
-- last-reviewed: —
-- evidence: —
+- introduced: 2026-08-10
+- last-reviewed: 2026-08-10
+- evidence: 🔴 asked to build the optimised (bitmask) version directly instead of naive-then-optimise, reordering this ahead of the generator. First contact with bit mechanics was a real struggle — said *"I don't understand anything you just did"* after the initial explanation and needed a full stop-and-rebuild on a shrunk 8-slot example. After the rebuild, correctly wrote out 8 bits for "busy at slots 0 and 2" himself (`00000101`), and correctly explained `<<`/`|=` back in his own words (*"<< shifts the 1 left, |= merges it into the mask"*). Real code had several rounds of bugs — a stray pasted character breaking `setSlot` twice, loop-variable naming mismatches (`index` vs `i`) in `masksConflict`, and critically using `&&` (logical) instead of `&` (bitwise) for the actual conflict check, which he initially didn't self-correct even after one explanation and needed a second, concrete-numbers walkthrough (`5 && 2` vs `5 & 2`) before fixing it correctly. Full pipeline (`sectionToMask` + `masksConflict`) verified live against the known-correct `meetingsConflict` on two real cases, both predicted correctly beforehand. **Same-day follow-up, after the task was already closed:** said *"I still want to understand the whole mask thing"* — honest signal the first pass hadn't fully settled. Got genuinely confused conflating three unrelated numbers (the toy 8-bit example, `2^8=256`, and the real 32-bit width), needed that named explicitly as three separate facts with no formula connecting them. Struggled through several wrong manual computations of `70 & 31` (said 7, then 8, correct answer 6) before I just showed the binary directly — manual bit arithmetic itself was correctly deprioritized as "not an actual skill needed" once it became clear he was stuck on execution, not concept. Once shown, correctly and independently explained *why* `& 31` isolates a remainder (place-value argument, same as reading the last two decimal digits for mod 100) and *why 31 specifically* — "because 31 in binary is exactly five 1s." That second explanation is real, from-first-principles understanding, not pattern-matching — good evidence the concept is now solid, even though the same-day cap still applies
+<!-- Reordered ahead of backtracking-with-pruning 2026-08-10 at Akeem's request -->
+
+### classic-for-loops
+- status: practicing
+- depends-on: none
+- introduced: 2026-08-10
+- last-reviewed: 2026-08-11
+- evidence: first `for (let i = 0; i < n; i++)` loops in the project — previously only used `.map()`/`.filter()`/`.find()`. Wrote the slot-setting loop in `sectionToMask` correctly by reusing an example shown a few messages earlier verbatim (didn't need it re-explained, just pointed back to it). The word-iteration loop in `masksConflict` had loop-variable naming bugs, fixed once each was named specifically. **2026-08-11:** correctly reused the same loop shape for `combineMasks` a day later, from a pointer back to `masksConflict` rather than a fresh explanation — real evidence the shape itself has stuck, though he still needed the loop *body* (`|` vs `&`) spelled out
+<!-- New leaf, not in original section 3 concept list -->
 
 ### backtracking-with-pruning
-- status: seed
-- depends-on: time-conflict-detection
-- introduced: —
-- last-reviewed: —
-- evidence: —
+- status: practicing
+- depends-on: time-conflict-detection, bitmask-representation, classic-for-loops
+- introduced: 2026-08-11
+- last-reviewed: 2026-08-11
+- evidence: 🔴 the flagged risk from the previous session materialised exactly as predicted — asked to trace `solve(0, ...)` for a real 2-course example, said *"I have no idea"*, confirming the earlier *"I understand recursion, don't worry"* had been a bare assertion, not real understanding. Full stop-and-rebuild: correctly traced `countdown(2)` by hand (*"2, 1, done"*) on the first try; then, given a `pairUp` example with a loop inside the recursive call, correctly predicted the result of adding a third `colors` option **and explained why** unprompted — *"pairup will fire 3 times for the colors option before base case and 2 times for the sizes option before the base case, so 3x2 = 6."* That's real, from-first-principles understanding of recursive fan-out, not pattern-matching. Applying it to the actual `generateSchedules`/`solve` function, made two real bugs: the base-case condition compared `courseIndex` to the array itself instead of `.length` (self-corrected once asked to trace `0 <= orderedLists.length` by hand), and tried to reassign a `const` with `results = {...chosenSoFar}` instead of `results.push(chosenSoFar)` — this one he said outright *"I don't understand"* rather than guessing, and needed the real reason explained (plain local variable vs. React state, why mutation is fine here but never for `rows`). After both fixes, the recursive search itself was correct on the first attempt. Verified against real, hand-computed data — correctly predicted 3 valid combinations out of 4 for a 2-course case and identified which pair conflicts, then confirmed live in the browser
+<!-- Recursion itself has no separate leaf — folded into this one, since it's the concept the plan named for this piece -->
 
 ### result-capping
-- status: seed
+- status: seed — **decision reversed 2026-08-10, see plan.md section 3.** Akeem chose no cap after the tradeoff was explained twice; this concept may not get built at all unless testing surfaces a real freeze. Leaving at `seed` rather than deleting, in case it's revisited
 - depends-on: backtracking-with-pruning
 - introduced: —
 - last-reviewed: —

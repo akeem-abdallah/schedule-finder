@@ -118,7 +118,7 @@ Originally specified server-side. **Reversed once real student usage became the 
 > **Be clear-eyed:** with generation client-side, the backend is a pure read API over 700 rows that change daily. Strictly, the app no longer *needs* a backend or a database — a static JSON file would work. **FastAPI and Postgres are here because they are the learning goals.** That's legitimate. They stop being optional the moment any v1.1 feature lands.
 
 ### Performance levers, in order of impact
-1. **Cap results** — generate the first ~50 and stop. Nobody scrolls 37,000.
+1. ~~Cap results~~ — reversed 2026-08-10 at Akeem's request; see `plan.md` section 3 for the full reasoning and revisit condition.
 2. **Bitmask conflict detection** — encode weekly occupancy as a bitmask; conflict is `a & b != 0`.
 3. **Client-side generation** — the structural fix.
 
