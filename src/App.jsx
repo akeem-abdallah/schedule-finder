@@ -1,5 +1,4 @@
 import './App.css'
-import Course from './Course'
 import { useState, Fragment } from 'react'
 import { subjects } from './data'
 import { DAYS, DAY_START, generateSchedules, GRID_HOURS, orderedEligibleLists, timeToMinutes, to12Hour } from './schedule'
@@ -99,19 +98,25 @@ function App() {
 
     return (
         <>
-            <h1>AURAK Schedule Finder</h1>
 
-            <div>
+            <div className="card">
+
+                <div className="status-strip">
+                    <h1 className="strip-title">AURAK Schedule Finder</h1>
+                    <div className="spacer"></div>
+                    <span className="chip">UNOFFICIAL</span>
+                </div>
+
                 {results ? (
-                    <>
+                    <div className="view-body">
 
-                        <button onClick={() => setResults(null)}>Back</button>
+                        <button onClick={() => setResults(null)}>← BACK</button>
 
                         <div className="schedule-navigation">
 
-                            <button onClick={() => setIndex(-1)}>Previous</button>
+                            <button className="btn-secondary" onClick={() => setIndex(-1)}>Previous</button>
                             <p>{currentIndex + 1} of {results.length}</p>
-                            <button onClick={() => setIndex(1)}>Next</button>
+                            <button className="btn-secondary" onClick={() => setIndex(1)}>Next</button>
                         </div>
 
 
@@ -154,11 +159,11 @@ function App() {
                                 })
                             )}
                         </div>
-                    </>
+                    </div>
                 ) : customizingID ? (
-                    <div className="courses">
+                    <div className="view-body">
 
-                        <button onClick={() => setCustomizingID(null)}>Back</button>
+                        <button onClick={() => setCustomizingID(null)}>← BACK</button>
 
                         <p>{customizingCourse.code} - {customizingCourse.description}</p>
 
@@ -186,64 +191,83 @@ function App() {
 
                 ) : (
 
-                    <div className="courses">
+                    <>
+
+                        <div className="table-header">
+                            <span>SUBJ</span>
+                            <span>CODE</span>
+                            <span>TITLE</span>
+                            <span>SEC</span>
+                            <span></span>
+                        </div>
+
                         {rows.map((row) => {
 
                             const currentSubject = subjects.find((s) => s.subject === row.subject)
                             const courses = currentSubject ? currentSubject.courses : []
                             const rowCourse = courses.find((c) => c.code === row.code)
+                            const isInProgress = row.subject !== "" && row.code === ""
 
                             return (
 
-                                <div key={row.id} className="row">
+                                <div key={row.id} className={isInProgress ? "row row-active" : "row"}>
 
-                                    <p>Course:</p>
-                                    <select value={row.subject} onChange={(e) => updateRow(row.id, { subject: e.target.value, code: "" })}>
-                                        <option value="">-- pick a subject --</option>
+                                    <select value={row.subject} aria-label="Subject" onChange={(e) => updateRow(row.id, { subject: e.target.value, code: "" })}>
+                                        <option value="">--</option>
                                         {subjects.map((s) => (
                                             <option key={s.subject} value={s.subject}>{s.subject}</option>
                                         ))}
                                     </select>
 
-                                    <p>Code:</p>
-                                    <select value={row.code} onChange={(e) => updateRow(row.id, { code: e.target.value })}>
-                                        <option value="">-- pick a course --</option>
+                                    <select value={row.code} aria-label="Course code" onChange={(e) => updateRow(row.id, { code: e.target.value })}>
+                                        <option value="">--</option>
                                         {courses.map((c) => (
-                                            <option key={c.code} value={c.code}>{c.code} - {c.description}</option>
+                                            <option key={c.code} value={c.code}>
+                                                {c.code === row.code ? c.code : `${c.code} - ${c.description}`}
+                                            </option>
                                         ))}
                                     </select>
 
+                                    <span className={rowCourse ? "row-title" : "row-title row-title-placeholder"}>
+                                        {rowCourse ? rowCourse.description : "select a course"}
+                                    </span>
 
+                             
+                                    <div className="sec-cell">
+                                        {rowCourse && (
+                                            <>
+                                                <button className="btn-secondary" aria-label={`Edit sections for ${row.subject} ${row.code}`}
+                                                    onClick={() => setCustomizingID(row.id)}>EDIT</button>
+                                                <span className={row.sections.length === 0 ? "sec-text" : "sec-text sec-text-accent"}>
+                                                    {row.sections.length === 0 ? "ALL" : `${row.sections.length}/${rowCourse.sections.length}`}</span>
 
-                                    {rowCourse && (
-                                        <>
-                                            <p>{row.sections.length === 0 ? "All sections" : `${row.sections.length} / ${rowCourse.sections.length} selected`}</p>
-
-                                            <button onClick={() => setCustomizingID(row.id)}>Customize</button>
-                                        </>
-
-                                    )}
-
-
-                                    <button onClick={() => removeRow(row.id)}>x</button>
+                                            </>
+                                        )}
+                                    </div>
+                                  
+                                    <button className="btn-destructive" onClick={() => removeRow(row.id)} aria-label="Remove course">×</button>
 
                                 </div>
 
                             )
                         })}
 
-                        <div>
+                        <div className="table-footer">
 
-                            <button onClick={addRow}>+ Add</button>
+                            <button className="btn-secondary" onClick={addRow}>+ ADD COURSE</button>
 
-                            <button onClick={handleSubmit}>Submit</button>
+                            <button className="btn-primary" onClick={handleSubmit}>GENERATE →</button>
 
                         </div>
-                    </div>
+
+                    </>
                 )}
+
+                {error && <div className="error" role="alert">{error}</div>}
+
             </div>
 
-            {error && <p>{error}</p>}
+            
 
 
 

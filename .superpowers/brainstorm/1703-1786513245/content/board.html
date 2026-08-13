@@ -1,0 +1,246 @@
+<h2>The board</h2>
+<p class="subtitle">Two type families doing different jobs: <strong>monospace for every piece of data</strong> (codes, sections, times, counts) so columns align on their own, and system sans for prose and labels. Ruled rows instead of cards. Zero radius. One accent.</p>
+
+<!-- ============ DESKTOP LIGHT ============ -->
+<div class="section">
+  <span class="label">Pick courses &mdash; light</span>
+  <div class="mockup">
+    <div class="mockup-body" style="background:#fbfbfa;padding:20px;">
+      <div style="max-width:720px;margin:0 auto;background:#ffffff;border:1px solid #d8d6d1;">
+
+        <!-- status strip -->
+        <div style="display:flex;align-items:center;gap:10px;border-bottom:2px solid #16150f;padding:9px 13px;">
+          <div style="font-family:system-ui,sans-serif;font-size:13px;font-weight:800;letter-spacing:.13em;color:#16150f;">AURAK SCHEDULE FINDER</div>
+          <div style="flex:1;"></div>
+          <div style="font-family:ui-monospace,Consolas,monospace;font-size:10px;color:#8a867c;letter-spacing:.05em;">UPD 06:00</div>
+          <div style="font-family:ui-monospace,Consolas,monospace;font-size:9px;font-weight:700;letter-spacing:.12em;background:#16150f;color:#fbfbfa;padding:2px 6px;">UNOFFICIAL</div>
+        </div>
+
+        <!-- column header -->
+        <div style="display:grid;grid-template-columns:66px 58px 1fr 74px 34px;align-items:center;border-bottom:1px solid #d8d6d1;background:#f4f3f0;padding:6px 13px;font-family:system-ui,sans-serif;font-size:9px;font-weight:800;letter-spacing:.14em;color:#8a867c;">
+          <div>SUBJ</div><div>CODE</div><div>TITLE</div><div style="text-align:right;">SECTIONS</div><div></div>
+        </div>
+
+        <!-- rows -->
+        <div style="display:grid;grid-template-columns:66px 58px 1fr 74px 34px;align-items:center;border-bottom:1px solid #eceae5;padding:7px 13px;gap:8px;">
+          <div style="font-family:ui-monospace,Consolas,monospace;font-size:14px;font-weight:600;color:#16150f;">CSCI</div>
+          <div style="font-family:ui-monospace,Consolas,monospace;font-size:14px;font-weight:600;color:#16150f;">112</div>
+          <div style="font-family:system-ui,sans-serif;font-size:13px;color:#3d3a33;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">Introduction to Computer Programming</div>
+          <div style="font-family:ui-monospace,Consolas,monospace;font-size:12px;color:#8a867c;text-align:right;">ALL</div>
+          <div style="text-align:right;font-family:ui-monospace,Consolas,monospace;font-size:14px;color:#b8b3a8;">&times;</div>
+        </div>
+
+        <div style="display:grid;grid-template-columns:66px 58px 1fr 74px 34px;align-items:center;border-bottom:1px solid #eceae5;padding:7px 13px;gap:8px;">
+          <div style="font-family:ui-monospace,Consolas,monospace;font-size:14px;font-weight:600;color:#16150f;">MATH</div>
+          <div style="font-family:ui-monospace,Consolas,monospace;font-size:14px;font-weight:600;color:#16150f;">113</div>
+          <div style="font-family:system-ui,sans-serif;font-size:13px;color:#3d3a33;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">Calculus I</div>
+          <div style="font-family:ui-monospace,Consolas,monospace;font-size:12px;color:#b8600d;text-align:right;font-weight:700;">1/2</div>
+          <div style="text-align:right;font-family:ui-monospace,Consolas,monospace;font-size:14px;color:#b8b3a8;">&times;</div>
+        </div>
+
+        <div style="display:grid;grid-template-columns:66px 58px 1fr 74px 34px;align-items:center;border-bottom:1px solid #eceae5;padding:7px 13px;gap:8px;">
+          <div style="font-family:ui-monospace,Consolas,monospace;font-size:14px;font-weight:600;color:#16150f;">PHYS</div>
+          <div style="font-family:ui-monospace,Consolas,monospace;font-size:14px;font-weight:600;color:#16150f;">095</div>
+          <div style="font-family:system-ui,sans-serif;font-size:13px;color:#3d3a33;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">Introductory Physics</div>
+          <div style="font-family:ui-monospace,Consolas,monospace;font-size:12px;color:#8a867c;text-align:right;">ALL</div>
+          <div style="text-align:right;font-family:ui-monospace,Consolas,monospace;font-size:14px;color:#b8b3a8;">&times;</div>
+        </div>
+
+        <!-- empty / active row -->
+        <div style="display:grid;grid-template-columns:66px 58px 1fr 74px 34px;align-items:center;border-bottom:1px solid #eceae5;padding:5px 13px;gap:8px;background:#fffdf7;">
+          <div style="border:1px solid #16150f;padding:4px 6px;font-family:ui-monospace,Consolas,monospace;font-size:13px;color:#16150f;">CHEM</div>
+          <div style="border:1px solid #c9c5bb;padding:4px 6px;font-family:ui-monospace,Consolas,monospace;font-size:13px;color:#b8b3a8;">&mdash;&mdash;&mdash;</div>
+          <div style="font-family:system-ui,sans-serif;font-size:12px;color:#b8b3a8;font-style:italic;">select a course</div>
+          <div></div>
+          <div style="text-align:right;font-family:ui-monospace,Consolas,monospace;font-size:14px;color:#b8b3a8;">&times;</div>
+        </div>
+
+        <!-- footer actions -->
+        <div style="display:flex;align-items:center;padding:11px 13px;gap:10px;">
+          <button style="background:transparent;border:1px solid #c9c5bb;padding:8px 13px;font-family:system-ui,sans-serif;font-size:10px;font-weight:800;letter-spacing:.11em;color:#3d3a33;">+ ADD COURSE</button>
+          <div style="flex:1;"></div>
+          <button style="background:#b8600d;color:#fff;border:none;padding:9px 18px;font-family:system-ui,sans-serif;font-size:10px;font-weight:800;letter-spacing:.13em;">GENERATE &rarr;</button>
+        </div>
+
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ============ RESULTS SPLIT ============ -->
+<div class="section">
+  <span class="label">Results &mdash; light / dark</span>
+  <div class="split">
+
+    <!-- results light -->
+    <div class="mockup">
+      <div class="mockup-header">Light</div>
+      <div class="mockup-body" style="background:#fbfbfa;padding:14px;">
+        <div style="background:#fff;border:1px solid #d8d6d1;">
+          <div style="display:flex;align-items:center;gap:8px;border-bottom:2px solid #16150f;padding:8px 11px;">
+            <div style="font-family:system-ui,sans-serif;font-size:9px;font-weight:800;letter-spacing:.11em;color:#8a867c;">&larr; EDIT</div>
+            <div style="flex:1;"></div>
+            <div style="font-family:ui-monospace,Consolas,monospace;font-size:20px;font-weight:700;color:#16150f;letter-spacing:-.02em;">003</div>
+            <div style="font-family:ui-monospace,Consolas,monospace;font-size:12px;color:#b8b3a8;">/</div>
+            <div style="font-family:ui-monospace,Consolas,monospace;font-size:20px;font-weight:700;color:#b8600d;letter-spacing:-.02em;">048</div>
+          </div>
+
+          <div style="display:grid;grid-template-columns:44px repeat(3,1fr);">
+            <div style="border-bottom:1px solid #d8d6d1;background:#f4f3f0;"></div>
+            <div style="border-bottom:1px solid #d8d6d1;background:#f4f3f0;text-align:center;font-family:system-ui,sans-serif;font-size:9px;font-weight:800;letter-spacing:.13em;color:#3d3a33;padding:6px 0;">MON</div>
+            <div style="border-bottom:1px solid #d8d6d1;background:#f4f3f0;text-align:center;font-family:system-ui,sans-serif;font-size:9px;font-weight:800;letter-spacing:.13em;color:#3d3a33;padding:6px 0;">TUE</div>
+            <div style="border-bottom:1px solid #d8d6d1;background:#f4f3f0;text-align:center;font-family:system-ui,sans-serif;font-size:9px;font-weight:800;letter-spacing:.13em;color:#3d3a33;padding:6px 0;">WED</div>
+
+            <div style="font-family:ui-monospace,Consolas,monospace;font-size:10px;color:#b8b3a8;padding:3px 5px;text-align:right;border-bottom:1px solid #eceae5;border-right:1px solid #d8d6d1;height:40px;">0900</div>
+            <div style="border-bottom:1px solid #eceae5;border-right:1px solid #eceae5;padding:2px;"><div style="background:rgba(23,74,140,.09);border-left:3px solid #174a8c;padding:4px 5px;height:100%;box-sizing:border-box;"><div style="font-family:ui-monospace,Consolas,monospace;font-size:10px;font-weight:700;color:#16150f;">CSCI 104-01</div><div style="font-family:system-ui,sans-serif;font-size:9px;color:#8a867c;">Dr. Ahmed</div></div></div>
+            <div style="border-bottom:1px solid #eceae5;border-right:1px solid #eceae5;"></div>
+            <div style="border-bottom:1px solid #eceae5;padding:2px;"><div style="background:rgba(23,74,140,.09);border-left:3px solid #174a8c;padding:4px 5px;height:100%;box-sizing:border-box;"><div style="font-family:ui-monospace,Consolas,monospace;font-size:10px;font-weight:700;color:#16150f;">CSCI 104-01</div><div style="font-family:system-ui,sans-serif;font-size:9px;color:#8a867c;">Dr. Ahmed</div></div></div>
+
+            <div style="font-family:ui-monospace,Consolas,monospace;font-size:10px;color:#b8b3a8;padding:3px 5px;text-align:right;border-bottom:1px solid #eceae5;border-right:1px solid #d8d6d1;height:40px;">1100</div>
+            <div style="border-bottom:1px solid #eceae5;border-right:1px solid #eceae5;"></div>
+            <div style="border-bottom:1px solid #eceae5;border-right:1px solid #eceae5;padding:2px;"><div style="background:rgba(184,96,13,.11);border-left:3px solid #b8600d;padding:4px 5px;height:100%;box-sizing:border-box;"><div style="font-family:ui-monospace,Consolas,monospace;font-size:10px;font-weight:700;color:#16150f;">MATH 113-02</div><div style="font-family:system-ui,sans-serif;font-size:9px;color:#8a867c;">Dr. Sara</div></div></div>
+            <div style="border-bottom:1px solid #eceae5;"></div>
+
+            <div style="font-family:ui-monospace,Consolas,monospace;font-size:10px;color:#b8b3a8;padding:3px 5px;text-align:right;border-right:1px solid #d8d6d1;height:40px;">1300</div>
+            <div style="border-right:1px solid #eceae5;padding:2px;"><div style="background:rgba(29,102,74,.10);border-left:3px solid #1d664a;padding:4px 5px;height:100%;box-sizing:border-box;"><div style="font-family:ui-monospace,Consolas,monospace;font-size:10px;font-weight:700;color:#16150f;">PHYS 095-01</div><div style="font-family:system-ui,sans-serif;font-size:9px;color:#8a867c;">Dr. Farah</div></div></div>
+            <div style="border-right:1px solid #eceae5;"></div>
+            <div style="padding:2px;"><div style="background:rgba(29,102,74,.10);border-left:3px solid #1d664a;padding:4px 5px;height:100%;box-sizing:border-box;"><div style="font-family:ui-monospace,Consolas,monospace;font-size:10px;font-weight:700;color:#16150f;">PHYS 095-01</div><div style="font-family:system-ui,sans-serif;font-size:9px;color:#8a867c;">Dr. Farah</div></div></div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- results dark -->
+    <div class="mockup">
+      <div class="mockup-header">Dark</div>
+      <div class="mockup-body" style="background:#0d0d0c;padding:14px;">
+        <div style="background:#141413;border:1px solid #2e2d2a;">
+          <div style="display:flex;align-items:center;gap:8px;border-bottom:2px solid #e8e6df;padding:8px 11px;">
+            <div style="font-family:system-ui,sans-serif;font-size:9px;font-weight:800;letter-spacing:.11em;color:#8a867c;">&larr; EDIT</div>
+            <div style="flex:1;"></div>
+            <div style="font-family:ui-monospace,Consolas,monospace;font-size:20px;font-weight:700;color:#e8e6df;letter-spacing:-.02em;">003</div>
+            <div style="font-family:ui-monospace,Consolas,monospace;font-size:12px;color:#5c5a55;">/</div>
+            <div style="font-family:ui-monospace,Consolas,monospace;font-size:20px;font-weight:700;color:#ffb020;letter-spacing:-.02em;">048</div>
+          </div>
+
+          <div style="display:grid;grid-template-columns:44px repeat(3,1fr);">
+            <div style="border-bottom:1px solid #2e2d2a;background:#1c1b19;"></div>
+            <div style="border-bottom:1px solid #2e2d2a;background:#1c1b19;text-align:center;font-family:system-ui,sans-serif;font-size:9px;font-weight:800;letter-spacing:.13em;color:#c4c1b8;padding:6px 0;">MON</div>
+            <div style="border-bottom:1px solid #2e2d2a;background:#1c1b19;text-align:center;font-family:system-ui,sans-serif;font-size:9px;font-weight:800;letter-spacing:.13em;color:#c4c1b8;padding:6px 0;">TUE</div>
+            <div style="border-bottom:1px solid #2e2d2a;background:#1c1b19;text-align:center;font-family:system-ui,sans-serif;font-size:9px;font-weight:800;letter-spacing:.13em;color:#c4c1b8;padding:6px 0;">WED</div>
+
+            <div style="font-family:ui-monospace,Consolas,monospace;font-size:10px;color:#5c5a55;padding:3px 5px;text-align:right;border-bottom:1px solid #232220;border-right:1px solid #2e2d2a;height:40px;">0900</div>
+            <div style="border-bottom:1px solid #232220;border-right:1px solid #232220;padding:2px;"><div style="background:rgba(90,150,230,.22);border-left:3px solid #5a96e6;padding:4px 5px;height:100%;box-sizing:border-box;"><div style="font-family:ui-monospace,Consolas,monospace;font-size:10px;font-weight:700;color:#e8e6df;">CSCI 104-01</div><div style="font-family:system-ui,sans-serif;font-size:9px;color:#8a867c;">Dr. Ahmed</div></div></div>
+            <div style="border-bottom:1px solid #232220;border-right:1px solid #232220;"></div>
+            <div style="border-bottom:1px solid #232220;padding:2px;"><div style="background:rgba(90,150,230,.22);border-left:3px solid #5a96e6;padding:4px 5px;height:100%;box-sizing:border-box;"><div style="font-family:ui-monospace,Consolas,monospace;font-size:10px;font-weight:700;color:#e8e6df;">CSCI 104-01</div><div style="font-family:system-ui,sans-serif;font-size:9px;color:#8a867c;">Dr. Ahmed</div></div></div>
+
+            <div style="font-family:ui-monospace,Consolas,monospace;font-size:10px;color:#5c5a55;padding:3px 5px;text-align:right;border-bottom:1px solid #232220;border-right:1px solid #2e2d2a;height:40px;">1100</div>
+            <div style="border-bottom:1px solid #232220;border-right:1px solid #232220;"></div>
+            <div style="border-bottom:1px solid #232220;border-right:1px solid #232220;padding:2px;"><div style="background:rgba(255,176,32,.20);border-left:3px solid #ffb020;padding:4px 5px;height:100%;box-sizing:border-box;"><div style="font-family:ui-monospace,Consolas,monospace;font-size:10px;font-weight:700;color:#e8e6df;">MATH 113-02</div><div style="font-family:system-ui,sans-serif;font-size:9px;color:#8a867c;">Dr. Sara</div></div></div>
+            <div style="border-bottom:1px solid #232220;"></div>
+
+            <div style="font-family:ui-monospace,Consolas,monospace;font-size:10px;color:#5c5a55;padding:3px 5px;text-align:right;border-right:1px solid #2e2d2a;height:40px;">1300</div>
+            <div style="border-right:1px solid #232220;padding:2px;"><div style="background:rgba(70,190,140,.20);border-left:3px solid #46be8c;padding:4px 5px;height:100%;box-sizing:border-box;"><div style="font-family:ui-monospace,Consolas,monospace;font-size:10px;font-weight:700;color:#e8e6df;">PHYS 095-01</div><div style="font-family:system-ui,sans-serif;font-size:9px;color:#8a867c;">Dr. Farah</div></div></div>
+            <div style="border-right:1px solid #232220;"></div>
+            <div style="padding:2px;"><div style="background:rgba(70,190,140,.20);border-left:3px solid #46be8c;padding:4px 5px;height:100%;box-sizing:border-box;"><div style="font-family:ui-monospace,Consolas,monospace;font-size:10px;font-weight:700;color:#e8e6df;">PHYS 095-01</div><div style="font-family:system-ui,sans-serif;font-size:9px;color:#8a867c;">Dr. Farah</div></div></div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+  </div>
+</div>
+
+<!-- ============ PHONE ============ -->
+<div class="section">
+  <span class="label">Phone &mdash; 375px, both themes</span>
+  <p style="margin:8px 0 12px;">A table can't stay a table at 375px. Each course collapses to a two-line block &mdash; code line in mono, title beneath &mdash; but keeps the rules and the tabular alignment, so it still reads as the same object rather than a different design.</p>
+  <div style="display:flex;gap:16px;flex-wrap:wrap;justify-content:center;">
+
+    <div style="width:300px;background:#fbfbfa;padding:12px;border:1px solid #d8d6d1;">
+      <div style="background:#fff;border:1px solid #d8d6d1;">
+        <div style="display:flex;align-items:center;gap:6px;border-bottom:2px solid #16150f;padding:8px 10px;">
+          <div style="font-family:system-ui,sans-serif;font-size:10px;font-weight:800;letter-spacing:.1em;color:#16150f;">SCHEDULE FINDER</div>
+          <div style="flex:1;"></div>
+          <div style="font-family:ui-monospace,Consolas,monospace;font-size:8px;font-weight:700;letter-spacing:.1em;background:#16150f;color:#fbfbfa;padding:2px 5px;">UNOFFICIAL</div>
+        </div>
+
+        <div style="border-bottom:1px solid #eceae5;padding:8px 10px;">
+          <div style="display:flex;align-items:baseline;gap:7px;">
+            <div style="font-family:ui-monospace,Consolas,monospace;font-size:15px;font-weight:600;color:#16150f;">CSCI 112</div>
+            <div style="flex:1;"></div>
+            <div style="font-family:ui-monospace,Consolas,monospace;font-size:11px;color:#8a867c;">ALL</div>
+            <div style="font-family:ui-monospace,Consolas,monospace;font-size:15px;color:#b8b3a8;">&times;</div>
+          </div>
+          <div style="font-family:system-ui,sans-serif;font-size:12px;color:#3d3a33;margin-top:2px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">Introduction to Computer Programming</div>
+        </div>
+
+        <div style="border-bottom:1px solid #eceae5;padding:8px 10px;">
+          <div style="display:flex;align-items:baseline;gap:7px;">
+            <div style="font-family:ui-monospace,Consolas,monospace;font-size:15px;font-weight:600;color:#16150f;">MATH 113</div>
+            <div style="flex:1;"></div>
+            <div style="font-family:ui-monospace,Consolas,monospace;font-size:11px;color:#b8600d;font-weight:700;">1/2</div>
+            <div style="font-family:ui-monospace,Consolas,monospace;font-size:15px;color:#b8b3a8;">&times;</div>
+          </div>
+          <div style="font-family:system-ui,sans-serif;font-size:12px;color:#3d3a33;margin-top:2px;">Calculus I</div>
+        </div>
+
+        <div style="padding:10px;">
+          <button style="width:100%;background:transparent;border:1px solid #c9c5bb;padding:10px;font-family:system-ui,sans-serif;font-size:10px;font-weight:800;letter-spacing:.11em;color:#3d3a33;margin-bottom:7px;">+ ADD COURSE</button>
+          <button style="width:100%;background:#b8600d;color:#fff;border:none;padding:12px;font-family:system-ui,sans-serif;font-size:10px;font-weight:800;letter-spacing:.13em;">GENERATE &rarr;</button>
+        </div>
+      </div>
+    </div>
+
+    <div style="width:300px;background:#0d0d0c;padding:12px;border:1px solid #2e2d2a;">
+      <div style="background:#141413;border:1px solid #2e2d2a;">
+        <div style="display:flex;align-items:center;gap:6px;border-bottom:2px solid #e8e6df;padding:8px 10px;">
+          <div style="font-family:system-ui,sans-serif;font-size:10px;font-weight:800;letter-spacing:.1em;color:#e8e6df;">SCHEDULE FINDER</div>
+          <div style="flex:1;"></div>
+          <div style="font-family:ui-monospace,Consolas,monospace;font-size:8px;font-weight:700;letter-spacing:.1em;background:#e8e6df;color:#141413;padding:2px 5px;">UNOFFICIAL</div>
+        </div>
+
+        <div style="border-bottom:1px solid #232220;padding:8px 10px;">
+          <div style="display:flex;align-items:baseline;gap:7px;">
+            <div style="font-family:ui-monospace,Consolas,monospace;font-size:15px;font-weight:600;color:#e8e6df;">CSCI 112</div>
+            <div style="flex:1;"></div>
+            <div style="font-family:ui-monospace,Consolas,monospace;font-size:11px;color:#8a867c;">ALL</div>
+            <div style="font-family:ui-monospace,Consolas,monospace;font-size:15px;color:#5c5a55;">&times;</div>
+          </div>
+          <div style="font-family:system-ui,sans-serif;font-size:12px;color:#c4c1b8;margin-top:2px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">Introduction to Computer Programming</div>
+        </div>
+
+        <div style="border-bottom:1px solid #232220;padding:8px 10px;">
+          <div style="display:flex;align-items:baseline;gap:7px;">
+            <div style="font-family:ui-monospace,Consolas,monospace;font-size:15px;font-weight:600;color:#e8e6df;">MATH 113</div>
+            <div style="flex:1;"></div>
+            <div style="font-family:ui-monospace,Consolas,monospace;font-size:11px;color:#ffb020;font-weight:700;">1/2</div>
+            <div style="font-family:ui-monospace,Consolas,monospace;font-size:15px;color:#5c5a55;">&times;</div>
+          </div>
+          <div style="font-family:system-ui,sans-serif;font-size:12px;color:#c4c1b8;margin-top:2px;">Calculus I</div>
+        </div>
+
+        <div style="padding:10px;">
+          <button style="width:100%;background:transparent;border:1px solid #3d3b37;padding:10px;font-family:system-ui,sans-serif;font-size:10px;font-weight:800;letter-spacing:.11em;color:#c4c1b8;margin-bottom:7px;">+ ADD COURSE</button>
+          <button style="width:100%;background:#ffb020;color:#16150f;border:none;padding:12px;font-family:system-ui,sans-serif;font-size:10px;font-weight:800;letter-spacing:.13em;">GENERATE &rarr;</button>
+        </div>
+      </div>
+    </div>
+
+  </div>
+</div>
+
+<!-- ============ SYSTEM ============ -->
+<div class="section" style="border-top:2px solid currentColor;padding-top:16px;">
+  <span class="label">The rules that make it this and not something else</span>
+  <div style="font-size:14px;line-height:1.7;margin-top:10px;">
+    <p><strong>Mono is for data, sans is for language.</strong> Subject, code, section counts, times, the result counter &mdash; monospace, so <code>CSCI</code>/<code>MATH</code>/<code>PHYS</code> and <code>112</code>/<code>113</code>/<code>095</code> line up into columns without you setting a single width. Course titles, button labels, headings &mdash; system sans. Mixing the two <em>on purpose</em> is most of the personality here.</p>
+    <p><strong>Rules, not boxes.</strong> One hairline between rows, one heavy 2px rule under the status strip. No cards, no shadows, no radius anywhere. The heavy/hairline contrast is the whole hierarchy.</p>
+    <p><strong>Numbers get to be big.</strong> <code>003 / 048</code> at 20px mono is the loudest thing in the results view, because the count is what you came for. Leading zeros are deliberate &mdash; they keep the width fixed as you page, so nothing shifts.</p>
+    <p><strong>Labels are tiny, tracked, and uppercase.</strong> 9&ndash;10px, <code>letter-spacing: .13em</code>, muted. This is what lets them be small without looking like an accident.</p>
+    <p><strong>Course color is one hue at alpha</strong> &mdash; same mechanism as before, so it inverts for free. Text inside blocks stays the normal text color; only the left rule and the wash carry identity.</p>
+    <p style="margin-top:12px;color:#b8600d;"><strong>Two judgment calls to confirm or reject:</strong></p>
+    <p><strong>1. 24-hour times in the grid gutter</strong> (<code>0900</code>, <code>1100</code>, <code>1300</code>). Fixed-width, no AM/PM, aligns perfectly &mdash; very timetable. But it's a functional change to <code>to12Hour()</code>, and AURAK students may just read 12-hour faster. Easy to keep 12-hour and still get alignment from the mono font.</p>
+    <p><strong>2. The status strip replaces the big centered <code>&lt;h1&gt;</code>.</strong> The title goes small, tracked, top-left, with <code>UNOFFICIAL</code> as a filled chip and the update time in mono beside it. That kills the 34px centered heading you have now &mdash; which is the single most generic element on the page, but it is a real change in feel.</p>
+  </div>
+</div>

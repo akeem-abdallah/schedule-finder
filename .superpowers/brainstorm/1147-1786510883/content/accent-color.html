@@ -1,0 +1,84 @@
+<h2>Which accent color?</h2>
+<p class="subtitle">Modern SaaS, light mode. Each card shows the accent on a button, an active nav/tab state, and two sample class blocks from the weekly grid.</p>
+
+<div class="cards">
+
+  <div class="card" data-choice="indigo" onclick="toggleSelect(this)">
+    <div class="card-image">
+      <div style="background:#fff;border:1px solid #e5e7eb;border-radius:10px;padding:14px;font-family:system-ui,sans-serif;">
+        <div style="display:flex;gap:8px;margin-bottom:12px;">
+          <button style="background:#4f46e5;color:#fff;border:none;border-radius:8px;padding:8px 14px;font-size:13px;font-weight:600;">Submit</button>
+          <button style="background:#eef2ff;color:#4f46e5;border:none;border-radius:8px;padding:8px 14px;font-size:13px;font-weight:600;">Customize</button>
+        </div>
+        <div style="display:flex;gap:6px;">
+          <div style="flex:1;background:#eef2ff;border-left:3px solid #4f46e5;border-radius:6px;padding:8px;font-size:11px;color:#312e81;">CSCI 104<br>Dr. Ahmed</div>
+          <div style="flex:1;background:#e0e7ff;border-left:3px solid #6366f1;border-radius:6px;padding:8px;font-size:11px;color:#312e81;">MATH 113<br>Dr. Tariq</div>
+        </div>
+      </div>
+    </div>
+    <div class="card-body">
+      <h3>Indigo</h3>
+      <p>Linear/Notion default. Confident, techy, very "modern SaaS." Common enough to feel safe, not sleepy.</p>
+    </div>
+  </div>
+
+  <div class="card" data-choice="teal" onclick="toggleSelect(this)">
+    <div class="card-image">
+      <div style="background:#fff;border:1px solid #e5e7eb;border-radius:10px;padding:14px;font-family:system-ui,sans-serif;">
+        <div style="display:flex;gap:8px;margin-bottom:12px;">
+          <button style="background:#0d9488;color:#fff;border:none;border-radius:8px;padding:8px 14px;font-size:13px;font-weight:600;">Submit</button>
+          <button style="background:#ccfbf1;color:#0d9488;border:none;border-radius:8px;padding:8px 14px;font-size:13px;font-weight:600;">Customize</button>
+        </div>
+        <div style="display:flex;gap:6px;">
+          <div style="flex:1;background:#ccfbf1;border-left:3px solid #0d9488;border-radius:6px;padding:8px;font-size:11px;color:#134e4a;">CSCI 104<br>Dr. Ahmed</div>
+          <div style="flex:1;background:#99f6e4;border-left:3px solid #14b8a6;border-radius:6px;padding:8px;font-size:11px;color:#134e4a;">MATH 113<br>Dr. Tariq</div>
+        </div>
+      </div>
+    </div>
+    <div class="card-body">
+      <h3>Teal</h3>
+      <p>Fresh, calm, reads academic without looking official. Good contrast against a white grid.</p>
+    </div>
+  </div>
+
+  <div class="card" data-choice="blue" onclick="toggleSelect(this)">
+    <div class="card-image">
+      <div style="background:#fff;border:1px solid #e5e7eb;border-radius:10px;padding:14px;font-family:system-ui,sans-serif;">
+        <div style="display:flex;gap:8px;margin-bottom:12px;">
+          <button style="background:#2563eb;color:#fff;border:none;border-radius:8px;padding:8px 14px;font-size:13px;font-weight:600;">Submit</button>
+          <button style="background:#dbeafe;color:#2563eb;border:none;border-radius:8px;padding:8px 14px;font-size:13px;font-weight:600;">Customize</button>
+        </div>
+        <div style="display:flex;gap:6px;">
+          <div style="flex:1;background:#dbeafe;border-left:3px solid #2563eb;border-radius:6px;padding:8px;font-size:11px;color:#1e3a8a;">CSCI 104<br>Dr. Ahmed</div>
+          <div style="flex:1;background:#bfdbfe;border-left:3px solid #3b82f6;border-radius:6px;padding:8px;font-size:11px;color:#1e3a8a;">MATH 113<br>Dr. Tariq</div>
+        </div>
+      </div>
+    </div>
+    <div class="card-body">
+      <h3>Blue</h3>
+      <p>Safest, most "school tool" of the four. Slight risk of reading as official-university-blue &mdash; worth weighing against the "visibly unofficial" requirement.</p>
+    </div>
+  </div>
+
+  <div class="card" data-choice="coral" onclick="toggleSelect(this)">
+    <div class="card-image">
+      <div style="background:#fff;border:1px solid #e5e7eb;border-radius:10px;padding:14px;font-family:system-ui,sans-serif;">
+        <div style="display:flex;gap:8px;margin-bottom:12px;">
+          <button style="background:#e11d48;color:#fff;border:none;border-radius:8px;padding:8px 14px;font-size:13px;font-weight:600;">Submit</button>
+          <button style="background:#ffe4e6;color:#e11d48;border:none;border-radius:8px;padding:8px 14px;font-size:13px;font-weight:600;">Customize</button>
+        </div>
+        <div style="display:flex;gap:6px;">
+          <div style="flex:1;background:#ffe4e6;border-left:3px solid #e11d48;border-radius:6px;padding:8px;font-size:11px;color:#881337;">CSCI 104<br>Dr. Ahmed</div>
+          <div style="flex:1;background:#fecdd3;border-left:3px solid #fb7185;border-radius:6px;padding:8px;font-size:11px;color:#881337;">MATH 113<br>Dr. Tariq</div>
+        </div>
+      </div>
+    </div>
+    <div class="card-body">
+      <h3>Coral/Rose</h3>
+      <p>Most energetic, least "official." Farthest from your original #f08080 palette in feel &mdash; distinctly warmer and more saturated.</p>
+    </div>
+  </div>
+
+</div>
+
+<p class="subtitle" style="margin-top:16px;">Note: this is just the <em>accent</em> — sections in the weekly grid still get their own distinct colors per course (like now), this just sets buttons/links/active states.</p>
