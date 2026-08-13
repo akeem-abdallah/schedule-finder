@@ -105,7 +105,8 @@ function App() {
                     <div className="status-strip">
                         <h1 className="strip-title">AURAK Schedule Finder</h1>
                     </div>
-
+                    
+                    {/*Schedule view*/}
                     {results ? (
                         <div className="view-body">
 
@@ -159,9 +160,12 @@ function App() {
                                 )}
                             </div>
                         </div>
-                    ) : customizingID ? (
-                        <div className="view-body">
 
+                        // Edit sections view
+                    ) : customizingID ? (
+                        
+                        <div className="view-body">
+                        
                             <button onClick={() => setCustomizingID(null)}>← BACK</button>
 
                             <p>{customizingCourse.code} - {customizingCourse.description}</p>
@@ -185,13 +189,14 @@ function App() {
 
                             ))}
 
-                            <p>No selected courses means all of them will be included.</p>
+                            <p>No selected sections means all of them will be included.</p>
                         </div>
 
+                    // Course selection view
                     ) : (
 
-                        <>
-
+                        <> 
+                            
                             <div className="table-header">
                                 <span>SUBJ</span>
                                 <span>CODE</span>

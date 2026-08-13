@@ -6,7 +6,7 @@
     --text: #16150f;
     --muted: #787369;
     --faint: #b8b3a8;
-    --rule: #eceae5;
+    --rule: #e9e7e1;
     --rule-med: #97927f;
     --rule-strong: #16150f;
     --accent: #a3560c;
@@ -28,9 +28,9 @@
         --text: #e8e6df;
         --muted: #8a867c;
         --faint: #5c5a55;
-        --rule: #232220;
+        --rule: #2c2b29;
         --rule-med: #66635c;
-        --rule-strong: #e8e6df;
+        --rule-strong: #e4e1d9;
         --accent: #ffb020;
         --accent-hover: #ffc247;
         --accent-fg: #16150f;
@@ -61,18 +61,15 @@ body {
 .status-strip {
     display: flex;
     align-items: center;
-    border-bottom: 2px solid var(--rule-strong);
-    padding-bottom: 5px;
-    padding-top: 5px;
-    padding-left: 13px;
-    padding-right: 13px;
+    border-bottom: 3px solid var(--rule-strong);
+    padding: 6px 13px 6px 13px;
     margin-bottom: 14px;
     font-size: 15px;
 }
 
 .strip-title {
-    font-size: 13px; 
-    font-weight: 800; 
+    font-size: 14px;
+    font-weight: 800;
     letter-spacing: .12em;
     color: var(--text);
     margin: 0;
@@ -166,7 +163,7 @@ select:focus-visible, button:focus-visible {
 .row {
     display: grid;
     grid-template-columns: 72px 62px minmax(0, 1fr) 130px 30px;
-    border-bottom: 1px solid var(--rule);
+    border-bottom: 1.5px solid var(--rule);
     padding: 7px 13px;
     gap: 12px;
     align-items: center;
