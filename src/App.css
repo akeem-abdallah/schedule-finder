@@ -1,56 +1,61 @@
 
 :root {
-    --bg: #fbfbfa;
+    --bg: #f2f1ee;
     --surface: #ffffff;
     --surface-alt: #f4f3f0;
     --text: #16150f;
-    --muted: #8a867c;
+    --muted: #787369;
     --faint: #b8b3a8;
     --rule: #eceae5;
-    --rule-med: #d8d6d1;
+    --rule-med: #97927f;
     --rule-strong: #16150f;
-    --accent: #b8600d;
-    --accent-hover: #9a4f0a;
+    --accent: #a3560c;
+    --accent-hover: #854509;
     --accent-fg: #ffffff;
     --danger: #a8321a;
     --focus: rgba(184,96,13,.35);
+    --row-active-bg: #fffdf7;
     --font-ui: system-ui, "Segoe UI", -apple-system, sans-serif;
     --font-data: ui-monospace, "Cascadia Mono", "Segoe UI Mono", "SF Mono", Consolas, monospace;
 }
 
-/*@media (prefers-color-scheme: dark) {
+@media (prefers-color-scheme: dark) {
 
     :root {
-        --bg: #0d0d0c;
+        --bg: #000000;
         --surface: #141413;
         --surface-alt: #1c1b19;
         --text: #e8e6df;
         --muted: #8a867c;
         --faint: #5c5a55;
         --rule: #232220;
-        --rule-med: #2e2d2a;
+        --rule-med: #66635c;
         --rule-strong: #e8e6df;
         --accent: #ffb020;
         --accent-hover: #ffc247;
         --accent-fg: #16150f;
         --danger: #ff6b4a;
         --focus: rgba(255,176,32,.35);
+        --row-active-bg: #241d10;
     }
-}*/
+}
 
 body {
     background-color: var(--bg);
     color: var(--text);
     font-family: var(--font-ui);
-    padding: 20px 20px 20px 20px;
-    max-width: 900px;
-    color-scheme: light;
-    margin: 0 auto;
-    
+    padding: 0;
 }
 
-.spacer {
-    flex: 1;
+.page-main {
+    max-width: 900px;
+    margin: 0 auto;
+    padding: 30px 20px 20px 20px;
+}
+
+.card {
+    background-color: var(--surface);
+    border: 1px solid var(--rule-med);
 }
 
 .status-strip {
@@ -135,6 +140,14 @@ select {
     border-radius: 0;
     padding: 6px 8px;
     font-weight: 600;
+    appearance: none;
+    -webkit-appearance: none;
+    -moz-appearance: none;
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 10 6' fill='none'%3E%3Cpath d='M1 1l4 4 4-4' stroke='%238a867c' stroke-width='1.5' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E");
+    background-repeat: no-repeat;
+    background-position: right 9px center;
+    background-size: 9px 6px;
+    padding-right: 26px;
 }
 
 select:focus-visible, button:focus-visible {
@@ -166,6 +179,8 @@ select:focus-visible, button:focus-visible {
 .row-title {
     font-family: var(--font-ui);
     font-size: 14px;
+    font-weight: 450;
+    padding-bottom: 2px;
     white-space: nowrap;
     overflow: hidden;
     text-overflow: ellipsis;
@@ -177,7 +192,7 @@ select:focus-visible, button:focus-visible {
 }
 
 .row-active {
-    background-color: #fffdf7;
+    background-color: var(--row-active-bg);
 }
 
 .table-header {
@@ -223,11 +238,6 @@ select:focus-visible, button:focus-visible {
     color: var(--accent);
 }
 
-.card {
-    background-color: var(--surface);
-    border: 1px solid var(--rule-med);
-}
-
 .table-footer {
     display: flex;
     align-items: center;
@@ -241,9 +251,9 @@ select:focus-visible, button:focus-visible {
     display: block
 }
 
-
-
-
+.spacer {
+    flex: 1;
+}
 
 .view-body {
     padding: 13px;
@@ -289,4 +299,27 @@ select:focus-visible, button:focus-visible {
     gap: 15px;
     align-items: center;
     justify-content: center;
+}
+
+
+
+
+
+
+
+
+.page-footer {
+    margin-top: 40px;
+    padding: 20px;
+    text-align: center;
+    font-size: 12px;
+}
+
+.page-footer a {
+    color: var(--accent);
+}
+
+.page-footer p {
+    max-width: 640px;
+    margin: 0 auto 6px;
 }
