@@ -220,7 +220,7 @@ function App() {
                                 )
                             })}
 
-                            <p className="section-note">No selected sections means all of them will be included.</p>
+                            <p className="section-note">Leave all sections unchecked to include every one of them.</p>
                          </>
 
                     // Course selection view

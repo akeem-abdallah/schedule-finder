@@ -126,11 +126,13 @@ button {
     color: var(--faint);
     font-size: 16px;
     padding: 0;
+    padding-right: 6px;
     line-height: 1;
     display: flex;
     align-items: center;
-    justify-content: center;
+    justify-content: flex-end;
     height: 33px;
+    transform: translateY(-1.5px);
 }
 
 .btn-destructive:hover {
@@ -163,7 +165,7 @@ select:focus-visible, button:focus-visible, input[type="checkbox"]:focus-visible
 
 .row {
     display: grid;
-    grid-template-columns: 72px 62px minmax(0, 1fr) 130px 30px;
+    grid-template-columns: 72px 62px minmax(0, 1fr) 130px 44px;
     border-bottom: 1.5px solid var(--rule);
     padding: 7px 13px;
     gap: 12px;
@@ -195,12 +197,13 @@ select:focus-visible, button:focus-visible, input[type="checkbox"]:focus-visible
 
 .table-header {
     display: grid;
-    grid-template-columns: 72px 62px 1fr 130px 30px;
+    grid-template-columns: 72px 62px 1fr 130px 44px;
     background-color: var(--surface-alt);
     padding: 6px 13px;
     margin-top: 14px;
     gap: 12px;
     border-bottom: 1px solid var(--rule-med);
+    align-items: baseline;
 }
 
 .table-header span {
@@ -215,13 +218,14 @@ select:focus-visible, button:focus-visible, input[type="checkbox"]:focus-visible
 }
 
 .btn-clear-all {
-    padding: 0;
-    font-size: 8px;
+    padding: 3px 0;
+    font-size: 9px;
     font-weight: 800;
     letter-spacing: .10em;
+    border: 1px solid var(--rule-med);
     line-height: 1;
     color: var(--muted);
-    text-align: right;
+    text-align: center;
     white-space: nowrap;
 }
 
@@ -236,7 +240,7 @@ select:focus-visible, button:focus-visible, input[type="checkbox"]:focus-visible
 
 .sec-cell {
     display: flex;
-    align-items: center;
+    align-items: baseline;
     gap: 20px;
     justify-content: flex-end;
 }
@@ -282,7 +286,7 @@ select:focus-visible, button:focus-visible, input[type="checkbox"]:focus-visible
 
 .section-row {
     display: flex;
-    gap: 9px;
+    gap: 12px;
     align-items: center;
     padding: 8px 13px 8px 10px;
     border-bottom: 1px solid var(--rule);
@@ -313,7 +317,7 @@ select:focus-visible, button:focus-visible, input[type="checkbox"]:focus-visible
 }
 
 .section-num {
-    min-width: 24px;
+    min-width: 22px;
     font-family: var(--font-data);
     font-size: 14px;
     font-weight: 600;
@@ -326,7 +330,7 @@ select:focus-visible, button:focus-visible, input[type="checkbox"]:focus-visible
     color: var(--text);
     font-size: 14px;
     font-weight: 450;
-    padding-bottom: 2px;
+    padding-bottom: 1px;
     min-width: 0;
     white-space: nowrap;
     overflow: hidden;
@@ -697,6 +701,7 @@ select:focus-visible, button:focus-visible, input[type="checkbox"]:focus-visible
         grid-column: 3;
         grid-row: 1;
         gap: 20px;
+        align-items: baseline;
     }
 
     .sec-cell button {
@@ -710,15 +715,15 @@ select:focus-visible, button:focus-visible, input[type="checkbox"]:focus-visible
         grid-row: 1;
         width: 44px;
         height: 44px;
-        padding: 0;
+        padding-right: 4px;
         font-size: 15px;
         line-height: 1;
         display: flex;
         align-items: center;
-        justify-content: center;
-        transform: translateY(-1.5px);
+        justify-content: flex-end;
         margin-top: -7px;
         margin-bottom: -7px;
+        margin-left: -13.5px;
     }
 
     .row-title {
@@ -767,7 +772,7 @@ select:focus-visible, button:focus-visible, input[type="checkbox"]:focus-visible
     .section-row {
         display: grid;
         grid-template-columns: auto auto 1fr;
-        column-gap: 9px;
+        column-gap: 12px;
         row-gap: 1px;
         align-items: center;
         padding: 9px 13px 9px 10px;
@@ -841,7 +846,10 @@ select:focus-visible, button:focus-visible, input[type="checkbox"]:focus-visible
             display: inline;
         }
 
-
+        .gutter-cell {
+            font-size: 10px;
+            padding: 2px 4px;
+        }
 
         .weekly-grid {
             --gutter-w: 42px;
