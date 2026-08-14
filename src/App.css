@@ -394,7 +394,7 @@ select:focus-visible, button:focus-visible, input[type="checkbox"]:focus-visible
 
 .section-note {
     padding: 8px 13px;
-    font-size: 12px;
+    font-size: 13px;
     color: var(--muted);
     margin: 0;
 }
@@ -657,7 +657,7 @@ select:focus-visible, button:focus-visible, input[type="checkbox"]:focus-visible
 
     .status-strip {
         flex-wrap: wrap;
-        padding: 8px 10px;
+        padding: 8px 13px;
         row-gap: 4px;
     }
 
@@ -677,10 +677,10 @@ select:focus-visible, button:focus-visible, input[type="checkbox"]:focus-visible
     }
 
     .row {
-        grid-template-columns: 60px 54px 1fr auto;
+        grid-template-columns: 64px 54px 1fr auto;
         column-gap: 6px;
         row-gap: 2px;
-        padding: 9px 10px;
+        padding: 9px 13px;
     }
 
     .row select:nth-of-type(1) {
@@ -717,11 +717,14 @@ select:focus-visible, button:focus-visible, input[type="checkbox"]:focus-visible
         align-items: center;
         justify-content: center;
         transform: translateY(-1.5px);
+        margin-top: -7px;
+        margin-bottom: -7px;
     }
 
     .row-title {
         grid-column: 1 / -1;
         grid-row: 2;
+        font-size: 13px;
     }
 
     select {
@@ -730,10 +733,6 @@ select:focus-visible, button:focus-visible, input[type="checkbox"]:focus-visible
         padding-left: 5px;
         padding-right: 20px;
         background-position: right 6px center;
-    }
-
-    .row-title {
-        font-size: 13px;
     }
 
     .sec-text {
@@ -751,7 +750,7 @@ select:focus-visible, button:focus-visible, input[type="checkbox"]:focus-visible
     }
 
     .sub-strip {
-        padding: 4px 12px 0 2px;
+        padding: 4px 13px 0 13px;
     }
 
     .sub-strip > button {
@@ -777,6 +776,7 @@ select:focus-visible, button:focus-visible, input[type="checkbox"]:focus-visible
     .section-row input[type="checkbox"] {
         grid-column: 1;
         grid-row: 1;
+        border-radius: 0;
     }
 
     .section-num {
