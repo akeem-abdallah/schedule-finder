@@ -1,9 +1,9 @@
 import './App.css'
 import { useState, Fragment } from 'react'
 import { subjects } from './data'
-import { DAYS, DAY_START, generateSchedules, GRID_HOURS, orderedEligibleLists, timeToMinutes, to12Hour, formatMeetings } from './schedule'
+import { DAYS, generateSchedules, orderedEligibleLists, timeToMinutes, to12Hour, formatMeetings } from './schedule'
 
-const SECTION_COLORS = ["#f08080", "#87ceeb", "#90ee90", "#ffd27f", "#dda0dd", "#f4a6a6"]
+const COURSE_HUES = ["#2f6bff", "#e0561f", "#17a06a", "#9d4edd", "#c9910d", "#00a0b8", "#e0447f", "#7cb518"]
 
 function App() {
 
@@ -70,11 +70,12 @@ function App() {
     const usedDays = new Set()
     const meetingTimes = []
     if (results) {
-
-        for (const section of results[currentIndex]) {
-            for (const meeting of section.meetings) {
-                usedDays.add(meeting.day)
-                meetingTimes.push(timeToMinutes(meeting.start), timeToMinutes(meeting.end))
+        for (const schedule of results) {
+            for (const section of schedule) {
+                for (const meeting of section.meetings) {
+                    usedDays.add(meeting.day)
+                    meetingTimes.push(timeToMinutes(meeting.start), timeToMinutes(meeting.end))
+                }
             }
         }
     }
@@ -110,31 +111,38 @@ function App() {
                     
                     {/*Schedule view*/}
                     {results ? (
-                        <div className="view-body">
+                        <>
 
-                            <button onClick={() => setResults(null)}>← BACK</button>
-
-                            <div className="schedule-navigation">
-
-                                <button className="btn-secondary" onClick={() => setIndex(-1)}>Previous</button>
-                                <p>{currentIndex + 1} of {results.length}</p>
-                                <button className="btn-secondary" onClick={() => setIndex(1)}>Next</button>
+                            <div className="sub-strip">
+                                <button onClick={() => setResults(null)}>← BACK</button>
+                                <span className="spacer"></span>
+                                <div className="pager-group" aria-live="polite">
+                                    <button className="pager" aria-label="Previous schedule" disabled={currentIndex === 0} onClick={() => setIndex(-1)}>‹</button>
+                                    <span className="counter-current">{String(currentIndex + 1).padStart(3, "0")}</span>
+                                    <span className="counter-sep">/</span>
+                                    <span className="counter-total">{String(results.length).padStart(3, "0")}</span>
+                                    <button className="pager" aria-label="Next schedule" disabled={currentIndex === results.length - 1} onClick={() => setIndex(1)}>›</button>
+                                </div>
                             </div>
 
-
-                            <div className="weekly-grid" style={{ gridTemplateColumns: `110px repeat(${activeDays.length}, 140px)` }}>
-                                <div style={{ gridColumn: 1, gridRow: 1 }}>Time</div>
+                            <div className="weekly-grid" style={{
+                                gridTemplateColumns: `70px repeat(${activeDays.length}, minmax(0, 1fr))`,
+                                gridTemplateRows: `auto repeat(${activeHours.length * 4}, 12px)`
+                            }}>
+                                <div className="grid-corner" style={{ gridColumn: 1, gridRow: 1 }}></div>
 
                                 {activeDays.map((day, dayIndex) => (
-                                    <div key={day} className="grid-header" style={{ gridColumn: dayIndex + 2, gridRow: 1 }}>{day}</div> // builds the header row
+                                    <div key={day} className="day-header" style={{ gridColumn: dayIndex + 2, gridRow: 1 }}>{day.toUpperCase()}</div> // builds the header row
                                 ))}
 
                                 {activeHours.map((hour, hourIndex) => (
                                     <Fragment key={hour}>
-                                        <div style={{ gridColumn: 1, gridRow: `${hourIndex * 4 + 2} / span 4` }}>{to12Hour(`${hour}:00`)}</div>
-                                        {activeDays.map((day, dayIndex) => (
-                                            <div key={day} style={{ gridColumn: dayIndex + 2, gridRow: `${hourIndex * 4 + 2} / span 4` }}></div>
-                                        ))}
+                                        <div className={hourIndex === 0 ? "gutter-cell no-rule-top" : "gutter-cell"}
+                                            style={{ gridColumn: 1, gridRow: `${hourIndex * 4 + 2} / span 4` }}>{to12Hour(`${hour}:00`)}</div>
+                                        {activeDays.map((day, dayIndex) => {
+                                            const hourCellClass = ["hour-cell", hourIndex === 0 && "no-rule-top", dayIndex === 0 && "no-rule-left"].filter(Boolean).join(" ")
+                                            return <div key={day} className={hourCellClass} style={{ gridColumn: dayIndex + 2, gridRow: `${hourIndex * 4 + 2} / span 4` }}></div>
+                                        })}
                                     </Fragment>
                                 ))}
 
@@ -145,23 +153,23 @@ function App() {
                                         const durationSlots = (timeToMinutes(meeting.end) - timeToMinutes(meeting.start)) / 15
                                         const gridRowStart = startSlot + 2
                                         const gridColumn = activeDays.indexOf(meeting.day) + 2
-                                        const color = SECTION_COLORS[sectionIndex % SECTION_COLORS.length]
+                                        const hue = COURSE_HUES[sectionIndex % COURSE_HUES.length]
 
                                         return (
                                             <div
                                                 key={`${section.courseCode}-${section.section}-${meeting.day}`}
                                                 className="class-block"
-                                                style={{ gridColumn, gridRow: `${gridRowStart} / span ${durationSlots}`, backgroundColor: color }}
+                                                style={{ gridColumn, gridRow: `${gridRowStart} / span ${durationSlots}`, "--hue": hue }}
                                             >
-                                                {section.courseSubject} {section.courseCode}-{section.section}<br />
-                                                {section.instructor} <br />
-                                                {to12Hour(meeting.start)} - {to12Hour(meeting.end)}
+                                                <div className="block-code">{section.courseSubject} {section.courseCode}-{section.section}</div>
+                                                <div className="block-instructor">{section.instructor}</div>
+                                                <div className="block-time">{to12Hour(meeting.start).slice(0, -3)}–{to12Hour(meeting.end).slice(0, -3)}</div>
                                             </div>
                                         )
                                     })
                                 )}
                             </div>
-                        </div>
+                        </>
 
                         // Edit sections view
                     ) : customizingID ? (
