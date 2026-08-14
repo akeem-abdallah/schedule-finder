@@ -23,6 +23,16 @@ export function to12Hour(time) {
     return time
 }
 
+export function formatMeetings(meetings) {
+
+    const days = meetings.map(m => m.day.toUpperCase()).join(" ")
+    let s = to12Hour(meetings[0].start)
+    let e = to12Hour(meetings[0].end)
+
+    const time = s.slice(-2) === e.slice(-2) ? `${s.slice(0, -3)}–${e}` : `${s}–${e}`
+    return `${days}\n${time}`
+}
+
 // extracts all eligible sections in a row
 export function getEligibleSections(row) {
 

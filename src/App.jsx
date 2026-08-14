@@ -1,7 +1,7 @@
 import './App.css'
 import { useState, Fragment } from 'react'
 import { subjects } from './data'
-import { DAYS, DAY_START, generateSchedules, GRID_HOURS, orderedEligibleLists, timeToMinutes, to12Hour } from './schedule'
+import { DAYS, DAY_START, generateSchedules, GRID_HOURS, orderedEligibleLists, timeToMinutes, to12Hour, formatMeetings } from './schedule'
 
 const SECTION_COLORS = ["#f08080", "#87ceeb", "#90ee90", "#ffd27f", "#dda0dd", "#f4a6a6"]
 
@@ -104,6 +104,8 @@ function App() {
 
                     <div className="status-strip">
                         <h1 className="strip-title">AURAK Schedule Finder</h1>
+                        <span className="spacer"></span>
+                        <span className="chip">Semester: Fall 2026</span>
                     </div>
                     
                     {/*Schedule view*/}
@@ -164,33 +166,35 @@ function App() {
                         // Edit sections view
                     ) : customizingID ? (
                         
-                        <div className="view-body">
+                        <>
                         
-                            <button onClick={() => setCustomizingID(null)}>← BACK</button>
+                            <div className="sub-strip">
+                                <button onClick={() => setCustomizingID(null)}>← BACK</button>
+                                <span className="spacer"></span>
+                                <span className="section-code">{customizingRow.subject} {customizingCourse.code}</span>
+                            </div>
+                            <div className="section-desc">{customizingCourse.description}</div>
 
-                            <p>{customizingCourse.code} - {customizingCourse.description}</p>
-
-                            {customizingCourse.sections.map((s) => (
-
-                                <label key={s.section} className="checkboxes">
-                                    <input type="checkbox"
-                                        checked={customizingRow.sections.includes(s.section)}
-                                        onChange={() => {
+                            {customizingCourse.sections.map((s) => {
+                                const isSelected = customizingRow.sections.includes(s.section)
+                                return (
+                                    <label key={s.section} className={isSelected ? "section-row section-row-selected" : "section-row"}>
+                                        <input type="checkbox" checked={isSelected} onChange={() => {
                                             const alreadyIn = customizingRow.sections.includes(s.section)
                                             const newSections = alreadyIn
                                                 ? customizingRow.sections.filter((sec) => sec !== s.section)
                                                 : [...customizingRow.sections, s.section]
                                             updateRow(customizingID, { sections: newSections })
-                                        }}
-                                    /> {s.section.length === 1 ? "0" + s.section : s.section} - {s.instructor}
+                                        }} />
+                                        <span className="section-num">{s.section.length === 1 ? "0" + s.section : s.section}</span>
+                                        <span className="section-instructor">{s.instructor}</span>
+                                        <span className="section-meeting">{formatMeetings(s.meetings)}</span>
+                                    </label>
+                                )
+                            })}
 
-
-                                </label>
-
-                            ))}
-
-                            <p>No selected sections means all of them will be included.</p>
-                        </div>
+                            <p className="section-note">No selected sections means all of them will be included.</p>
+                         </>
 
                     // Course selection view
                     ) : (
