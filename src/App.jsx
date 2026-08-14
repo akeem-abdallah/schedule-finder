@@ -119,7 +119,8 @@ function App() {
                     <div className="status-strip">
                         <h1 className="strip-title">AURAK Schedule Finder</h1>
                         <span className="spacer"></span>
-                        <span className="chip">Semester: Fall 2026</span>
+                        <a className="chip" href="https://eums.aurak.ac.ae/Public/Schedule?h42blu9ygNZPnBJmMbXuWAu8XR3hS4tcKtMIP6xFd2U="
+                            target="_blank" rel="noopener noreferrer">Semester: Fall 2026</a>
                     </div>
                     
                     {/*Schedule view*/}

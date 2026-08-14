@@ -87,6 +87,12 @@ body {
     color: var(--muted);
     padding: 2px 5px;
     margin: 0 0 0 5px;
+    text-decoration: none;
+}
+
+.chip:hover {
+    border-color: var(--accent);
+    color: var(--accent);
 }
 
 button {

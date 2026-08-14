@@ -13,6 +13,27 @@
 
 ---
 
+## 📌 State of play — updated 2026-08-14
+
+**Sections 1–4 done. Section 5 (the parser) is next, and it's the first Python work in this project.**
+
+| | |
+|---|---|
+| Live | https://schedule-finder-delta.vercel.app — **still on fake data** (15 courses in `src/data.js`) |
+| Works today | Pick courses → narrow sections → generate → page through a styled weekly grid. Responsive to 320px, light + dark |
+| Last commit | `ba6c5a6 final polish` |
+| Open from section 4 | Nothing. Loading state + arrow-key paging moved to v1.1 |
+
+**Three things a fresh session should know before starting section 5:**
+
+1. **Section 4 was renamed** from *"Usable on a phone"* to *"Styling and responsiveness"* because the design pass — explicitly deferred to v1.1 — happened there anyway and became the bulk of it. Recorded honestly in `plan.md`; the point is the pacing warning, which still applies.
+2. **The knowledge-graph caps for section 4 are deliberately low.** A lot of CSS shipped, but most values were measured by the agent and handed to Akeem to type — not evidence under rule 1. Don't read shipped CSS as CSS fluency. The one genuine `practicing` entry there, `slot-granularity-must-divide-the-data`, is his outright and worth a cold quiz.
+3. **`useEffect` was met early** (section 4's toast timer) and is at `introduced`. Section 7 still owns effects-for-fetching in full, including StrictMode's double-invoke. Re-teach; don't assume.
+
+⚠️ **Two known latent issues, neither urgent:** `MASK_WORDS = 35` assumes no class ends after 21:00 (a later one writes past the mask and misses conflicts *with no error*), and `to12Hour("0:00")` returns `"0:00 AM"` instead of `"12:00 AM"` (currently unreachable — the grid can't start before 08:00).
+
+---
+
 ## About me
 
 - **Akeem.** B.Sc. Computer Science at AURAK (Ras Al Khaimah, UAE).
@@ -28,7 +49,9 @@ After that project his knowledge graph sat almost entirely at `practicing`. **Ex
 
 **Never touched:** FastAPI, PostgreSQL as a server, any ORM, migrations, scheduled jobs, deploying more than one service, CORS, environment secrets (he has only used `$PORT`, which isn't sensitive).
 
-**React, as of 2026-08-11** (sections 1–3 done — this supersedes "never touched"): components, props, JSX, `useState`, controlled inputs (including checkboxes), event handlers, rendering lists with `key`, `Fragment` with and without keys, derived vs. stored state, immutable array updates, multi-way view swapping via conditional state, and CSS Grid with fully explicit item placement — all at `practicing`. He has built a working schedule generator end to end: an editable multi-row shortlist with per-course section narrowing, a recursive backtracking search over bitmask-encoded weekly occupancy, and a dynamically-sized weekly calendar with paginated results.
+**React, as of 2026-08-14** (sections 1–4 done — this supersedes "never touched"): components, props, JSX, `useState`, controlled inputs (including checkboxes), event handlers, rendering lists with `key`, `Fragment` with and without keys, derived vs. stored state, immutable array updates, multi-way view swapping via conditional state, and CSS Grid with fully explicit item placement — all at `practicing`. He has built a working schedule generator end to end: an editable multi-row shortlist with per-course section narrowing, a recursive backtracking search over bitmask-encoded weekly occupancy, and a dynamically-sized weekly calendar with paginated results — now fully styled and responsive down to 320px.
+
+**Added in section 4, all at `introduced` only:** `useEffect` (met early, for the toast timer — *not* yet met for fetching, which is what section 7 needs), the Rules of Hooks, `setTimeout` + cleanup, CSS custom properties, media-query breakpoints. ⚠️ **Read the section 4 caps in the knowledge graph before assuming CSS fluency** — a lot of CSS shipped, but most values were measured by the agent and handed over to type, which is explicitly not evidence.
 
 **The gap that remains is still plain JavaScript, not React, and section 3 confirmed it precisely.** His *logic* was right nearly every time; the friction was always syntax. Recurring slips worth expecting: a missing `Math.` prefix, passing an array where a single value is needed, nested calls with the wrong argument type, `&&` vs `&`, and `{}` vs `<>` in JSX. See the section 4 calibration note in `plan.md`.
 
@@ -38,7 +61,7 @@ After that project his knowledge graph sat almost entirely at `practicing`. **Ex
 - **Loses things between introduction and recall** — had forgotten gunicorn entirely by his final walkthrough. Spaced review matters.
 
 ### Constraints
-- **~25 days** until next semester starts (as of 2026-08-06).
+- **~17 days** until next semester starts (as of 2026-08-14; was ~25 on 2026-08-06). ⚠️ Sections 5–10 — the parser, Postgres, SQLAlchemy, Alembic, FastAPI, CORS, tests, deployment — are all still ahead, and they are where this project's actual learning goals live. Section 4 cost more than planned; pace accordingly.
 - **Free hosting only.** He declined $7/month for a service. Worth knowing the nuance: he *did* accept ~$10–15/**year** for a domain, so the objection is to recurring monthly cost, not to spending anything.
 
 ---
@@ -71,7 +94,7 @@ An AURAK student who has never met Akeem opens a link on their phone during regi
 
 ### v1.1 — build immediately after, not "someday"
 - ⭐ **The advanced filter panel** — a time window ("nothing before X, nothing after Y"), excluded days, and a protected break window. Highest-value item here. Detail and the section-level-vs-schedule-level teaching note are in `plan.md`
-- **The full styling / design-token pass** — section 4 does only the minimum to work on a phone. ⚠️ Design has no natural "done"; it's what over-grew section 4. Better against real data anyway
+- ~~**The full styling / design-token pass**~~ — ✅ **done in section 4** (2026-08-12→14), which was renamed *"Styling and responsiveness"* to own it. ⚠️ Still open here: **re-checking that design against real data** — everything was tuned against 15 fake courses, not ~700 real rows with long descriptions
 - **Remembering the shortlist across refreshes** (`localStorage`)
 - **Total credits per schedule** — needs the real `credits` field the parser supplies
 - **Exclude sections that are already full** — makes the output actionable
@@ -81,7 +104,9 @@ An AURAK student who has never met Akeem opens a link on their phone during regi
 ### Parking lot (v2+)
 Displaying seat counts (prefer coarse **Open / Almost full / Full**) · accounts and saved schedules · sharing a schedule · calendar export · multiple semesters · button icons *(cosmetic; an icon package is a rabbit hole)* · a page header *(an `<h1>` already exists)* · a download/screenshot button *(needs a rendering library; the phone's own screenshot works)*
 
-**Scoping history, 2026-08-11.** Out of the parking lot into **section 4 ("Usable on a phone")**: **fade-out error popups** (his idea, 2026-08-09 — was parked pending `setTimeout`) and **mobile polish** (never really optional — "usable on a phone" is in the MVP). Into **v1.1**: the **no-8am** and **days-off** filters, generalised into one time window plus an excluded-days control. **Still parked:** instructor preference and max-days-on-campus — he rejected both explicitly.
+**Scoping history, 2026-08-11.** Out of the parking lot into **section 4** (then called *"Usable on a phone"*, renamed *"Styling and responsiveness"* on 2026-08-14): **fade-out error popups** (his idea, 2026-08-09 — was parked pending `setTimeout`) and **mobile polish** (never really optional — "usable on a phone" is in the MVP). Into **v1.1**: the **no-8am** and **days-off** filters, generalised into one time window plus an excluded-days control. **Still parked:** instructor preference and max-days-on-campus — he rejected both explicitly.
+
+**Scoping history, 2026-08-14.** Section 4 closed. **Cut:** first-run hint line. **Into v1.1:** loading state / deferred rendering, arrow-key paging. **Landed unplanned:** the full styling pass (the section was renamed to own it) and two real bug fixes — the 50-minute slot granularity bug and stale `row.sections` surviving a course change.
 
 ---
 

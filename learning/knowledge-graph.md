@@ -329,7 +329,11 @@ Shipped 2026-08-05. Full history with detailed evidence lives in
 - evidence: correctly derived `grid-template-columns: 60px repeat(7, 1fr)` and the row equivalent from a plain-language description of 8 columns/13 rows, after correctly working out the 8×13 dimension itself (initially said 7×12, self-corrected once asked where day names and hour labels would go). One real slip: wrote `repeat(13, 1fr)` for rows, double-counting the header row that was already the separate `40px` — self-corrected once it was traced through. Struggled genuinely on the nested-`.map()` JSX (said "I don't get it" on the day-header map, needed a direct side-by-side comparison to the `<option>` pattern he already knew), and made a real content bug in the placeholder cells (rendered `{day}` in every cell instead of leaving them empty) — self-corrected once named. First real use of `Fragment` with an explicit `key` (vs. the `<>` shorthand, which can't take props) for grouping a label + 7 placeholder cells per row. Also drove a genuine design refinement himself — asked for the hour labels to sit at the top of their row like a real calendar app rather than centered, correctly predicting/confirming the fix (`align-items: start`) worked by checking the browser. **Follow-up styling pass, same day:** flagged real UX problems himself (rows too compact, labels visually detached from their lines) — root cause was no explicit `height` on the grid, so `1fr` rows had no real space to divide, which was explained and fixed by him (`height: 600px`). That fix then caused a genuine regression (`align-items: start` shrinking each cell to its own content, breaking row-height consistency and producing a double-line effect) — he removed it correctly once the mechanism was traced through, and separately diagnosed (with a screenshot) that double-digit hour labels were wrapping because the label column was too narrow, correctly identifying that padding was the wrong fix and a wider column was the right one. **3.7 wiring pass:** diagnosed unprompted why pagination buttons were stacking vertically (a block-level `<p>` breaking the flex flow), and independently applied `justify-content: center` (no explanation needed) once told it was the property for horizontal centering in a flex container
 <!-- He built a 2×2 grid last project — same property, larger scale -->
 
-## Section 4 — Usable on a phone
+## Section 4 — Styling and responsiveness
+<!-- Renamed from "Usable on a phone" on 2026-08-14, retroactively — see plan.md section 4 for why -->
+<!-- ⚠️ Read the cap levels here carefully. A large volume of CSS shipped, but most values were measured by the agent and handed over to type, which rule 1 says is not evidence. Only slot-granularity-must-divide-the-data reaches `practicing`, and that one is his outright. -->
+
+
 
 ### static-build-deployment
 - status: introduced
@@ -338,6 +342,71 @@ Shipped 2026-08-05. Full history with detailed evidence lives in
 - last-reviewed: 2026-08-11
 - evidence: asked to predict what clicking Vercel's Deploy button would do, answered *"It's gonna run my react on vercel"* — graded as wrong, not vague: conflated deploying a static frontend with running a live server process (the mental model that's correct for his Flask app on Render, not for this). Corrected with the real mechanism: Vercel runs `npm install` + `vite build`, which compiles JSX/JS into plain static HTML/CSS/JS files, then serves those files with no Node process running per-request — same as handing it a folder of plain HTML. Not yet restated in his own words; good re-check candidate once section 6/9 make the FastAPI contrast concrete (a backend that *does* stay running)
 <!-- New leaf, not in original section 4 concept list -->
+
+### slot-granularity-must-divide-the-data
+- status: practicing
+- depends-on: bitmask-representation, explicit-grid-item-placement
+- introduced: 2026-08-14
+- last-reviewed: 2026-08-14
+- evidence: ⭐ **the strongest independent catch of the whole project so far, and it came from him unprompted.** After the grid was already "finished" and deployed, he said: *"the shortest is 50 minutes, so tell me what you think, I think that also means its incompatible for desktop."* Both halves correct. 50 minutes is not divisible by the 15-minute slot size the whole system was built on (chosen back in 3.4 from AURAK's live page), so `durationSlots` evaluated to `3.333`. Two distinct failures followed, and he had predicted the second: `grid-row: span 3.3333` is **rejected outright** by CSS (verified live — computes to `auto`), so the block collapsed to one row *and* fell to grid auto-placement, landing at the wrong time; and `timeToSlot` truncated the same fraction inside the conflict mask, over-claiming ~10 minutes and **silently discarding valid schedules with no visible symptom at all**. Fix (5-minute slots throughout: `SLOTS_PER_DAY` 48 → 156, `MASK_WORDS` 11 → 35, `/ 15` → `/ 5`) was worked out with the agent, and the arithmetic for `MASK_WORDS` was supplied rather than derived by him — so `practicing`, not higher. **What is unambiguously his: noticing that a real-world data property silently invalidated a design decision made three sections earlier, and reasoning correctly about its blast radius before any code was looked at.** Worth quizzing cold later: *why is 5 the right slot size and not 10?* (50 and 75 both divide by 5; 75 does not divide by 10.)
+<!-- New leaf. The general lesson: your discretisation has to divide every value your real data can take -->
+
+### responsive-design
+- status: introduced
+- depends-on: css-grid-layout
+- introduced: 2026-08-14
+- last-reviewed: 2026-08-14
+- evidence: ⚠️ **cap deliberately low despite a large volume of shipped CSS.** Two breakpoints (640px / 480px) now drive a full mobile layout across all three views, but essentially every value was derived by the *agent* measuring the live DOM and handed to him to type — that is explicitly not evidence under rule 1. He wrote every line and drove every design decision, but never derived a breakpoint or predicted a layout outcome himself. What *is* his: consistently accurate visual QA against a real iPhone 15 Pro Max, repeatedly catching real defects the agent had missed or mis-verified — misaligned gutter labels (*"the labels on phone resolution (10 AM, 11 AM, 12 PM) are not aligned with the other hours"*), unequal spacing between `EDIT`/`ALL`/`×`, and a `×` that had drifted off the footer's edge. He also correctly rejected an over-complicated fix — *"I feel like you're overcomplicating it, I really feel like its just one change"* — and he was right; the answer was a single `margin-left`. **Good first quiz when section 4 is revisited: what does `minmax(0, 1fr)` do that plain `1fr` doesn't, and why does it matter here?** (He has never been asked to explain this, though it is load-bearing in his grid.)
+
+### css-custom-properties
+- status: introduced
+- depends-on: none
+- introduced: 2026-08-14
+- last-reviewed: 2026-08-14
+- evidence: the `--gutter-w` / `--day-w` / `--slot-h` / `--hue` variables and the whole Amber token block are now central to how the app is styled and themed. Mechanism explained to him, not derived: that `var(--x, fallback)` lets an **inline JSX style string** read a value the **stylesheet** decides, which is what makes the grid respond to a media query without React re-rendering or any width in state. He applied it correctly on the first attempt each time. No explain-back check was done, so `introduced`. ⚠️ This is genuinely worth re-teaching properly rather than leaving as told-once — it is the mechanism the entire responsive grid rests on
+
+### settimeout-and-cleanup
+- status: introduced
+- depends-on: react-state
+- introduced: 2026-08-14
+- last-reviewed: 2026-08-14
+- evidence: his first timer, delivered as part of the toast. The `useEffect` + `setTimeout` + `return () => clearTimeout(timer)` block was written by the agent and typed by him — no prediction or derivation, so `introduced` only. Two mechanisms were explained and are worth cold-checking later: **why the cleanup exists** (without it an old timer survives and can clear a *newer* error early), and **why the effect depends on `[error, errorId]` rather than `[error]`** — React bails out of a re-render when `setError` is called with an identical string, so re-clicking GENERATE on the same validation failure would not restart the timer and the toast would vanish early. Verified live: toast still showing 5.7s after the first click, dismissed ~5s after the second. ⚠️ The plan flags this as the concept that buys `useeffect` early at a discount for section 7 — that payoff is only real if it gets re-taught there rather than assumed
+
+### rules-of-hooks
+- status: introduced
+- depends-on: settimeout-and-cleanup
+- introduced: 2026-08-14
+- last-reviewed: 2026-08-14
+- evidence: 🔴 real, instructive failure. He placed the `useEffect` **inside `handleSubmit`**, in the `else` branch after `generateSchedules` — so it only executed on a valid submit. Symptom was confirmed live rather than asserted: console threw `Invalid hook call. Hooks can only be called inside of the body of a function component`, and the app **stayed stuck on view 1** because the throw happened before `setResults` ran, making GENERATE silently do nothing. Mechanism was explained, not self-derived: React identifies hooks purely by **call order** (first `useState` is slot 0, second slot 1, …), which only works if every render calls the same hooks in the same sequence — so a hook inside an `if`, a loop, or an event handler breaks the mapping. Also explained: `useEffect` is a *declaration* evaluated every render, not a step you run inside a handler, which is why it belongs beside the `useState` calls. Fixed correctly on the first attempt once told. Capped at `introduced`, and this one should be **re-checked cold in section 7** before `useEffect` is used for fetching
+
+### toast-notifications
+- status: introduced
+- depends-on: settimeout-and-cleanup
+- introduced: 2026-08-14
+- last-reviewed: 2026-08-14
+- evidence: replaced the inline `.error` row with a fixed-position toast — desktop top-right, phone bottom full-width, auto-dismiss plus a manual `×`. Design direction was entirely his across several rounds (*"I don't like how the size and it looks weird on phone, I want it to be professional"*, then *"maybe a bit more obvious? I feel like they're so small"*), and he correctly judged the final 13px against the surrounding type. Implementation values were supplied. One genuine agent error he was told about rather than discovering: the mobile override was never actually written into the file on the first pass, so the phone rendered the desktop variant — found by grep, not by reasoning
+
+### deferred-rendering
+- status: seed — **not built. Moved to v1.1** on 2026-08-14 at Akeem's call
+- depends-on: settimeout-and-cleanup
+- introduced: —
+- last-reviewed: —
+- evidence: —
+<!-- ⚠️ Still the only thing distinguishing "thinking" from "broken", since Akeem declined the result cap in section 3 -->
+
+### event-listener-cleanup
+- status: seed — **not built. Moved to v1.1** on 2026-08-14 with arrow-key paging
+- depends-on: settimeout-and-cleanup
+- introduced: —
+- last-reviewed: —
+- evidence: — ⚠️ Briefly believed complete on 2026-08-14; checked against the source and it was not — `src/` contains no `keydown`, `addEventListener`, or arrow-key handling, and no commit references it. Most likely confused with the `‹ ›` pager **buttons** (click handlers, section 3.7). Worth naming the distinction when it is built: a click handler is attached by React to one element and cleaned up automatically when that element unmounts; a `window` listener is attached by *you* and outlives the component unless *you* remove it — which is the whole reason it pairs with the toast's `clearTimeout`
+
+### typographic-alignment
+- status: introduced
+- depends-on: none
+- introduced: 2026-08-14
+- last-reviewed: 2026-08-14
+- evidence: emerged from him repeatedly rejecting alignments that measured "correct" but looked wrong — *"the edit label is a little higher than the section label on its right"*, *"the X buttons are lower than the sec on its left"*, and finally *"make them exactly aligned, not even 0.5px difference."* Each was a genuine defect and each had a different cause, which is what makes this worth a leaf: boxes centred perfectly while **baselines** differed (mixed 9px/12px text); a glyph centred in its box while the *box* was flush and the **ink** was not (the `×` sitting 15.7px short of the footer edge); and a label overflowing its content box so `text-align: right` silently stopped holding the edge (`10 AM` needing 32.2px in a 30px box). Mechanisms were explained, not derived — so `introduced`. **The limit he should be able to state back:** two texts of different sizes cannot share both a baseline and an ink centre; the residual is exactly half the cap-height difference, so you pick one anchor (baseline for text-to-text, ink centre for symbol-to-text) rather than chasing zero on both
 
 ## Section 5 — The parser
 
@@ -457,12 +526,14 @@ Shipped 2026-08-05. Full history with detailed evidence lives in
 - evidence: —
 
 ### useeffect
-- status: seed
+- status: introduced — ⚠️ **met early, in section 4, not here**
 - depends-on: fetch-in-react
-- introduced: —
-- last-reviewed: —
-- evidence: —
+- introduced: 2026-08-14 (section 4, toast timer)
+- last-reviewed: 2026-08-14
+- evidence: first contact came early and by side door — the toast's auto-dismiss timer, not data fetching. He wrote it from a supplied block, and immediately hit a **Rules of Hooks** violation by placing it inside `handleSubmit` (see [[rules-of-hooks]]), which threw and left GENERATE silently doing nothing. What he has seen: an effect as a *declaration* re-evaluated each render, the dependency array, and the cleanup function. **What he has NOT seen, and section 7 still owns in full:** effects for fetching, the async/`await` shape inside one, loading and error states, and — critically — **StrictMode double-invoking effects in dev**, which `main.jsx` already wraps his app in. ⚠️ **Do not treat this as pre-taught.** The plan's bet was that section 4's `setTimeout` buys `useEffect` "at a discount"; the discount is real but small, and section 7 should re-teach from the dependency array up rather than assume it
 <!-- Warn about StrictMode double-invoking effects in dev BEFORE he sees it -->
+<!-- Status raised from seed 2026-08-14: he used it in section 4 for the toast. Fetching remains untouched -->
+<!-- ⚠️ Being at `introduced` here means "has typed one", NOT "has understood effects" -->
 
 ### cors
 - status: seed

@@ -103,6 +103,8 @@ dropping one update (stale closure over `rows`).
 - Hardcode 5–6 fake courses with a handful of sections. Enough to test conflicts in section 3, small enough to reason about.
 
 ### 3. The algorithm and the grid  [x] done 2026-08-11
+
+> ⚠️ **Superseded detail, added 2026-08-14:** tasks 3.4/3.6/3.8 below describe the grid and conflict mask at **15-minute** slots. **Section 4 changed this to 5-minute slots** (`SLOTS_PER_DAY` 48→156, `MASK_WORDS` 11→35) because real AURAK classes run 50 minutes, which 15 does not divide — the old code produced fractional slots that CSS rejected outright and the bitmask silently truncated. The tasks below are left as written, as the record of what was built at the time; `schedule.js` is the current truth → [[slot-granularity-must-divide-the-data]]
 **Deliverable:** Click Submit and page through valid schedule combinations on a weekly calendar. **The working tool — just with fake courses.** **Revised 2026-08-11** — no separate Generate button; Submit both validates and generates, swapping to the grid view the same way `customizingID` swaps to the section-customize panel.
 **Concepts:** time-conflict-detection, bitmask-representation, backtracking-with-pruning, result-capping, css-grid-layout
 
@@ -153,9 +155,15 @@ dropping one update (stale closure over `rows`).
 > **Solid now, no need to re-teach:** `.map()`, `.filter()`, `.find()`, `.some()`, `Set`, ternaries,
 > `key`, immutable array updates, React state and what triggers a re-render.
 
-### 4. Usable on a phone  [ ] not started
-**Deliverable:** A live URL you can open on your own phone and actually use, with the rough edges filed off.
-**Concepts:** responsive-design, settimeout-and-cleanup, toast-notifications, deferred-rendering, event-listener-cleanup
+### 4. Styling and responsiveness  [x] done 2026-08-14
+**Deliverable:** A live URL you can open on your own phone and actually use, styled to a finished standard.
+**Concepts:** responsive-design, css-custom-properties, typographic-alignment, settimeout-and-cleanup, toast-notifications, rules-of-hooks, slot-granularity-must-divide-the-data
+
+> 🔄 **Renamed and re-scoped 2026-08-14, retroactively, at Akeem's call.** Was *"Usable on a phone"*, whose plan deliberately **excluded** styling (moved to v1.1 on 2026-08-11) and kept only the minimum that stopped the app being broken below ~1000px.
+>
+> What actually happened is the reverse: the full Amber design system landed here and became the section's bulk, while three of the planned "tiny fixes" turned out to be either already done, unnecessary, or deferrable. His reasoning for the rename: *"the main objective of section 4 was to add styling and make it responsive. those stuff were just extras."*
+>
+> **Recorded as a rename, not a silent edit,** because the 2026-08-11 cut note predicted this exact overrun ("design has no natural done") and that prediction being right is worth keeping visible. The honest read: the section was re-scoped to match the work, not the work to the section. Cost is real — see the deadline math in the cut note — but the app is now genuinely demo-able, which section 10 needs.
 
 > **Added 2026-08-11, at Akeem's request** — his reasoning: finish the frontend while React context is still loaded, rather than switching to Python for sections 5–7 and coming back cold. Sound argument, and it also unparks the fade-out error popup idea he had on 2026-08-09 (parked at the time because it needed `setTimeout`, which hadn't been taught).
 
@@ -174,13 +182,45 @@ dropping one update (stale closure over `rows`).
 
 **Tasks:**
 - [x] 4.1 Deploy to Vercel as-is (fake data, current state) — first live URL, testable on his phone
-- [ ] 4.2 Mobile/responsive fixes — replace the fixed `450px` side padding so the app works below ~1000px wide
-- [ ] 4.3 Three tiny fixes — "clear all", disabled Previous/Next at boundaries, first-run hint line
-- [ ] 4.4 Toast errors + loading state — `setTimeout` + cleanup, deferred rendering for the loading label
-- [ ] 4.5 Arrow-key paging — `keydown` listener on `window`, same cleanup discipline as the toast
-- [ ] 4.6 Commit — deliverable reached
+- [x] 4.2 Mobile/responsive fixes — done 2026-08-14, far beyond the planned minimum (see below)
+- [x] 4.3 "clear all" — done 2026-08-14 as a `CLEAR` button in the table header. **Disabled Previous/Next already existed** (shipped in section 3.7, `disabled={currentIndex === 0}`) — the plan double-counted it
+- ~~4.3b First-run hint line~~ — **cut 2026-08-14** at Akeem's call, not needed
+- [x] 4.4a Toast errors — done 2026-08-14, `setTimeout` + cleanup in a `useEffect`
+- ~~4.4b Loading state / deferred rendering~~ — **moved to v1.1** 2026-08-14 at Akeem's call
+- ~~4.5 Arrow-key paging~~ — **moved to v1.1** 2026-08-14 at Akeem's call, not needed now. ⚠️ Briefly believed finished that day; verified against the source and it was not (no `keydown`/`addEventListener`/`ArrowLeft` anywhere in `src/`, no commit referencing it) — most likely confused with the `‹ ›` pager *buttons*, which are click handlers shipped in 3.7 → [[bounded-index-navigation]]
+- [x] 4.6 Commit — done (`ba6c5a6 final polish`, preceded by `e989012`, `b7c00e2`, `e3f599c`)
 
 **Live URL (as of 2026-08-11):** https://schedule-finder-delta.vercel.app — deployed in 4.1, still on fake data
+
+---
+
+#### What actually shipped in section 4 (2026-08-12 → 2026-08-14)
+
+**Scope changes made 2026-08-14, at Akeem's call:** first-run hint line **cut**; loading state / deferred rendering **moved to v1.1**; arrow-key paging **moved to v1.1**. Section closed with the deliverable met — a live URL, usable and styled on a real iPhone 15 Pro Max.
+
+**Planned and delivered:**
+- **Responsive pass**, two breakpoints derived from measurement rather than round numbers: **640px** (below it the desktop `.row`'s 342px of fixed columns crushes the TITLE column to uselessness) and **480px** (below it a block's `CSCI 104-01` code line wraps and clips). View 1 collapses to a two-line block, view 2's meeting time becomes a sub-line, view 3 shrinks its gutter and shortens `9:00 AM` → `9 AM`.
+- **Horizontal grid scroll for 5+ days** — `--day-w: calc((100% - var(--gutter-w)) / 4)` pins day columns to their 4-day width and lets the grid overflow a `overflow-x: auto` wrapper, with the time gutter `position: sticky; left: 0`. Akeem's own spec: *"keep the cells the same size as if only mon to thurs was rendered."*
+- **Toast errors** — fixed-position, auto-dismiss after 5s, manual `×`, desktop top-right / phone bottom-full-width. Needs an `errorId` nonce alongside the message: React bails out of a re-render when `setError` is called with an identical string, so re-clicking GENERATE on the same validation failure would not restart the timer.
+- **`CLEAR` button** in the table header, styled as a bordered 9px caps button so it reads as an action rather than a second row-level `×`.
+
+**Also shipped, unplanned but small:**
+- **View 2 rebuilt for phone** — the section row becomes a two-line grid (checkbox · number · instructor, with the meeting time as a sub-line beneath) instead of a single row with a ~150px void mid-line. `white-space: normal` collapses `formatMeetings`'s `\n` into one line on mobile with no change to `schedule.js`.
+- **View 3 blocks shed lines by *duration*, not viewport** — `class-block-short` (< 60 min) drops the time line at every width, since vertical position already encodes it. A `title` attribute carries the full code · instructor · time, which also restores that information to screen readers after `display: none` removes it from the accessibility tree.
+- **Semester chip → external link** to AURAK's live schedule page (`target="_blank"` + `rel="noopener noreferrer"`).
+- **Copy fix** — `.section-note` reworded from *"No selected sections means all of them will be included"* to *"Leave all sections unchecked to include every one of them."*
+- **Alignment pass** across both views: a single 22px content edge on mobile (was three different edges — 11 / 19 / 22), baseline alignment for mixed-size label pairs (`EDIT`/`ALL`, `SEC`/`CLEAR`), and negative margins so the 44px `×` tap target stops inflating row height by 14px.
+
+> 📐 **One typographic limit worth remembering, since it came up repeatedly:** two texts of *different sizes* cannot share both a baseline and an optical (ink) centre — the gap is exactly half the cap-height difference. Baseline is the correct anchor for text pairs; ink-centre is correct for aligning a *symbol* (the `×`) against text. Asking for "zero difference on both" is unsatisfiable without making the sizes equal, which the mono/sans split in `amber.md` rules out.
+
+**Unplanned, and the honest accounting:**
+- 🔴 **The full styling / design-token pass happened here.** It had been explicitly moved to v1.1 on 2026-08-11, with a warning that design "has no natural done" and would eat the section if unwatched. It did — the entire Amber design system (`docs/design/amber.md`) was implemented across all three views: tokens, dark mode, type scale, the eight-hue course palette, the results grid rebuild. **This was the single largest time cost of the section.** The section was subsequently renamed to own it (see the note at the top), which is the honest resolution — but the prediction was correct, and the deadline math from the cut note still stands: sections 5–10 are where this project's actual learning goals live.
+- ⚠️ **A real correctness bug, found by Akeem, fixed here:** he pointed out real AURAK classes run **50 minutes**, and correctly predicted it would break desktop too. 50 isn't divisible by the 15-minute slot size, so `durationSlots` came out `3.333`; `grid-row: span 3.3333` is invalid and silently computes to `auto`, so the block rendered as a sliver **at the wrong time**. Worse, `timeToSlot` truncated the same fraction in the conflict mask, so it over-claimed 10 minutes and **silently discarded valid schedules with no visible symptom**. Fixed by moving the whole pipeline to **5-minute slots**: `SLOTS_PER_DAY` 48 → 156, `MASK_WORDS` 11 → 35, `/ 15` → `/ 5` in both `schedule.js` and `App.jsx`, slot height 12px → 5px. Verified: 105 course pairs, 259 schedules, 0 mismatches against brute force, 0 overlaps in output.
+- ⚠️ **Second real bug:** neither `<select>` reset `row.sections`, so a section number from a previous course survived a course change, `getEligibleSections` filtered everything out, and the user got "No schedules found" while the row displayed `1/2`. **Unrecoverable through the UI** — the stale section had no checkbox to untick. Fixed by adding `sections: []` to both `updateRow` calls.
+- Semester chip became a link to AURAK's live schedule page.
+- `.section-note` reworded from *"No selected sections means all of them will be included"* to *"Leave all sections unchecked to include every one of them."*
+
+> ⚠️ **Method note for whoever runs section 5.** Much of the styling work was delivered as *exact CSS values to type*, derived by the agent measuring the live DOM (`getBoundingClientRect`, canvas `TextMetrics`, ink-vs-box comparisons). Akeem wrote every line himself and drove every design decision — but **typing a measured value is not the same as learning a mechanism**, and the knowledge graph reflects that: most of the CSS leaves below are capped at `introduced`, not `practicing`. The genuinely instructive moments are marked there. Don't let the volume of shipped CSS read as depth of CSS understanding.
 
 **Notes for the lesson:**
 - 🔑 **Mobile is the only genuinely blocking item.** `project.md` says "usable on a phone," and `body { padding: 24px 450px 0 450px }` currently makes the app unusable below ~1000px wide. Do the *minimum that stops it being broken on a phone* — resist turning this into the full design pass that just got deferred.
@@ -315,7 +355,9 @@ Build immediately after section 10, not "someday". These are Akeem's stated prio
   - **A protected break window** (his idea, e.g. no classes 12:00–13:00). 💡 Nearly free to build: encode the break as a mask and reuse `masksConflict` — a section is excluded if any meeting overlaps it, which is the exact check he already wrote in section 3.
   - **Explicitly rejected 2026-08-11:** "max days on campus" and instructor filters. Don't re-propose.
   - 📝 Worth teaching when built: **section-level** filters (these) prune before generation and speed it up; **schedule-level** filters (max days on campus, minimum gap between classes) can only be checked on a finished schedule, so they can't prune. Different mechanism, different cost.
-- **The full styling / design-token pass** — moved out of section 4 on 2026-08-11. Section 4 does only the minimum that stops the app being broken on a phone. ⚠️ **This is the item that ate section 4 and will do it again if unwatched:** design has no natural "done." Two reasons it belongs here and not earlier — an unstyled app with real data beats a styled app with fake data, and real data (long course descriptions, ~700 rows, many subjects) is what you actually want to design against. Extract CSS custom properties (`--color-primary` etc.) as a *refactor once the repetition is visible*, not as an upfront task; naming colors before choosing them is backwards.
+- ~~**The full styling / design-token pass**~~ — ✅ **done in section 4 (2026-08-12→14), not here.** Moved out of section 4 on 2026-08-11, then happened there anyway and the section was renamed to own it. The Amber system (`docs/design/amber.md`) ships tokens for both themes, the mono/sans type split, the eight course hues, and a two-breakpoint responsive layout. ⚠️ **The 2026-08-11 warning was correct and is worth remembering for v1.1 itself:** design has no natural "done." What *is* still open here is the thing the original note was actually right about — **re-checking the design against real data** (long course descriptions, ~700 rows, many subjects). Everything shipped was tuned against 15 fake courses.
+- **Loading state / deferred rendering** — *moved here from section 4 on 2026-08-14 at Akeem's call.* ⚠️ Still matters for the reason section 4 gave it: he declined the result cap in section 3, so a large shortlist can freeze the main thread during generation, and this is the only thing distinguishing "thinking" from "broken." A plain label set before generation **will not paint** — React batches state updates, so the handler runs to completion before any repaint and `loading` goes true→false unpainted. Needs `setTimeout(..., 0)` around the generation so the handler returns and React paints first → [[deferred-rendering]]
+- **Arrow-key paging** — *moved here from section 4 on 2026-08-14 at Akeem's call.* A `keydown` listener on `window` stepping through results with ←/→. Small, and still worth building for its teaching value: it is the **second rep** of the cleanup discipline the toast introduced. Worth naming the contrast when built — React attaches a click handler to one element and tears it down automatically on unmount; a `window` listener is attached by *you* and outlives the component unless *you* remove it in the effect's cleanup → [[event-listener-cleanup]]
 - **Remembering the shortlist across refreshes** (`localStorage`) — moved out of section 4 on 2026-08-11. New concept, moderate work, pure convenience. Independent of where the data comes from, so nothing about section 7 invalidates it. ⚠️ One real edge case when built: a saved shortlist can reference a course code that no longer exists next semester — handle the miss rather than crashing.
 - **Total credits per schedule** — moved out of section 4 on 2026-08-11. Real student value, but it needs a `credits` field, and hand-adding fake ones would be thrown away when section 5's parser reads the real "No. of Credits" column. Cheap and correct once real data exists.
 - **Exclude sections that are already full** — makes the output actionable. A schedule containing a section nobody can register for is a wasted result.
