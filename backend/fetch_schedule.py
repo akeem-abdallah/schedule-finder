@@ -11,4 +11,4 @@ rows = tbody.find_all("tr")
 first_row = rows[0]
 cells = first_row.find_all("td")
 for cell in cells:
-    print(repr(cell.get_text()))
+    print(repr(cell.get_text().strip()))

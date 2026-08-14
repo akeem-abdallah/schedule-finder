@@ -258,7 +258,7 @@ select:focus-visible, button:focus-visible, input[type="checkbox"]:focus-visible
 
 .sec-text {
     font-family: var(--font-data);
-    font-size: 12px;
+    font-size: 11px;
     font-weight: 500;
     color: var(--muted);
 }
@@ -318,8 +318,9 @@ select:focus-visible, button:focus-visible, input[type="checkbox"]:focus-visible
     padding: 8px 13px;
     border-bottom: 1px solid var(--rule);
     font-family: var(--font-ui);
-    font-size: 13px;
-    color: var(--muted);
+    font-size: 14px;
+    color: var(--text);
+    font-weight: 600;
 }
 
 .section-num {
@@ -735,7 +736,9 @@ select:focus-visible, button:focus-visible, input[type="checkbox"]:focus-visible
     .row-title {
         grid-column: 1 / -1;
         grid-row: 2;
-        font-size: 13px;
+        font-size: 14px;
+        padding: 3px 0 2px 5px;
+        
     }
 
     select {
@@ -747,7 +750,7 @@ select:focus-visible, button:focus-visible, input[type="checkbox"]:focus-visible
     }
 
     .sec-text {
-        font-size: 11px;
+        font-size: 10px;
     }
 
     .table-footer {
@@ -773,6 +776,7 @@ select:focus-visible, button:focus-visible, input[type="checkbox"]:focus-visible
         width: 44px;
         height: 44px;
         font-size: 20px;
+        margin-right: -10px;
     }
 
     .section-row {
