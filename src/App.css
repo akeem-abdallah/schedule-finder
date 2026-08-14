@@ -125,7 +125,12 @@ button {
 .btn-destructive {
     color: var(--faint);
     font-size: 16px;
-    padding-top: 4px;
+    padding: 0;
+    line-height: 1;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    height: 33px;
 }
 
 .btn-destructive:hover {
@@ -154,14 +159,6 @@ select {
 select:focus-visible, button:focus-visible, input[type="checkbox"]:focus-visible {
     outline: none;
     box-shadow: 0 0 0 3px var(--focus);
-}
-
-.error {
-    color: var(--danger);
-    background-color: rgba(168, 50, 26, 0.06);
-    font-weight: 500;
-    padding: 8px 11px;
-    font-size: 13px;
 }
 
 .row {
@@ -215,6 +212,26 @@ select:focus-visible, button:focus-visible, input[type="checkbox"]:focus-visible
 
 .table-header span:nth-child(4) {
     text-align: right;
+}
+
+.btn-clear-all {
+    padding: 0;
+    font-size: 8px;
+    font-weight: 800;
+    letter-spacing: .10em;
+    line-height: 1;
+    color: var(--muted);
+    text-align: right;
+    white-space: nowrap;
+}
+
+.btn-clear-all:hover:not(:disabled) {
+    color: var(--danger);
+}
+
+.btn-clear-all:disabled {
+    opacity: .35;
+    cursor: default;
 }
 
 .sec-cell {
@@ -284,7 +301,7 @@ select:focus-visible, button:focus-visible, input[type="checkbox"]:focus-visible
     font-size: 15px;
     font-weight: 600;
     color: var(--text);
-    padding-right: 5px;
+
 }
 
 .section-desc {
@@ -397,6 +414,10 @@ select:focus-visible, button:focus-visible, input[type="checkbox"]:focus-visible
 
 .weekly-grid {
     display: grid;
+}
+
+.grid-scroll {
+    overflow-x: auto;
 }
 
 .class-block {
@@ -554,7 +575,45 @@ select:focus-visible, button:focus-visible, input[type="checkbox"]:focus-visible
 
 
 
+.toast {
+    position: fixed;
+    top: 20px;
+    right: 20px;
+    z-index: 100;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    max-width: 340px;
+    padding: 13px 15px;
+    background-color: var(--surface);
+    border: 1px solid var(--rule-med);
+    border-left: 3px solid var(--danger);
+    color: var(--text);
+    font-size: 13px;
+    font-weight: 500;
+    line-height: 1.4;
+}
 
+.toast-msg {
+    flex: 1;
+}
+
+.toast-close {
+    flex: none;
+    width: 24px;
+    height: 24px;
+    padding: 0;
+    font-size: 15px;
+    line-height: 1;
+    color: var(--faint);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.toast-close:hover {
+    color: var(--danger);
+}
 
 .page-footer {
     margin-top: 40px;
@@ -618,7 +677,7 @@ select:focus-visible, button:focus-visible, input[type="checkbox"]:focus-visible
     }
 
     .row {
-        grid-template-columns: 54px 48px 1fr auto;
+        grid-template-columns: 60px 54px 1fr auto;
         column-gap: 6px;
         row-gap: 2px;
         padding: 9px 10px;
@@ -668,9 +727,9 @@ select:focus-visible, button:focus-visible, input[type="checkbox"]:focus-visible
     select {
         border: none;
         background-color: transparent;
-        padding-left: 0;
-        padding-right: 16px;
-        background-position: right 2px center;
+        padding-left: 5px;
+        padding-right: 20px;
+        background-position: right 6px center;
     }
 
     .row-title {
@@ -692,7 +751,7 @@ select:focus-visible, button:focus-visible, input[type="checkbox"]:focus-visible
     }
 
     .sub-strip {
-        padding: 4px 10px;
+        padding: 4px 12px 0 2px;
     }
 
     .sub-strip > button {
@@ -737,12 +796,42 @@ select:focus-visible, button:focus-visible, input[type="checkbox"]:focus-visible
         white-space: normal;
     }
 
+    .gutter-cell {
+        position: sticky;
+        left: 0;
+        z-index: 2;
+        background-color: var(--surface);
+    }
+
+    .grid-corner {
+        position: sticky;
+        left: 0;
+        z-index: 3;
+    }
+
+    .weekly-grid {
+        --day-w: calc((100% - var(--gutter-w, 70px)) / 4);
+    }
+
+    .toast {
+        top: auto;
+        bottom: 8px;
+        left: 8px;
+        right: 8px;
+        max-width: none;
+        padding: 12px 8px 12px 12px;
+    }
+
+    .toast-close {
+        width: 44px;
+        height: 44px;
+        margin: -12px -8px -12px 0;
+        font-size: 16px;
+    }
+
     @media (max-width: 480px) {
 
-        .gutter-cell {
-            font-size: 10px;
-            padding: 2px 5px;
-        }
+        
 
         .gutter-full {
             display: none;
@@ -751,6 +840,8 @@ select:focus-visible, button:focus-visible, input[type="checkbox"]:focus-visible
         .gutter-short {
             display: inline;
         }
+
+
 
         .weekly-grid {
             --gutter-w: 42px;
@@ -776,6 +867,10 @@ select:focus-visible, button:focus-visible, input[type="checkbox"]:focus-visible
             white-space: nowrap;
             overflow: hidden;
             text-overflow: ellipsis;
+        }
+
+        .class-block-short .block-time {
+            display: block;
         }
     }
 

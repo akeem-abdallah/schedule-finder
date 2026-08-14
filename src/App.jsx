@@ -1,5 +1,5 @@
 import './App.css'
-import { useState, Fragment } from 'react'
+import { useState, Fragment, useEffect } from 'react'
 import { subjects } from './data'
 import { DAYS, generateSchedules, orderedEligibleLists, timeToMinutes, to12Hour, formatMeetings } from './schedule'
 
@@ -11,6 +11,7 @@ function App() {
     const [customizingID, setCustomizingID] = useState(null)
 
     const [error, setError] = useState("")
+    const [errorId, setErrorId] = useState(0)
 
     const [results, setResults] = useState(null)
     const [currentIndex, setCurrentIndex] = useState(0)
@@ -18,11 +19,22 @@ function App() {
     const combos = rows.map((row) => row.subject + row.code)
     const hasDuplicates = new Set(combos).size !== combos.length
 
+    useEffect(() => {
+        if (!error) return
+        const timer = setTimeout(() => setError(""), 5000)
+        return () => clearTimeout(timer)
+    }, [error, errorId])
+
     function setIndex(increment) {
         const newIndex = currentIndex + increment
         if (newIndex >= 0 && newIndex < results.length) {
             setCurrentIndex(newIndex)
         }
+    }
+
+    function showError(message) {
+        setError(message)
+        setErrorId((n) => n + 1)
     }
 
     function updateRow(id, changes) {
@@ -42,18 +54,19 @@ function App() {
         const incomplete = rows.some((row) => row.subject === "" || row.code === "")
 
         if (rows.length === 0) {
-            setError("Please add at least one course.")
+            showError("Please add at least one course.")
 
         } else if (incomplete) {
-            setError("Please fill in all fields.")
+            showError("Please fill in all fields.")
 
         } else if (hasDuplicates) {
-            setError("Please remove all duplicates.")
+            showError("Please remove all duplicates.")
 
         } else {
             const generated = generateSchedules(orderedEligibleLists(rows))
+
             if (generated.length === 0) {
-                setError("No schedules found.")
+                showError("No schedules found.")
 
             } else {
                 setError("")
@@ -125,53 +138,55 @@ function App() {
                                 </div>
                             </div>
 
-                            <div className="weekly-grid" style={{
-                                gridTemplateColumns: `var(--gutter-w, 70px) repeat(${activeDays.length}, minmax(0, 1fr))`,
-                                gridTemplateRows: `auto repeat(${activeHours.length * 12}, var(--slot-h, 5px))`
-                            }}>
-                                <div className="grid-corner" style={{ gridColumn: 1, gridRow: 1 }}></div>
+                            <div className="grid-scroll">
+                                <div className="weekly-grid" style={{
+                                    gridTemplateColumns: `var(--gutter-w, 70px) repeat(${activeDays.length}, var(--day-w, minmax(0, 1fr)))`,
+                                    gridTemplateRows: `auto repeat(${activeHours.length * 12}, var(--slot-h, 5px))`
+                                }}>
+                                    <div className="grid-corner" style={{ gridColumn: 1, gridRow: 1 }}></div>
 
-                                {activeDays.map((day, dayIndex) => (
-                                    <div key={day} className="day-header" style={{ gridColumn: dayIndex + 2, gridRow: 1 }}>{day.toUpperCase()}</div> // builds the header row
-                                ))}
+                                    {activeDays.map((day, dayIndex) => (
+                                        <div key={day} className="day-header" style={{ gridColumn: dayIndex + 2, gridRow: 1 }}>{day.toUpperCase()}</div> // builds the header row
+                                    ))}
 
-                                {activeHours.map((hour, hourIndex) => (
-                                    <Fragment key={hour}>
-                                        <div className={hourIndex === 0 ? "gutter-cell no-rule-top" : "gutter-cell"} style={{ gridColumn: 1, gridRow: `${hourIndex * 12 + 2} / span 12` }}>
-                                            <span className="gutter-full">{to12Hour(`${hour}:00`)}</span>
-                                            <span className="gutter-short">{to12Hour(`${hour}:00`).replace(":00", "")}</span>
-                                        </div>
-                                        {activeDays.map((day, dayIndex) => {
-                                            const hourCellClass = ["hour-cell", hourIndex === 0 && "no-rule-top", dayIndex === 0 && "no-rule-left"].filter(Boolean).join(" ")
-                                            return <div key={day} className={hourCellClass} style={{
-                                                gridColumn: dayIndex + 2, gridRow: `${hourIndex * 12 + 2} / span 12` }}></div>
-                                        })}
-                                    </Fragment>
-                                ))}
-
-                                {/*builds every section block using map*/}
-                                {results[currentIndex].map((section, sectionIndex) =>
-                                    section.meetings.map((meeting) => {
-                                        const startSlot = (timeToMinutes(meeting.start) - startHour * 60) / 5
-                                        const durationSlots = (timeToMinutes(meeting.end) - timeToMinutes(meeting.start)) / 5
-                                        const gridRowStart = startSlot + 2
-                                        const gridColumn = activeDays.indexOf(meeting.day) + 2
-                                        const hue = COURSE_HUES[sectionIndex % COURSE_HUES.length]
-
-                                        return (
-                                            <div
-                                                key={`${section.courseCode}-${section.section}-${meeting.day}`}
-                                                className={durationSlots < 12 ? "class-block class-block-short" : "class-block"}
-                                                title={`${section.courseSubject} ${section.courseCode}-${section.section} · ${section.instructor} · ${to12Hour(meeting.start)}–${to12Hour(meeting.end)}`}
-                                                style={{ gridColumn, gridRow: `${gridRowStart} / span ${durationSlots}`, "--hue": hue }}
-                                            >
-                                                <div className="block-code">{section.courseSubject} {section.courseCode}-{section.section}</div>
-                                                <div className="block-instructor">{section.instructor}</div>
-                                                <div className="block-time">{to12Hour(meeting.start).slice(0, -3)}–{to12Hour(meeting.end).slice(0, -3)}</div>
+                                    {activeHours.map((hour, hourIndex) => (
+                                        <Fragment key={hour}>
+                                            <div className={hourIndex === 0 ? "gutter-cell no-rule-top" : "gutter-cell"} style={{ gridColumn: 1, gridRow: `${hourIndex * 12 + 2} / span 12` }}>
+                                                <span className="gutter-full">{to12Hour(`${hour}:00`)}</span>
+                                                <span className="gutter-short">{to12Hour(`${hour}:00`).replace(":00", "")}</span>
                                             </div>
-                                        )
-                                    })
-                                )}
+                                            {activeDays.map((day, dayIndex) => {
+                                                const hourCellClass = ["hour-cell", hourIndex === 0 && "no-rule-top", dayIndex === 0 && "no-rule-left"].filter(Boolean).join(" ")
+                                                return <div key={day} className={hourCellClass} style={{
+                                                    gridColumn: dayIndex + 2, gridRow: `${hourIndex * 12 + 2} / span 12` }}></div>
+                                            })}
+                                        </Fragment>
+                                    ))}
+
+                                    {/*builds every section block using map*/}
+                                    {results[currentIndex].map((section, sectionIndex) =>
+                                        section.meetings.map((meeting) => {
+                                            const startSlot = (timeToMinutes(meeting.start) - startHour * 60) / 5
+                                            const durationSlots = (timeToMinutes(meeting.end) - timeToMinutes(meeting.start)) / 5
+                                            const gridRowStart = startSlot + 2
+                                            const gridColumn = activeDays.indexOf(meeting.day) + 2
+                                            const hue = COURSE_HUES[sectionIndex % COURSE_HUES.length]
+
+                                            return (
+                                                <div
+                                                    key={`${section.courseCode}-${section.section}-${meeting.day}`}
+                                                    className={durationSlots < 12 ? "class-block class-block-short" : "class-block"}
+                                                    title={`${section.courseSubject} ${section.courseCode}-${section.section} · ${section.instructor} · ${to12Hour(meeting.start)}–${to12Hour(meeting.end)}`}
+                                                    style={{ gridColumn, gridRow: `${gridRowStart} / span ${durationSlots}`, "--hue": hue }}
+                                                >
+                                                    <div className="block-code">{section.courseSubject} {section.courseCode}-{section.section}</div>
+                                                    <div className="block-instructor">{section.instructor}</div>
+                                                    <div className="block-time">{to12Hour(meeting.start).slice(0, -3)}–{to12Hour(meeting.end).slice(0, -3)}</div>
+                                                </div>
+                                            )
+                                        })
+                                    )}
+                                </div>
                             </div>
                         </>
 
@@ -218,7 +233,8 @@ function App() {
                                 <span>CODE</span>
                                 <span>TITLE</span>
                                 <span>SEC</span>
-                                <span></span>
+                                <button className="btn-clear-all" onClick={() => setRows([])} disabled={rows.length === 0}
+                                    aria-label="Remove all courses" title="Remove all courses">CLEAR</button>
                             </div>
 
                             {rows.map((row) => {
@@ -232,14 +248,14 @@ function App() {
 
                                     <div key={row.id} className={isInProgress ? "row row-active" : "row"}>
 
-                                        <select value={row.subject} aria-label="Subject" onChange={(e) => updateRow(row.id, { subject: e.target.value, code: "" })}>
+                                        <select value={row.subject} aria-label="Subject" onChange={(e) => updateRow(row.id, { subject: e.target.value, code: "", sections: [] })}>
                                             <option value="">--</option>
                                             {subjects.map((s) => (
                                                 <option key={s.subject} value={s.subject}>{s.subject}</option>
                                             ))}
                                         </select>
 
-                                        <select value={row.code} aria-label="Course code" onChange={(e) => updateRow(row.id, { code: e.target.value })}>
+                                        <select value={row.code} aria-label="Course code" onChange={(e) => updateRow(row.id, { code: e.target.value, sections: [] })}>
                                             <option value="">--</option>
                                             {courses.map((c) => (
                                                 <option key={c.code} value={c.code}>
@@ -283,11 +299,14 @@ function App() {
                         </>
                     )}
 
-                    {error && <div className="error" role="alert">{error}</div>}
+                    {error && (
+                        <div className="toast" role="alert">
+                            <span className="toast-msg">{error}</span>
+                            <button className="toast-close" onClick={() => setError("")} aria-label="Dismiss error">×</button>
+                        </div>
+                    )}
 
                 </div>
-
-            
 
             </div>
 
