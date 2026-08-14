@@ -418,6 +418,14 @@ Shipped 2026-08-05. Full history with detailed evidence lives in
 - evidence: had only ever `pip install`ed globally before. Correctly predicted, before running, how he'd know activation worked (*"it shows (venv)"*) — confirmed against the real terminal output. Ran `python -m venv venv` and the activation two-liner himself. When asked why `requirements.txt` matters beyond "remembering what I installed," said *"idk"* honestly rather than guessing; given the real reason (reproducible environment elsewhere, exact pinned versions, same relationship as `package.json`/`package-lock.json` he already knows)
 <!-- New leaf, not in original section 5 concept list -->
 
+### html-parsing
+- status: practicing
+- depends-on: none
+- introduced: 2026-08-14
+- last-reviewed: 2026-08-14
+- evidence: bridged to `document.getElementById`/DOM tree navigation (already `practicing`) — same idea, static text instead of a live browser DOM. Correctly predicted `table is not None` would be `True`, though only answered the "what" half of a two-part question, not the "why check `is not None`" half (supplied: a clean boolean instead of a giant HTML dump or a silent `None`). Predicted `len(rows)` at "around 400" — real count came back 421, both from his own script's `print()` and independently confirmed against AURAK's own page UI, which is a real signal the parse is correct, not just non-empty. Skipped predict-before-run on the `get_text()`/`repr()` step (ran straight away), but correctly identified both messy fields on inspection afterward. His explanation for *why* was incomplete — *"because the \\n's are end lines"* restates what the character is, not why it's there — corrected: the seats field is sloppy whitespace formatting (needs `.strip()`), the Day/Time/Room field is a genuinely different problem, multiple `<span>` meetings concatenated by `.get_text()`, which is real structure, not noise
+<!-- The real row count (421) is meaningfully lower than project.md's original ~700 estimate from 2026-08-06 — worth a docs update once section 5 has clean data, not a bug -->
+
 ### http-requests-python
 - status: practicing
 - depends-on: none

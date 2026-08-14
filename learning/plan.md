@@ -279,7 +279,7 @@ dropping one update (stale closure over `rows`).
 
 **Tasks:**
 - [x] 5.1 Set up the Python side of the project (folder, venv, `requirements.txt` with `requests` + `beautifulsoup4`); fetch the live AURAK page once and save the raw HTML to a local file
-- [ ] 5.2 Locate the course table in the saved HTML and print the raw text of each row/column, to see what real data actually looks like
+- [x] 5.2 Locate the course table in the saved HTML and print the raw text of each row/column, to see what real data actually looks like — found 421 real rows (real count, lower than the ~700 originally estimated), confirmed the two messy fields: Available Seats (whitespace, trivial) and Day/Time/Room (multiple `<span>` meetings genuinely concatenated, the real problem for 5.4)
 - [ ] 5.3 Parse Course Code / Section / Description / Credits / Seats into clean values per row
 - [ ] 5.4 Parse the `Day/Time/Room` field into structured meetings (day, start, end, room) — the hard part, since a section can meet more than once a week
 - [ ] 5.5 Assemble everything into structured Course/Section/Meeting objects and print a final count (~700 courses)

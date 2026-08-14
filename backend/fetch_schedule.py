@@ -1,9 +1,14 @@
-import requests
+from bs4 import BeautifulSoup
 
-URL = "https://eums.aurak.ac.ae/Public/Schedule?h42blu9ygNZPnBJmMbXuWAu8XR3hS4tcKtMIP6xFd2U="
+with open("aurak_schedule.html", "r", encoding="utf-8") as f:
+    html = f.read()
 
-response = requests.get(URL)
-print(response.status_code)
+soup = BeautifulSoup(html, "html.parser")
+table = soup.find("table", id="dt_basic")
+tbody = table.find("tbody")
+rows = tbody.find_all("tr")
 
-with open("aurak_schedule.html", "w", encoding="utf-8") as f:
-    f.write(response.text)
+first_row = rows[0]
+cells = first_row.find_all("td")
+for cell in cells:
+    print(repr(cell.get_text()))
