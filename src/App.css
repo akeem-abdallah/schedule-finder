@@ -186,7 +186,7 @@ select:focus-visible, button:focus-visible, input[type="checkbox"]:focus-visible
     font-family: var(--font-ui);
     font-size: 14px;
     font-weight: 450;
-    padding-bottom: 2px;
+    padding-bottom: 1px;
     white-space: nowrap;
     overflow: hidden;
     text-overflow: ellipsis;

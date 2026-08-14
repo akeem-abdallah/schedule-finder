@@ -38,6 +38,12 @@ Entries stay **one line** forever. They record *why a file exists*, not what's i
 - src/assets/ — deleted 2026-08-07 (template image assets, no longer applicable)
 - .vs/ — generated — Visual Studio's own project cache/index; gitignored, never tracked, machine-rebuildable. Locks a file while VS is open, which crashed both Vite's dev server and `git add` until both were told to ignore it
 
+### /backend — added 2026-08-14
+- backend/venv/ — known (2026-08-14) — generated — Python's isolated per-project package folder, created with `python -m venv venv`; never hand-edited, gitignored, rebuildable from `requirements.txt` → [[python-venv]]
+- backend/requirements.txt — known (2026-08-14) — the Python packages this project needs, pinned to exact versions via `pip freeze`; same relationship to `pip install` as `package-lock.json` has to `npm install` → [[python-venv]]
+- backend/fetch_schedule.py — known (2026-08-14) — fetches AURAK's live schedule page over HTTP and saves the raw HTML locally; the first piece of the parser, will grow through the rest of section 5 → [[http-requests-python]]
+- backend/aurak_schedule.html — known (2026-08-14) — a saved copy of AURAK's real page (~700 rows), fetched once so the rest of section 5 develops against a local file instead of hitting AURAK's server every run; will double as the test fixture in section 8 → [[http-requests-python]]
+
 ### /docs/design — added 2026-08-12
 - docs/design/amber.md — known (2026-08-12) — the design spec the app now implements: colour tokens for both themes, the two-family type scale (mono for data, sans for language), layout primitives, the eight course hues, the responsive column budget, and a build order. Deliberately written as **tables of values, not CSS**, so transcribing it is the work → [[responsive-design]], [[css-custom-properties]]
 - docs/design/view3-build.md — known (2026-08-13) — an 8-task build spec for rebuilding the results grid to match the mockup, with the measured before-state (645px of dead space, grid overflowing its card) and the reasoning behind each non-obvious call. Written by the agent at Akeem's request so the work could continue on a cheaper model
@@ -51,8 +57,7 @@ Nothing else exists yet.
 Not on disk yet. Listed so that when a command creates them, the lesson can tour them rather than let them pile up unexplained. **Delete an entry from here and add it above once it actually exists.**
 
 ### Section 5 will create
-- The parser script — fetches AURAK's page and turns its HTML table into structured course data → [[html-parsing]]
-- A saved copy of AURAK's HTML — kept locally so debugging doesn't hit their server repeatedly, and reused as the test fixture in section 7 → [[testing-a-parser]]
+- `fetch_schedule.py` grows into the full parser — turning the saved HTML table into structured course data is tasks 5.2–5.5 → [[html-parsing]]
 
 ### Section 6 will create
 - `.env` — 🔑 **the database connection string lives here. Gitignored from the very first commit, before it ever holds a real value.** His first real secret → [[environment-secrets]]

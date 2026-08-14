@@ -87,8 +87,8 @@ Shipped 2026-08-05. Full history with detailed evidence lives in
 - status: practicing
 - depends-on: none
 - introduced: 2026-08-06
-- last-reviewed: 2026-08-06
-- evidence: asked why this project needs a data pipeline when the matrix app didn't, answered correctly and unprompted — *"because the course data comes from AURAK and changes every semester, the seats also change frequently depending on how busy registration is."* The sharper framing (matrix-app data was **created by its users**; this data **belongs to someone else**, so the job is syncing a copy of a source you don't control) was supplied afterwards
+- last-reviewed: 2026-08-14
+- evidence: asked why this project needs a data pipeline when the matrix app didn't, answered correctly and unprompted — *"because the course data comes from AURAK and changes every semester, the seats also change frequently depending on how busy registration is."* The sharper framing (matrix-app data was **created by its users**; this data **belongs to someone else**, so the job is syncing a copy of a source you don't control) was supplied afterwards. **2026-08-14 review, entering section 5:** asked why the fetch needs to rerun *automatically* rather than by hand, answered *"because AURAK can update their database, and during registration week it updates quite alot"* — graded as vague, not a pass: correctly re-derived why the *data* changes, but didn't address why the *fetching mechanism* has to be unattended. Corrected: a scheduled job removes the human from the loop, since "run it by hand" only works as long as someone remembers to, and this job needs to keep working long after nobody's thinking about it — which is also the motivation for idempotent-full-replace in section 6
 
 ---
 
@@ -410,12 +410,20 @@ Shipped 2026-08-05. Full history with detailed evidence lives in
 
 ## Section 5 — The parser
 
-### http-requests-python
-- status: seed
+### python-venv
+- status: practicing
 - depends-on: none
-- introduced: —
-- last-reviewed: —
-- evidence: —
+- introduced: 2026-08-14
+- last-reviewed: 2026-08-14
+- evidence: had only ever `pip install`ed globally before. Correctly predicted, before running, how he'd know activation worked (*"it shows (venv)"*) — confirmed against the real terminal output. Ran `python -m venv venv` and the activation two-liner himself. When asked why `requirements.txt` matters beyond "remembering what I installed," said *"idk"* honestly rather than guessing; given the real reason (reproducible environment elsewhere, exact pinned versions, same relationship as `package.json`/`package-lock.json` he already knows)
+<!-- New leaf, not in original section 5 concept list -->
+
+### http-requests-python
+- status: practicing
+- depends-on: none
+- introduced: 2026-08-14
+- last-reviewed: 2026-08-14
+- evidence: bridged to `fetch()` (JS, already `practicing`) once told the two are the same idea — send a request, get an object back. First prediction of `response.status_code` on success was wrong (*"uhhh 500?"*, which is a server error code) despite having returned status codes himself from Flask routes last project — the knowledge didn't transfer unprompted. Corrected (200 = success, 400s = client error, 500s = server error) and got the real 200 back when he ran it. Wrote the fetch + file-write code himself from a plain-language description of `open()`/`with`/`"w"` mode, ran it, and correctly identified the saved file as "thousands of lines" of real HTML. Capped at `practicing`, not higher — the wrong status-code prediction is real evidence the mental model isn't fully connected yet, good re-check candidate
 
 ### html-parsing
 - status: seed
