@@ -2,9 +2,7 @@ import { subjects } from './data'
 
 export const DAYS = ["Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"]
 export const DAY_START = 480
-export const SLOTS_PER_DAY = 48
-
-export const GRID_HOURS = [8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19]
+export const SLOTS_PER_DAY = 156
 
 // TODO(you): "13:30" -> "1:30 PM". Split the string like timeToMinutes does,
 // figure out AM/PM from the hour, convert the hour with % 12, then build the string.
@@ -63,11 +61,11 @@ export function timeToMinutes(time) {
 // converts minutes to slot (48 slots per day, day starts at 8:00) each slot is 15 min, formula: 1(Tue) * 48 + (780 - 480) / 15 = 68
 export function timeToSlot(day, time) {
     const dayIndex = DAYS.indexOf(day)
-    return dayIndex * SLOTS_PER_DAY + (timeToMinutes(time) - DAY_START) / 15
+    return dayIndex * SLOTS_PER_DAY + (timeToMinutes(time) - DAY_START) / 5
 }
 
-// js stores each number with 32 bits, so 32 x 11 = 352, 48 x 7 = 336
-export const MASK_WORDS = 11
+// js stores each number with 32 bits, so 32 x 35 = 1120, 156 x 7 = 1092
+export const MASK_WORDS = 35
 
 // sets one slot in a mask
 export function setSlot(mask, slot) {

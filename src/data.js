@@ -10,15 +10,15 @@ export const subjects = [
                     {
                         section: "1", instructor: "Dr. Ahmed",
                         meetings: [
-                            { day: "Mon", start: "09:00", end: "10:15" },
-                            { day: "Wed", start: "09:00", end: "10:15" },
+                            { day: "Mon", start: "09:00", end: "09:50" },
+                            { day: "Wed", start: "09:00", end: "09:50" },
                         ],
                     },
                     {
                         section: "2", instructor: "Dr. Khan",
                         meetings: [
-                            { day: "Tue", start: "11:00", end: "12:15" },
-                            { day: "Thu", start: "11:00", end: "12:15" },
+                            { day: "Tue", start: "11:00", end: "11:50" },
+                            { day: "Thu", start: "11:00", end: "11:50" },
                         ],
                     },
                 ],

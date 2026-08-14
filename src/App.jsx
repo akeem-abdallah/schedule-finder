@@ -126,8 +126,8 @@ function App() {
                             </div>
 
                             <div className="weekly-grid" style={{
-                                gridTemplateColumns: `70px repeat(${activeDays.length}, minmax(0, 1fr))`,
-                                gridTemplateRows: `auto repeat(${activeHours.length * 4}, 12px)`
+                                gridTemplateColumns: `var(--gutter-w, 70px) repeat(${activeDays.length}, minmax(0, 1fr))`,
+                                gridTemplateRows: `auto repeat(${activeHours.length * 12}, var(--slot-h, 5px))`
                             }}>
                                 <div className="grid-corner" style={{ gridColumn: 1, gridRow: 1 }}></div>
 
@@ -137,11 +137,14 @@ function App() {
 
                                 {activeHours.map((hour, hourIndex) => (
                                     <Fragment key={hour}>
-                                        <div className={hourIndex === 0 ? "gutter-cell no-rule-top" : "gutter-cell"}
-                                            style={{ gridColumn: 1, gridRow: `${hourIndex * 4 + 2} / span 4` }}>{to12Hour(`${hour}:00`)}</div>
+                                        <div className={hourIndex === 0 ? "gutter-cell no-rule-top" : "gutter-cell"} style={{ gridColumn: 1, gridRow: `${hourIndex * 12 + 2} / span 12` }}>
+                                            <span className="gutter-full">{to12Hour(`${hour}:00`)}</span>
+                                            <span className="gutter-short">{to12Hour(`${hour}:00`).replace(":00", "")}</span>
+                                        </div>
                                         {activeDays.map((day, dayIndex) => {
                                             const hourCellClass = ["hour-cell", hourIndex === 0 && "no-rule-top", dayIndex === 0 && "no-rule-left"].filter(Boolean).join(" ")
-                                            return <div key={day} className={hourCellClass} style={{ gridColumn: dayIndex + 2, gridRow: `${hourIndex * 4 + 2} / span 4` }}></div>
+                                            return <div key={day} className={hourCellClass} style={{
+                                                gridColumn: dayIndex + 2, gridRow: `${hourIndex * 12 + 2} / span 12` }}></div>
                                         })}
                                     </Fragment>
                                 ))}
@@ -149,8 +152,8 @@ function App() {
                                 {/*builds every section block using map*/}
                                 {results[currentIndex].map((section, sectionIndex) =>
                                     section.meetings.map((meeting) => {
-                                        const startSlot = (timeToMinutes(meeting.start) - startHour * 60) / 15
-                                        const durationSlots = (timeToMinutes(meeting.end) - timeToMinutes(meeting.start)) / 15
+                                        const startSlot = (timeToMinutes(meeting.start) - startHour * 60) / 5
+                                        const durationSlots = (timeToMinutes(meeting.end) - timeToMinutes(meeting.start)) / 5
                                         const gridRowStart = startSlot + 2
                                         const gridColumn = activeDays.indexOf(meeting.day) + 2
                                         const hue = COURSE_HUES[sectionIndex % COURSE_HUES.length]
@@ -158,7 +161,8 @@ function App() {
                                         return (
                                             <div
                                                 key={`${section.courseCode}-${section.section}-${meeting.day}`}
-                                                className="class-block"
+                                                className={durationSlots < 12 ? "class-block class-block-short" : "class-block"}
+                                                title={`${section.courseSubject} ${section.courseCode}-${section.section} · ${section.instructor} · ${to12Hour(meeting.start)}–${to12Hour(meeting.end)}`}
                                                 style={{ gridColumn, gridRow: `${gridRowStart} / span ${durationSlots}`, "--hue": hue }}
                                             >
                                                 <div className="block-code">{section.courseSubject} {section.courseCode}-{section.section}</div>
