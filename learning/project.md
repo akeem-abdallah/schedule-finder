@@ -15,7 +15,7 @@
 
 ## 📌 State of play — updated 2026-08-14
 
-**Sections 1–4 done. Section 5 (the parser) is next, and it's the first Python work in this project.**
+**Sections 1–4 done. Section 5 (the parser) built and verified — 421 real rows fetched, parsed, normalized, and correctly nested into `data.js`'s Subject→Course→Section shape; only the final commit is left (5.9).** Real row count is 421, not the ~700 originally estimated — nothing wrong, just the actual current number.
 
 | | |
 |---|---|

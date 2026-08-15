@@ -426,6 +426,22 @@ Shipped 2026-08-05. Full history with detailed evidence lives in
 - evidence: bridged to `document.getElementById`/DOM tree navigation (already `practicing`) — same idea, static text instead of a live browser DOM. Correctly predicted `table is not None` would be `True`, though only answered the "what" half of a two-part question, not the "why check `is not None`" half (supplied: a clean boolean instead of a giant HTML dump or a silent `None`). Predicted `len(rows)` at "around 400" — real count came back 421, both from his own script's `print()` and independently confirmed against AURAK's own page UI, which is a real signal the parse is correct, not just non-empty. Skipped predict-before-run on the `get_text()`/`repr()` step (ran straight away), but correctly identified both messy fields on inspection afterward. His explanation for *why* was incomplete — *"because the \\n's are end lines"* restates what the character is, not why it's there — corrected: the seats field is sloppy whitespace formatting (needs `.strip()`), the Day/Time/Room field is a genuinely different problem, multiple `<span>` meetings concatenated by `.get_text()`, which is real structure, not noise
 <!-- The real row count (421) is meaningfully lower than project.md's original ~700 estimate from 2026-08-06 — worth a docs update once section 5 has clean data, not a bug -->
 
+### data-cleaning
+- status: practicing
+- depends-on: html-parsing
+- introduced: 2026-08-14
+- last-reviewed: 2026-08-14
+- evidence: wrote `parse_row(row)` himself, extending a 4-field example I gave to all 8 fields unprompted. Correctly predicted `credits` would print as `'3.0'` (string, quoted) before type conversion and `3.0` (unquoted) after wrapping in `float()`/`int()`. Predicted real rows might crash `parse_row` due to "unavailable or different data" — correct: `int('Full')` crashed on a genuinely full section where AURAK shows text instead of a seat count. Said "I'm not sure" honestly when asked how to handle it rather than guessing; given the reasoning (`'Full'` → `0`, keeping `available_seats` a consistent type) and wrote the if/else fix himself, then reran and confirmed all 421 real rows parse without error
+<!-- New leaf, not in original section 5 concept list (concept name matches plan.md's data-cleaning, but plan didn't specify this exact case) -->
+
+### dict-based-grouping
+- status: practicing
+- depends-on: multi-value-fields
+- introduced: 2026-08-14
+- last-reviewed: 2026-08-14
+- evidence: new pattern — using a dict as a lookup table for "find or create" (bridged to the `Set`-based duplicate check from section 2: same idea, O(1) lookup by key instead of scanning). First real struggle: over-indented the course-lookup and section-append lines one level too deep, nesting them *inside* `if subj not in subjects_dict:` — classic Python trap coming from JS's explicit `{}` blocks, meant the course/section logic only ran the first time a subject was seen. Said *"idk what I did, can you check the for loop"* rather than guessing at a fix; asked to trace what the `if` evaluates to on a second same-subject record before being shown the fix, then fixed the indentation himself. On the final `.values()`/`list()` conversion, predicted `subjects` correctly as a list but said `courses` was "still a dict" — missed that the same line's `list(...)` wrapper converts both; corrected, then verified the real output matched (`ACCT 205` correctly showing 2 nested sections). Closed with a genuinely strong, unprompted check: proposed and correctly predicted `sum(len(c["sections"]) for s in subjects for c in s["courses"]) == 421` as a way to prove the restructuring itself lost or duplicated nothing, and named *why* it's meaningful (not just repeating a number) before running it
+<!-- New leaf, not in original section 5 concept list — emerged from Akeem catching the flat-vs-nested mismatch between the parser and data.js himself -->
+
 ### http-requests-python
 - status: practicing
 - depends-on: none
@@ -447,12 +463,22 @@ Shipped 2026-08-05. Full history with detailed evidence lives in
 - last-reviewed: —
 - evidence: —
 
-### multi-value-fields
-- status: seed
+### normalize-at-the-boundary
+- status: practicing
 - depends-on: data-cleaning
-- introduced: —
-- last-reviewed: —
-- evidence: —
+- introduced: 2026-08-14
+- last-reviewed: 2026-08-14
+- evidence: built `to_24_hour()`, the mirror image of `to12Hour()` he'd already written in `schedule.js`. Real bugs, worked through by running and reading tracebacks rather than being told: (1) tried `time.split()` (whitespace) on `"10:30AM"`, which has no space — needed the actual mechanism given (`[:-2]`/`[-2:]` slicing, bridged to the JS `.slice()` he already knows from `array-slice`); (2) `int(time_part.split(':'))` — tried to `int()` a whole list at once instead of converting each piece; (3) `else if` — a JS habit, not valid Python (`elif`), self-corrected without prompting; (4) the core logic bug, comparing/mutating `time_part` (still a string) instead of `hour` (the actual int) — asked which variable was right, found it himself; (5) missing zero-pad on `minute` (`12:0` instead of `12:00`) — spotted and fixed once shown the raw wrong output, no explanation given first. Verified against real edge cases from the actual data: `12:00AM`→`00:00`, `12:00PM`→`12:00`, `9:00AM`→`09:00`, `10:30AM`→`10:30`, then against all 421 real rows. Correctly predicted the `"TBA"` swap was isolated to `parse_row`, no ripple into `parse_meetings`/`to_24_hour`
+<!-- The principle: convert someone else's format into your own shape once, at the parser (the border), not at every place that later reads it. Emerged from Akeem's own (reversed) proposal to store 12-hour times and convert at calculation time -->
+<!-- ⚠️ Akeem asked to skip predict-before-run and have the agent run+show tracebacks directly for this task, after initially asking for the whole thing to just be fixed — declined, with the reasoning named. Real debugging (reading his own tracebacks, diagnosing the actual cause) still happened; only the "type it, then wait for him to run it" step was compressed -->
+
+### multi-value-fields
+- status: practicing
+- depends-on: data-cleaning
+- introduced: 2026-08-14
+- last-reviewed: 2026-08-14
+- evidence: chose to use `find_all("span")` per meeting rather than fight the concatenated `.get_text()` string — his own scope call to drop room parsing surfaced a real complication he then diagnosed correctly: room text (`"On L-215A"`) is still embedded in spans he wasn't storing room for, so naive `day, time_range = text.split()` crashed with 4 values on rows with a room. Also independently flagged, unprompted, that some rows have no Day/Time/Room data at all (`BIOL 494`, confirmed for real) — then correctly reasoned that `find_all("span")` returning `[]` on an empty cell means the loop just does nothing, no crash, no special-casing needed (phrased as a question, "it wouldn't crash because of find all?", but the reasoning itself was right). Verified against all 421 real rows twice — once broken by the room case, once clean after the fix. **2026-08-14, task 5.7:** independently caught a real structural gap by comparing his parser's output against `data.js`'s shape — `code` bundled subject+number where `data.js` keeps them separate. Reused `.split()` to split `"ACCT 204"`, verified the real data first (exactly one space, no exceptions) before applying it — transferred the token-counting caution from the room bug above, unprompted
+<!-- Room dropped from the parsed output at his request — Meeting's schema in project.md includes room, worth a decision when section 6 builds the real table: re-add parsing then, or leave it out of the MVP -->
 <!-- The Day/Time/Room field. Where nearly all parsing effort goes, and why Meeting is its own table -->
 
 ## Section 6 — The database

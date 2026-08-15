@@ -280,10 +280,26 @@ dropping one update (stale closure over `rows`).
 **Tasks:**
 - [x] 5.1 Set up the Python side of the project (folder, venv, `requirements.txt` with `requests` + `beautifulsoup4`); fetch the live AURAK page once and save the raw HTML to a local file
 - [x] 5.2 Locate the course table in the saved HTML and print the raw text of each row/column, to see what real data actually looks like — found 421 real rows (real count, lower than the ~700 originally estimated), confirmed the two messy fields: Available Seats (whitespace, trivial) and Day/Time/Room (multiple `<span>` meetings genuinely concatenated, the real problem for 5.4)
-- [ ] 5.3 Parse Course Code / Section / Description / Credits / Seats into clean values per row
-- [ ] 5.4 Parse the `Day/Time/Room` field into structured meetings (day, start, end, room) — the hard part, since a section can meet more than once a week
-- [ ] 5.5 Assemble everything into structured Course/Section/Meeting objects and print a final count (~700 courses)
-- [ ] 5.6 Commit — deliverable reached
+- [x] 5.3 Parse Course Code / Section / Description / Credits / Seats into clean values per row — `parse_row()` built, handles the real `'Full'` seats edge case (→ 0), verified against all 421 real rows
+- [x] 5.4 Parse the `Day/Time/Room` field into structured meetings (day, start, end) — room dropped from output at Akeem's request (still worth revisiting when section 6 builds the real Meeting table); verified against all 421 real rows, including the no-meetings edge case (`BIOL 494`)
+- [x] 5.5 Assemble everything into structured Course/Section/Meeting objects and print a final count (421 rows — **every** row kept, including no-meeting sections; see the decision note below)
+- [x] 5.6 Normalize at the boundary — `to_24_hour()` built (mirrors `to12Hour()`), `"To Be Announced"` → `"TBA"`; verified against real edge cases (`12:00AM`, `12:00PM`, `9:00AM`) and all 421 rows
+- [x] 5.7 Split the raw `"Course Code"` column (e.g. `"ACCT 204"`) into separate `subject` and `code` fields — `data.js` already keeps them apart, the parser currently doesn't. Verified against all 421 rows, no exceptions to the "one space" pattern
+- [x] 5.8 Restructure the flat list of 421 section-records into the nested shape `data.js` actually uses: Subject → Course → Section → Meeting, instead of one flat record per section. Verified with an unprompted sanity check: total nested sections still sums to 421
+- [ ] 5.9 Commit — deliverable reached
+
+> #### 📌 Added 2026-08-14, at Akeem's request — a real structural gap he caught, not the agent
+> He compared his parser's output directly against `data.js`'s shape and found two things the parser was still missing: `code` bundles subject and number together (`"ACCT 204"`) instead of matching `data.js`'s separate `subject`/`code` fields, and the parser produces a flat list — one record per section-row — while `data.js` is nested three levels deep (Subject → Course → Section, with Meeting inside Section). Both are real, and both matter: section 7 swaps `data.js` for real data with as little frontend rework as possible, which only works if the shapes actually match.
+
+> #### 📌 Three decisions made 2026-08-14, at Akeem's request — one of them a reversal
+>
+> **1. No-meeting sections are kept, not filtered.** Earlier the same day the plan was to drop rows with an empty Day/Time/Room (`BIOL 494` and similar). Akeem reversed it, and his reasoning is the deciding one: **those courses still carry credits**, so dropping them would make the v1.1 total-credits label silently wrong. His spec: they appear in the shortlist, `EDIT` shows the instructor with no day/time, they never render on the grid, and they never cause an error.
+>
+> 💡 **The generator needs no changes for this.** A section with `meetings: []` produces an all-zero bitmask, and `masksConflict` against an all-zero mask is always false — so it is automatically compatible with every schedule, which is exactly correct. ⚠️ **`formatMeetings` in `schedule.js` does need a guard** — it reaches for `meetings[0]` and will crash on an empty array (same family as the section-3 blank-page bug → [[js-truthy-falsy]]). Frontend work, so it lands in **section 7** when real data arrives, or earlier if a no-meeting course is added to `data.js` to test against.
+>
+> **2. Time normalization moved to the parser — Akeem's original proposal was reversed after discussion.** He asked to store 12-hour times in `data.js`/the database and convert to 24-hour for calculations. Reversed to the opposite: **the parser converts 12-hour → 24-hour once, at the boundary.** His underlying instinct was right (fake data should match the shape real data will have), but the thing that must match is what *the database* holds, not what AURAK's HTML says. Storing 24-hour means `data.js` needs no change at all, `timeToMinutes`/`timeToSlot`/sorting/the whole mask pipeline keep working untouched, `to12Hour()` still handles display, and section 7's swap to real data is a drop-in. His version would have required conversion at every calculation site. → [[normalize-at-the-boundary]]
+>
+> **3. `"To Be Announced"` → `"TBA"` in the parser, not in the JSX** — same principle. It's a value, not a display choice.
 
 **Notes for the lesson:**
 - Back in Python — comfortable ground after three React sections. Good pacing.

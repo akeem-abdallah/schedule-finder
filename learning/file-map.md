@@ -41,7 +41,7 @@ Entries stay **one line** forever. They record *why a file exists*, not what's i
 ### /backend — added 2026-08-14
 - backend/venv/ — known (2026-08-14) — generated — Python's isolated per-project package folder, created with `python -m venv venv`; never hand-edited, gitignored, rebuildable from `requirements.txt` → [[python-venv]]
 - backend/requirements.txt — known (2026-08-14) — the Python packages this project needs, pinned to exact versions via `pip freeze`; same relationship to `pip install` as `package-lock.json` has to `npm install` → [[python-venv]]
-- backend/fetch_schedule.py — known (2026-08-14) — fetches AURAK's live schedule page over HTTP, saves the raw HTML locally, and now also parses it with BeautifulSoup to locate the `<table id="dt_basic">` and its data rows; will grow through the rest of section 5 → [[http-requests-python]], [[html-parsing]]
+- backend/fetch_schedule.py — known (2026-08-14) — **section 5's finished deliverable.** Fetches AURAK's live page, saves raw HTML, parses and normalizes all 421 rows (`parse_row`/`parse_meetings`/`parse_section`/`to_24_hour`), then groups the flat list into the same nested Subject→Course→Section(→Meeting) shape `data.js` uses, via a dict-based find-or-create pattern. Still printing to console, not yet in a database (section 6) → [[http-requests-python]], [[html-parsing]], [[data-cleaning]], [[multi-value-fields]], [[normalize-at-the-boundary]], [[dict-based-grouping]]
 - backend/aurak_schedule.html — known (2026-08-14) — a saved copy of AURAK's real page (~700 rows), fetched once so the rest of section 5 develops against a local file instead of hitting AURAK's server every run; will double as the test fixture in section 8 → [[http-requests-python]]
 
 ### /docs/design — added 2026-08-12
