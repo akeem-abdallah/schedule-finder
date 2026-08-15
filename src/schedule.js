@@ -1,5 +1,3 @@
-import { subjects } from './data'
-
 export const DAYS = ["Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"]
 export const DAY_START = 480
 export const SLOTS_PER_DAY = 156
@@ -22,33 +20,31 @@ export function to12Hour(time) {
 }
 
 export function formatMeetings(meetings) {
+    if (meetings.length === 0) return "TBA"
 
     const days = meetings.map(m => m.day.toUpperCase()).join(" ")
-    let s = to12Hour(meetings[0].start)
-    let e = to12Hour(meetings[0].end)
+    let s = to12Hour(meetings[0].start_time)
+    let e = to12Hour(meetings[0].end_time)
 
     const time = s.slice(-2) === e.slice(-2) ? `${s.slice(0, -3)}–${e}` : `${s}–${e}`
     return `${days}\n${time}`
 }
 
 // extracts all eligible sections in a row
-export function getEligibleSections(row) {
+export function getEligibleSections(row, subjects) {
 
     const eligibleSubject = subjects.find((r) => r.subject === row.subject)
     const eligibleCourse = eligibleSubject.courses.find((c) => c.code === row.code)
 
-    const eligible = row.sections.length === 0 ? eligibleCourse.sections : eligibleCourse.sections.filter((s) => row.sections.includes(s.section))
+    const eligible = row.sections.length === 0 ? eligibleCourse.sections : eligibleCourse.sections.filter((s) => row.sections.includes(s.section_number))
 
-    // TODO(you): map over `eligible`, returning a new object for each section
-    // that spreads in the original section's fields (...s) plus two new ones:
-    // courseCode (eligibleCourse.code) and courseDescription (eligibleCourse.description)
     return eligible.map((s) => ({ ...s, courseSubject: eligibleSubject.subject, courseCode: eligibleCourse.code }))
 
 }
 
 // orders those eligible sections
-export function orderedEligibleLists(rows) {
-    const lists = rows.map((row) => getEligibleSections(row))
+export function orderedEligibleLists(rows, subjects) {
+    const lists = rows.map((row) => getEligibleSections(row, subjects))
     return lists.sort((a, b) => a.length - b.length)
 }
 
@@ -79,8 +75,8 @@ export function sectionToMask(section) {
     const mask = new Array(MASK_WORDS).fill(0) // fills mask with 352 bits made of 0s
 
     for (const meeting of section.meetings) {
-        const startSlot = timeToSlot(meeting.day, meeting.start)
-        const endSlot = timeToSlot(meeting.day, meeting.end)
+        const startSlot = timeToSlot(meeting.day, meeting.start_time)
+        const endSlot = timeToSlot(meeting.day, meeting.end_time)
 
         for (let slot = startSlot; slot < endSlot; slot++) {
             setSlot(mask, slot)

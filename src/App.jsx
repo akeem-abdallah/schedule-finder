@@ -1,9 +1,26 @@
 import './App.css'
 import { useState, Fragment, useEffect } from 'react'
-import { subjects } from './data'
 import { DAYS, generateSchedules, orderedEligibleLists, timeToMinutes, to12Hour, formatMeetings } from './schedule'
 
 const COURSE_HUES = ["#2f6bff", "#e0561f", "#17a06a", "#9d4edd", "#c9910d", "#00a0b8", "#e0447f", "#7cb518"]
+
+function groupBySubject(courses) {
+    const bySubject = {}
+
+    for (const course of courses) {
+
+        if (!bySubject[course.subject]) {
+            bySubject[course.subject] = { subject: course.subject, courses: [] }
+        }
+
+        bySubject[course.subject].courses.push(course)
+
+    }
+
+    const grouped = Object.values(bySubject).sort((a, b) => a.subject.localeCompare(b.subject))
+    grouped.forEach((s) => s.courses.sort((a, b) => a.code.localeCompare(b.code)))
+    return grouped
+}
 
 function App() {
 
@@ -18,6 +35,18 @@ function App() {
 
     const combos = rows.map((row) => row.subject + row.code)
     const hasDuplicates = new Set(combos).size !== combos.length
+
+    const [courses, setCourses] = useState([])
+    const subjects = groupBySubject(courses)
+
+    useEffect(() => {
+        fetch('http://127.0.0.1:8000/courses')
+            .then(r => r.json())
+            .then(data => {
+                console.log(data)
+                setCourses(data)
+            })
+    }, [])
 
     useEffect(() => {
         if (!error) return
@@ -63,7 +92,7 @@ function App() {
             showError("Please remove all duplicates.")
 
         } else {
-            const generated = generateSchedules(orderedEligibleLists(rows))
+            const generated = generateSchedules(orderedEligibleLists(rows, subjects))
 
             if (generated.length === 0) {
                 showError("No schedules found.")
@@ -87,7 +116,7 @@ function App() {
             for (const section of schedule) {
                 for (const meeting of section.meetings) {
                     usedDays.add(meeting.day)
-                    meetingTimes.push(timeToMinutes(meeting.start), timeToMinutes(meeting.end))
+                    meetingTimes.push(timeToMinutes(meeting.start_time), timeToMinutes(meeting.end_time))
                 }
             }
         }
@@ -167,22 +196,22 @@ function App() {
                                     {/*builds every section block using map*/}
                                     {results[currentIndex].map((section, sectionIndex) =>
                                         section.meetings.map((meeting) => {
-                                            const startSlot = (timeToMinutes(meeting.start) - startHour * 60) / 5
-                                            const durationSlots = (timeToMinutes(meeting.end) - timeToMinutes(meeting.start)) / 5
+                                            const startSlot = (timeToMinutes(meeting.start_time) - startHour * 60) / 5
+                                            const durationSlots = (timeToMinutes(meeting.end_time) - timeToMinutes(meeting.start_time)) / 5
                                             const gridRowStart = startSlot + 2
                                             const gridColumn = activeDays.indexOf(meeting.day) + 2
                                             const hue = COURSE_HUES[sectionIndex % COURSE_HUES.length]
 
                                             return (
                                                 <div
-                                                    key={`${section.courseCode}-${section.section}-${meeting.day}`}
+                                                    key={`${section.courseCode}-${section.section_number}-${meeting.day}`}
                                                     className={durationSlots < 12 ? "class-block class-block-short" : "class-block"}
-                                                    title={`${section.courseSubject} ${section.courseCode}-${section.section} · ${section.instructor} · ${to12Hour(meeting.start)}–${to12Hour(meeting.end)}`}
+                                                    title={`${section.courseSubject} ${section.courseCode}-${section.section_number} · ${section.instructor} · ${to12Hour(meeting.start_time)}–${to12Hour(meeting.end_time)}`}
                                                     style={{ gridColumn, gridRow: `${gridRowStart} / span ${durationSlots}`, "--hue": hue }}
                                                 >
-                                                    <div className="block-code">{section.courseSubject} {section.courseCode}-{section.section}</div>
+                                                    <div className="block-code">{section.courseSubject} {section.courseCode}-{section.section_number}</div>
                                                     <div className="block-instructor">{section.instructor}</div>
-                                                    <div className="block-time">{to12Hour(meeting.start).slice(0, -3)}–{to12Hour(meeting.end).slice(0, -3)}</div>
+                                                    <div className="block-time">{to12Hour(meeting.start_time).slice(0, -3)}–{to12Hour(meeting.end_time).slice(0, -3)}</div>
                                                 </div>
                                             )
                                         })
@@ -201,20 +230,20 @@ function App() {
                                 <span className="spacer"></span>
                                 <span className="section-code">{customizingRow.subject} {customizingCourse.code}</span>
                             </div>
-                            <div className="section-desc">{customizingCourse.description}</div>
+                            <div className="section-desc">{customizingCourse.title}</div>
 
                             {customizingCourse.sections.map((s) => {
-                                const isSelected = customizingRow.sections.includes(s.section)
+                                const isSelected = customizingRow.sections.includes(s.section_number)
                                 return (
-                                    <label key={s.section} className={isSelected ? "section-row section-row-selected" : "section-row"}>
+                                    <label key={s.section_number} className={isSelected ? "section-row section-row-selected" : "section-row"}>
                                         <input type="checkbox" checked={isSelected} onChange={() => {
-                                            const alreadyIn = customizingRow.sections.includes(s.section)
+                                            const alreadyIn = customizingRow.sections.includes(s.section_number)
                                             const newSections = alreadyIn
-                                                ? customizingRow.sections.filter((sec) => sec !== s.section)
-                                                : [...customizingRow.sections, s.section]
+                                                ? customizingRow.sections.filter((sec) => sec !== s.section_number)
+                                                : [...customizingRow.sections, s.section_number]
                                             updateRow(customizingID, { sections: newSections })
                                         }} />
-                                        <span className="section-num">{s.section.length === 1 ? "0" + s.section : s.section}</span>
+                                        <span className="section-num">{s.section_number.length === 1 ? "0" + s.section_number : s.section_number}</span>
                                         <span className="section-instructor">{s.instructor}</span>
                                         <span className="section-meeting">{formatMeetings(s.meetings)}</span>
                                     </label>
@@ -260,13 +289,13 @@ function App() {
                                             <option value="">--</option>
                                             {courses.map((c) => (
                                                 <option key={c.code} value={c.code}>
-                                                    {c.code === row.code ? c.code : `${c.code} - ${c.description}`}
+                                                    {c.code === row.code ? c.code : `${c.code} - ${c.title}`}
                                                 </option>
                                             ))}
                                         </select>
 
                                         <span className={rowCourse ? "row-title" : "row-title row-title-placeholder"}>
-                                            {rowCourse ? rowCourse.description : "select a course"}
+                                            {rowCourse ? rowCourse.title : "select a course"}
                                         </span>
 
                              

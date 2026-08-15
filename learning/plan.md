@@ -319,7 +319,7 @@ dropping one update (stale closure over `rows`).
 - [x] 6.4 Set up Alembic and run the first migration to actually create the tables in Supabase
 - [x] 6.5 Write the loader — turn the parser's nested output into ORM objects and insert them
 - [x] 6.6 Full replace inside one transaction: clear + reinsert + store the fetch timestamp; run it twice to prove it's safe
-- [ ] 6.7 Commit — deliverable reached
+- [x] 6.7 Commit — deliverable reached (`da63cad supabase completed, parser sessions updates database`)
 
 **Notes for the lesson:**
 - 🔑 **First real secret he's ever handled.** He's only used `$PORT`, which isn't sensitive. The database connection string is. `.env` file, gitignored from the very first commit — before it ever contains a real value. Getting a credential into git history is genuinely hard to undo.
@@ -329,9 +329,17 @@ dropping one update (stale closure over `rows`).
 - **Full replace inside one transaction**: parse everything, then atomically clear and reinsert. Simpler than upserts at 700 rows, and makes re-running the job safe. Store the fetch timestamp in the same transaction.
 - Good understanding check: **why does re-running the loader twice have to be safe?** (Because a scheduled job will run it unattended, forever, and nobody will be watching.)
 
-### 7. Connecting the halves  [ ] not started
+### 7. Connecting the halves  [x] done — commit pending (7.6)
 **Deliverable:** Your React app showing real AURAK courses instead of the fake ones.
 **Concepts:** fastapi-routes, pydantic-models, sqlalchemy-queries, fetch-in-react, useeffect, cors
+
+**Tasks:**
+- [x] 7.1 FastAPI skeleton — `backend/app.py`, one working route at `/`, verified in the browser and at `/docs`
+- [x] 7.2 `GET /courses` — real SQLAlchemy query against Supabase, a Pydantic response model, verified in `/docs`
+- [x] 7.3 CORS — `CORSMiddleware`, verified the Vite dev server can actually reach the backend
+- [x] 7.4 React fetch — `useEffect` + `fetch`, load real courses into state, replace the `data.js` import — deliverable reached, verified live (MGMT 401 → real generated schedule)
+- [x] 7.5 Fix the `formatMeetings` crash on no-meeting sections (flagged since section 5, now fixed)
+- [ ] 7.6 Commit — deliverable reached
 
 **Notes for the lesson:**
 - FastAPI's routes will feel familiar — decorator, function, return. Lean on the Flask comparison hard; the jump is small.

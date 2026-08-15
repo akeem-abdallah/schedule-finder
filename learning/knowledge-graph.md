@@ -128,7 +128,7 @@ Shipped 2026-08-05. Full history with detailed evidence lives in
 - depends-on: react-components
 - introduced: 2026-08-07
 - last-reviewed: 2026-08-07
-- evidence: 🔴 first answer to "what's a prop?" was wrong — *"its like self from python"* (confused an object's own reference with data passed in from outside) — corrected with the function-argument comparison. Second attempt, *"It's a placeholder for data from the outside"*, was graded as vague, not a pass: "placeholder" implies something unfilled, when a prop is the actual value already flowing in. Precise version was given directly. Real first-contact struggle, correctly capped at `practicing` — good early review candidate
+- evidence: 🔴 first answer to "what's a prop?" was wrong — *"its like self from python"* (confused an object's own reference with data passed in from outside) — corrected with the function-argument comparison. Second attempt, *"It's a placeholder for data from the outside"*, was graded as vague, not a pass: "placeholder" implies something unfilled, when a prop is the actual value already flowing in. Precise version was given directly. Real first-contact struggle, correctly capped at `practicing` — good early review candidate. **2026-08-15 spaced review, entering section 7 task 7.2, cold after 8 days:** said *"I forgot"* honestly rather than guessing. Not downgraded (already `practicing`, not `understood`) — given the function-argument refresher again, not yet re-checked
 
 ## Section 2 — The interactive shortlist
 
@@ -137,7 +137,7 @@ Shipped 2026-08-05. Full history with detailed evidence lives in
 - depends-on: react-components
 - introduced: 2026-08-07
 - last-reviewed: 2026-08-07
-- evidence: initially asked to stop and rebuild from scratch (*"start from useState, I didn't even understand that yet"*). After a plain-variable-vs-state contrast, correctly predicted unprompted: *"it would set selectedSubject to CMP and re-render the page"*. Also correctly reasoned that `useState("")` sets the starting value only, changed later only via the setter
+- evidence: initially asked to stop and rebuild from scratch (*"start from useState, I didn't even understand that yet"*). After a plain-variable-vs-state contrast, correctly predicted unprompted: *"it would set selectedSubject to CMP and re-render the page"*. Also correctly reasoned that `useState("")` sets the starting value only, changed later only via the setter. **2026-08-15 spaced review, entering section 7:** asked what a setter actually does and why a plain variable can't do the same — first answer, *"it tells react to rerun the whole page, and display the changes that the changer function produced,"* graded vague under rule 6: "rerun the whole page" is imprecise (it's a component re-render, not a page reload), and the *why plain reassignment fails* half was missing entirely. Corrected with both pieces (React re-renders only the component, patching the changed DOM; a plain variable change is invisible to React, so nothing gets scheduled). He replied "yes makes sense" — not treated as a pass since a bare confirmation isn't evidence; not upgraded, `last-reviewed` intentionally left unchanged since no real pass occurred
 
 ### event-handling-in-react
 - status: practicing
@@ -150,15 +150,15 @@ Shipped 2026-08-05. Full history with detailed evidence lives in
 - status: practicing
 - depends-on: react-state
 - introduced: 2026-08-07
-- last-reviewed: 2026-08-07
-- evidence: struggled initially or the `value={selectedSubject}` half (*"I don't get it"*), then correctly predicted the dropdown would show MATH selected if state held "MATH". Correctly concluded unprompted that `selectedSubject` "isn't related to the DOM... it's a separate variable" — the core of what makes it a controlled input
+- last-reviewed: 2026-08-15
+- evidence: **2026-08-15 spaced review, entering section 7 task 7.5, cold after 8 days:** said *"I have no idea"* honestly rather than guessing. Not downgraded (already `practicing`, not `understood`). Given the refresher again, not yet re-checked. struggled initially or the `value={selectedSubject}` half (*"I don't get it"*), then correctly predicted the dropdown would show MATH selected if state held "MATH". Correctly concluded unprompted that `selectedSubject` "isn't related to the DOM... it's a separate variable" — the core of what makes it a controlled input
 
 ### rendering-lists
 - status: practicing
 - depends-on: react-components
 - introduced: 2026-08-07
-- last-reviewed: 2026-08-07
-- evidence: correctly predicted `.map()` over `subjects` would render all three as options, confirmed in the browser. Wanted much deeper-than-usual grounding on `key` — rejected a surface analogy and a pseudocode explanation in turn, only satisfied once shown React's real `Map.get()`/`.delete()` based reconciliation. Note for future sessions: he wants the actual mechanism, not a simplified stand-in, once he pushes back a second time. 2026-08-08: hit a real "adjacent JSX elements" error returning two `<select>`s with no wrapper inside a `.map()`; didn't recall the one-root-element rule unprompted (said "idk"), but once reminded, fixed it himself and correctly placed `key` on the new wrapping element
+- last-reviewed: 2026-08-15
+- evidence: **2026-08-15 spaced review, entering section 7 task 7.4, cold after 8 days:** *"so that react can identify each of those elements whenever there are alterations or deleting in between the elements"* — clean pass, correctly names identification-across-changes as the purpose. correctly predicted `.map()` over `subjects` would render all three as options, confirmed in the browser. Wanted much deeper-than-usual grounding on `key` — rejected a surface analogy and a pseudocode explanation in turn, only satisfied once shown React's real `Map.get()`/`.delete()` based reconciliation. Note for future sessions: he wants the actual mechanism, not a simplified stand-in, once he pushes back a second time. 2026-08-08: hit a real "adjacent JSX elements" error returning two `<select>`s with no wrapper inside a `.map()`; didn't recall the one-root-element rule unprompted (said "idk"), but once reminded, fixed it himself and correctly placed `key` on the new wrapping element
 
 ### derived-state
 - status: practicing
@@ -310,7 +310,7 @@ Shipped 2026-08-05. Full history with detailed evidence lives in
 - depends-on: none
 - introduced: 2026-08-11
 - last-reviewed: 2026-08-11
-- evidence: found a real, self-reported bug — an empty results array (`[]`, when no valid schedule could be generated) still passed a plain `results ? (...)` truthiness check, showing the grid branch with no actual data and crashing to a blank page. Said *"idk"* honestly when asked whether `[]` is truthy or falsy, rather than guessing. Given the real rule (only `false, 0, "", null, undefined, NaN` are falsy — everything else, including empty arrays/objects, is truthy), correctly identified `results.length === 0` as the distinguishing check, and independently reasoned that it needed combining with a null-check first (same short-circuit `&&` pattern as `rowCourse && (...)`) to avoid crashing on `null.length`. Ultimately solved it more cleanly than the guided direction — checking emptiness once in `handleSubmit` and branching to `setError` there, instead of adding a whole new render branch
+- evidence: found a real, self-reported bug — an empty results array (`[]`, when no valid schedule could be generated) still passed a plain `results ? (...)` truthiness check, showing the grid branch with no actual data and crashing to a blank page. Said *"idk"* honestly when asked whether `[]` is truthy or falsy, rather than guessing. Given the real rule (only `false, 0, "", null, undefined, NaN` are falsy — everything else, including empty arrays/objects, is truthy), correctly identified `results.length === 0` as the distinguishing check, and independently reasoned that it needed combining with a null-check first (same short-circuit `&&` pattern as `rowCourse && (...)`) to avoid crashing on `null.length`. Ultimately solved it more cleanly than the guided direction — checking emptiness once in `handleSubmit` and branching to `setError` there, instead of adding a whole new render branch. **2026-08-15, section 7 task 7.5:** same family of bug — `formatMeetings` crashed on `meetings[0]` for a no-meeting section, flagged since section 5. Asked to write the guard himself, said *"do it for me I have no idea"* — given the exact line (`if (meetings.length === 0) return "TBA"`) to type in rather than working it out. Asked afterward *why* `.length === 0` catches it where a plain truthy check wouldn't, answered off-topic (*"its a more efficient way of coding"*) rather than engaging with the truthy/falsy mechanism — graded as not a pass, corrected directly, recorded honestly as told-to-him this time, not derived
 <!-- New leaf, not in original section 3 concept list -->
 
 ### array-slice
@@ -439,6 +439,7 @@ Shipped 2026-08-05. Full history with detailed evidence lives in
 - depends-on: multi-value-fields
 - introduced: 2026-08-14
 - last-reviewed: 2026-08-14
+- evidence: **2026-08-15, section 7 task 7.4:** transferred the same pattern to JS (`groupBySubject`, object as lookup instead of Python dict) — first attempt filled the "create if missing" half correctly but left out the actual `.push(course)` line entirely (every group stayed empty), self-diagnosed as "idk what to do" when asked to spot it, then correctly added `bySubject[course.subject].courses.push(course)` once given the line and asked to place it. Real cross-language transfer of the concept, though the final line itself was supplied rather than derived
 - evidence: new pattern — using a dict as a lookup table for "find or create" (bridged to the `Set`-based duplicate check from section 2: same idea, O(1) lookup by key instead of scanning). First real struggle: over-indented the course-lookup and section-append lines one level too deep, nesting them *inside* `if subj not in subjects_dict:` — classic Python trap coming from JS's explicit `{}` blocks, meant the course/section logic only ran the first time a subject was seen. Said *"idk what I did, can you check the for loop"* rather than guessing at a fix; asked to trace what the `if` evaluates to on a second same-subject record before being shown the fix, then fixed the indentation himself. On the final `.values()`/`list()` conversion, predicted `subjects` correctly as a list but said `courses` was "still a dict" — missed that the same line's `list(...)` wrapper converts both; corrected, then verified the real output matched (`ACCT 205` correctly showing 2 nested sections). Closed with a genuinely strong, unprompted check: proposed and correctly predicted `sum(len(c["sections"]) for s in subjects for c in s["courses"]) == 421` as a way to prove the restructuring itself lost or duplicated nothing, and named *why* it's meaningful (not just repeating a number) before running it
 <!-- New leaf, not in original section 5 concept list — emerged from Akeem catching the flat-vs-nested mismatch between the parser and data.js himself -->
 
@@ -555,34 +556,65 @@ Shipped 2026-08-05. Full history with detailed evidence lives in
 ## Section 7 — Connecting the halves
 
 ### fastapi-routes
-- status: seed
+- status: practicing
 - depends-on: none
-- introduced: —
-- last-reviewed: —
-- evidence: —
+- introduced: 2026-08-15
+- last-reviewed: 2026-08-15
+- evidence: wrote the decorator-function-return route himself from a one-line comparison to his own Flask code, no skeleton given — got the shape exactly right on the first attempt. One real mistake: `import FastAPI` instead of `from fastapi import FastAPI`. Asked to predict the outcome, said *"I have no idea"* honestly rather than guessing; given the concrete bridge (his own `from flask import Flask` — module lowercase, class capitalized), correctly predicted *"it will print an error"*, then fixed the import himself and ran it successfully. Verified both `/` (his own JSON) and `/docs` (FastAPI's auto-generated docs page, described unprompted as *"a whole new page showing all the routes"*) live in the browser
 <!-- Small jump from Flask routes, which he knows. Lean on the comparison -->
 
 ### pydantic-models
-- status: seed
+- status: practicing
 - depends-on: fastapi-routes
-- introduced: —
-- last-reviewed: —
-- evidence: —
+- introduced: 2026-08-15
+- last-reviewed: 2026-08-15
+- evidence: wrote `SectionOut`/`CourseOut` himself from a description, mirroring `models.py`'s nested shape with declining scaffolding (only `MeetingOut` was shown as an example). One real mistake self-corrected: initially typed `section_number: int` — asked to actually check the column type in `models.py` rather than being told, found `String` himself, fixed to `str`. `model_config = {"from_attributes": True}` was explained (Pydantic normally builds from a dict, not an object with attributes) and applied correctly on the first attempt to all three classes, no errors
 <!-- Replaces the hand-rolled `if "text" not in data` validation he wrote in Flask -->
 
+### fastapi-dependency-injection
+- status: practicing
+- depends-on: generator-functions-yield
+- introduced: 2026-08-15
+- last-reviewed: 2026-08-15
+- evidence: wrote `def get_courses(db=Depends(get_db)):` after two real syntax misses, each self-corrected once the gap was named rather than the fix given outright: first wrote `def get_courses(Depends(get_db)):` — a bare function call as a parameter, no name — fixed after being pointed to the `def foo(x=5)` name/default-value shape; imports (`Depends` from `fastapi`, `Course` from `models`) were also missing initially and added correctly once flagged. Understood the mechanism itself cleanly by the end — see [[generator-functions-yield]] — this leaf is specifically about wiring `Depends` into a route signature
+<!-- New leaf — the plan didn't separate this from pydantic-models/sqlalchemy-queries -->
+
+### generator-functions-yield
+- status: practicing
+- depends-on: none
+- introduced: 2026-08-15
+- last-reviewed: 2026-08-15
+- evidence: 🔴 **major struggle, full stop-and-rebuild, "I don't understand anything at all."** First contact with `yield`/generators for `get_db()`. Initial explanation (prose-heavy, generator object + `next()` + `finally` all at once) completely failed — he declined to even try the REPL example, said *"I don't understand anything at all"* to the follow-up. Rebuilt from a single known fact (normal functions run immediately when called) and added exactly one new fact per turn: (1) correctly confirmed normal-function-runs-immediately is true; (2) correctly predicted, once told what a generator function is, that `g = toy()` does **not** run the code yet — this after one wrong guess assuming `g = toy()` alone would print both lines; (3) asked for the actual definition of `yield` rather than guessing, given it (pauses and hands back a value, doesn't end the function); (4) correctly predicted a second `next(g)` call resumes right after the first `yield`; (5) correctly predicted what runs next (*"prints after yield"*); (6) applied the whole mechanism directly to the real `get_db()` code and correctly answered that the first `next()` call returns the session with `db.close()` not yet run. **The recovery was real and his own** — every answer after the full rebuild was correct free recall, not a repeated hint. Capped at `practicing` (same-day first contact, and the struggle was severe) despite the strong finish
+<!-- New leaf, not in original section 7 concept list — needed for get_db()'s try/yield/finally. The "shrink the example, expand nothing" recovery pattern from section 3 worked again here -->
+
 ### sqlalchemy-queries
-- status: seed
+- status: practicing
 - depends-on: sqlalchemy-models
-- introduced: —
-- last-reviewed: —
-- evidence: —
+- introduced: 2026-08-15
+- last-reviewed: 2026-08-15
+- evidence: wrote `db.query(Course).all()` himself as the route's one-line body, from a plain-language description (runs `SELECT * FROM courses`, returns real `Course` objects, `.sections`/`.meetings` already walkable via the `relationship()`s from section 6). Verified live: `/courses` returned all real courses in the correct nested shape, matching `data.js`'s structure
 
 ### fetch-in-react
-- status: seed
+- status: practicing
 - depends-on: react-state
-- introduced: —
-- last-reviewed: —
-- evidence: —
+- introduced: 2026-08-15
+- last-reviewed: 2026-08-15
+- evidence: added `fetch(...).then(r => r.json()).then(setCourses)` inside `useEffect` from a description, correctly predicted the flat (not subject-grouped) response shape would differ from `data.js` — wrong on "same structure" initially, then correctly diagnosed the actual mismatch himself once shown the console output (named `title` vs `description`, `start_time`/`end_time` vs `start`/`end`, a new `credits` field). Verified end-to-end: real courses render, GENERATE produces a real schedule from live Supabase data
+
+### module-scope-vs-parameter-passing
+- status: practicing
+- depends-on: none
+- introduced: 2026-08-15
+- last-reviewed: 2026-08-15
+- evidence: real bug, self-triggered and diagnosed with guidance. `schedule.js` had its own `import { subjects } from './data'` (the fake file), entirely separate from the real `subjects` computed in `App.jsx` via `groupBySubject(courses)` — same variable name, two unrelated bindings. Selecting a real subject (`MGMT`) not present in the fake data crashed `getEligibleSections` (`Cannot read properties of undefined (reading 'courses')`). Didn't self-diagnose the mechanism (said *"idk"* twice when asked how to fix it), but once reframed against React props (data passed in, not reached for) correctly implemented the actual fix: added a `subjects` parameter to `getEligibleSections`/`orderedEligibleLists`, removed the stale import, updated the call site in `App.jsx`. Verified live — MGMT 401 correctly generated a real schedule after the fix
+<!-- New leaf. The general lesson: a fixed module-level import and a same-named local variable elsewhere are not connected just because they share a name -->
+
+### eager-loading-n-plus-one
+- status: introduced
+- depends-on: sqlalchemy-queries
+- introduced: 2026-08-15
+- last-reviewed: 2026-08-15
+- evidence: noticed the real symptom himself (10-15s fetch) and asked why, unprompted. Mechanism given, not derived: `.sections`/`.meetings` are lazy-loaded, so serializing 272 courses triggered hundreds of individual round-trips to a remote Supabase database. Applied the fix (`selectinload(Course.sections).selectinload(Section.meetings)`) by typing it in, then hit and self-fixed a real syntax error (`from sqlalchemy.orm import` with nothing after it, from an incomplete edit) by rereading his own file. Confirmed the fetch got fast after the fix. Capped at `introduced` — the diagnosis and fix mechanism were both told, not derived
 
 ### useeffect
 - status: introduced — ⚠️ **met early, in section 4, not here**
@@ -595,11 +627,11 @@ Shipped 2026-08-05. Full history with detailed evidence lives in
 <!-- ⚠️ Being at `introduced` here means "has typed one", NOT "has understood effects" -->
 
 ### cors
-- status: seed
+- status: practicing
 - depends-on: why-split-hosting
-- introduced: —
-- last-reviewed: —
-- evidence: —
+- introduced: 2026-08-15
+- last-reviewed: 2026-08-15
+- evidence: correctly predicted (unprompted reasoning) that a fetch from the Vite origin to the FastAPI origin would fail before any explanation was given — *"they can't communicate in any way"*. Read the real browser console error himself (`No 'Access-Control-Allow-Origin' header is present`) rather than being told what it said. After `CORSMiddleware` was added, correctly predicted the same fetch would succeed *"since the localhost is whitelisted"* — confirmed live, 272 real courses returned to the console
 <!-- Will be confusing. The error message doesn't say "you need CORS" -->
 
 ## Section 8 — Tests and safety rails

@@ -21,7 +21,7 @@
 |---|---|
 | Live | https://schedule-finder-delta.vercel.app — **still on fake data** (15 courses in `src/data.js`) — real data lives in Supabase now, but nothing serves it to the frontend yet (section 7) |
 | Works today | Pick courses → narrow sections → generate → page through a styled weekly grid, against fake data. Responsive to 320px, light + dark. Separately: real AURAK data loads into Supabase on demand via `python fetch_schedule.py`, safe to re-run anytime |
-| Last commit | `b09e41f parser completed...` — section 6's work (models, migrations, loader) is uncommitted, by his own call, to commit once at section close |
+| Last commit | `da63cad supabase completed, parser sessions updates database` — section 6 fully committed |
 | Open from section 4 | Nothing. Loading state + arrow-key paging moved to v1.1 |
 
 **Three things a fresh session should know before starting section 7:**
@@ -29,6 +29,7 @@
 1. **Section 4 was renamed** from *"Usable on a phone"* to *"Styling and responsiveness"* because the design pass — explicitly deferred to v1.1 — happened there anyway and became the bulk of it. Recorded honestly in `plan.md`; the point is the pacing warning, which still applies.
 2. **The knowledge-graph caps for section 4 are deliberately low.** A lot of CSS shipped, but most values were measured by the agent and handed to Akeem to type — not evidence under rule 1. Don't read shipped CSS as CSS fluency. The one genuine `practicing` entry there, `slot-granularity-must-divide-the-data`, is his outright and worth a cold quiz.
 3. **`useEffect` was met early** (section 4's toast timer) and is at `introduced`. Section 7 still owns effects-for-fetching in full, including StrictMode's double-invoke. Re-teach; don't assume.
+4. **Section 6 handoff, what section 7 can rely on:** `backend/models.py` has `Course` (`subject`, `code`, `title`, `credits`), `Section` (`section_number`, `instructor`, all `nullable=False`), `Meeting` (`day`, `start_time`, `end_time`, 24-hour strings, no `room`), and `FetchLog` (one row, `fetched_at`) — the source for the MVP's "last updated" timestamp. `backend/fetch_schedule.py` is the safely-rerunnable loader (`TRUNCATE ... RESTART IDENTITY`, not raw `DELETE`s). **Frontend still owes a fix, flagged since section 5 and still not done:** `schedule.js`'s `formatMeetings` will crash on a no-meeting section's empty `meetings` array — real no-meeting courses exist in the actual data (e.g. senior-project courses), so this needs to land in section 7, not be assumed already safe.
 
 ⚠️ **Two known latent issues, neither urgent:** `MASK_WORDS = 35` assumes no class ends after 21:00 (a later one writes past the mask and misses conflicts *with no error*), and `to12Hour("0:00")` returns `"0:00 AM"` instead of `"12:00 AM"` (currently unreachable — the grid can't start before 08:00).
 
