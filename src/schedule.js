@@ -54,7 +54,7 @@ export function timeToMinutes(time) {
     return (Number(parts[0]) * 60) + Number(parts[1])
 }
 
-// converts minutes to slot (48 slots per day, day starts at 8:00) each slot is 15 min, formula: 1(Tue) * 48 + (780 - 480) / 15 = 68
+// converts minutes to slot (156 slots per day, day starts at 8:00) each slot is 5 min, formula: 1(Tue) * 156 + (780 - 480) / 5 = 216
 export function timeToSlot(day, time) {
     const dayIndex = DAYS.indexOf(day)
     return dayIndex * SLOTS_PER_DAY + (timeToMinutes(time) - DAY_START) / 5
@@ -72,7 +72,7 @@ export function setSlot(mask, slot) {
 
 // converts a section to a mask, so 9:00 to 10:15 would create 5 slots in a mask
 export function sectionToMask(section) {
-    const mask = new Array(MASK_WORDS).fill(0) // fills mask with 352 bits made of 0s
+    const mask = new Array(MASK_WORDS).fill(0) // 35 words x 32 bits = 1120 bits, enough for 156 slots x 7 days
 
     for (const meeting of section.meetings) {
         const startSlot = timeToSlot(meeting.day, meeting.start_time)
@@ -112,26 +112,26 @@ export function combineMasks(maskA, maskB) {
 // generate schedules 
 export function generateSchedules(orderedLists) {
     const results = []
+    const schedulableLists = orderedLists.filter(list => list.some(s => s.meetings.length > 0))
 
     // solves each schedule recursively
     function solve(courseIndex, accumulatedMask, chosenSoFar) {
-
-        if (courseIndex >= orderedLists.length) {
+        if (courseIndex >= schedulableLists.length) {
             results.push(chosenSoFar)
             return results // base case, push schedule result
         }
 
-        for (const section of orderedLists[courseIndex]) {
+        for (const section of schedulableLists[courseIndex]) {
 
             // if masks don't conflict, recurse with new acculumatedMask
             if (!masksConflict(sectionToMask(section), accumulatedMask)) {
-
                 solve(courseIndex + 1, combineMasks(sectionToMask(section), accumulatedMask), [...chosenSoFar, section])
             }
         }
     }
 
     // initiate schedule generation
+    if (schedulableLists.length === 0) return results
     solve(0, new Array(MASK_WORDS).fill(0), [])
     return results
 }

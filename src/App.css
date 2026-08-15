@@ -1,5 +1,6 @@
 
 :root {
+    color-scheme: light;
     --bg: #f2f1ee;
     --surface: #ffffff;
     --surface-alt: #f4f3f0;
@@ -23,6 +24,7 @@
 @media (prefers-color-scheme: dark) {
 
     :root {
+        color-scheme: dark;
         --bg: #000000;
         --surface: #141413;
         --surface-alt: #1c1b19;
@@ -54,6 +56,13 @@ body {
     max-width: 900px;
     margin: 0 auto;
     padding: 30px 20px 20px 20px;
+}
+
+/* desktop only — the card sits too high against the top of the viewport */
+@media (min-width: 641px) {
+    .page-main {
+        padding-top: 64px;
+    }
 }
 
 .card {
@@ -776,7 +785,8 @@ select:focus-visible, button:focus-visible, input[type="checkbox"]:focus-visible
         width: 44px;
         height: 44px;
         font-size: 20px;
-        margin-right: -10px;
+        margin-left: -9px;
+        margin-right: -9px;
     }
 
     .section-row {
