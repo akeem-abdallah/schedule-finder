@@ -40,7 +40,7 @@ function App() {
     const subjects = groupBySubject(courses)
 
     useEffect(() => {
-        fetch('http://127.0.0.1:8000/courses')
+        fetch('https://schedule-finder-ghpt.onrender.com/courses')
             .then(r => r.json())
             .then(data => {
                 console.log(data)
