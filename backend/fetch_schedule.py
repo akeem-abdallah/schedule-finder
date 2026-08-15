@@ -1,4 +1,17 @@
 from bs4 import BeautifulSoup
+from dotenv import load_dotenv
+import os
+from sqlalchemy import create_engine, text
+from sqlalchemy.orm import sessionmaker
+from models import Base, Course, Section, Meeting, FetchLog
+from datetime import datetime, timezone
+
+load_dotenv()
+engine = create_engine(os.environ["DATABASE_URL"])
+Session = sessionmaker(bind=engine)
+session = Session()
+
+session.execute(text("TRUNCATE TABLE meetings, sections, courses, fetch_log RESTART IDENTITY"))
 
 with open("aurak_schedule.html", "r", encoding="utf-8") as f:
     html = f.read()
@@ -102,14 +115,32 @@ for subj_data in subjects_dict.values():
     subj_data["courses"] = list(subj_data["courses"].values())
     subjects.append(subj_data)
 
-total = sum(len(c["sections"]) for s in subjects for c in s["courses"])
-print(total)
-
-
-
-
-
-
-print(len(sections))
-print(sections[0])
-
+try:
+    for subj_data in subjects:
+        for course_data in subj_data["courses"]:
+            course = Course(
+            subject=subj_data["subject"],
+            code=course_data["code"],
+            title=course_data["description"],
+            credits=course_data["credits"],
+        )
+            for section_data in course_data["sections"]:
+                section = Section(
+                    section_number=section_data["section"],
+                    instructor=section_data["instructor"],
+                )
+                for meeting_data in section_data["meetings"]:
+                    meeting = Meeting(
+                        day=meeting_data["day"],
+                        start_time=meeting_data["start"],
+                        end_time=meeting_data["end"],
+                    )
+                    section.meetings.append(meeting)
+                course.sections.append(section)
+            session.add(course)
+    session.add(FetchLog(fetched_at=datetime.now(timezone.utc)))
+    session.commit()
+    print("Loaded", len(subjects), "subjects into the database.")
+except Exception:
+    session.rollback()
+    raise

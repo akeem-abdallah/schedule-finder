@@ -59,8 +59,8 @@ Shipped 2026-08-05. Full history with detailed evidence lives in
 - status: practicing
 - depends-on: none
 - introduced: 2026-08-06
-- last-reviewed: 2026-08-06
-- evidence: answered **"I'm not sure"** when first asked — honest, and consistent with earlier confusion (*"I'm so confused why are there three homes?"*). After being shown that SQLite is a *file his code opens* while Postgres is a *separate running program*, and that the matrix app's data loss on Render happened precisely because the SQLite file sat on the app's disposable disk, he passed the re-check cleanly in his own words: *"nothing happens to my course data, because it lives in a separate program, postgres won't even notice that the app restarted."* The struggle-then-pass sequence is the point; don't read the first answer as failure
+- last-reviewed: 2026-08-15
+- evidence: answered **"I'm not sure"** when first asked — honest, and consistent with earlier confusion (*"I'm so confused why are there three homes?"*). After being shown that SQLite is a *file his code opens* while Postgres is a *separate running program*, and that the matrix app's data loss on Render happened precisely because the SQLite file sat on the app's disposable disk, he passed the re-check cleanly in his own words: *"nothing happens to my course data, because it lives in a separate program, postgres won't even notice that the app restarted."* The struggle-then-pass sequence is the point; don't read the first answer as failure. **2026-08-15 spaced review, entering section 6: failed cold.** Three attempts, each vague or off-target — *"because postgres can only live on its separate home"* (circular), *"because postgres lives in supabase"* (names the location, not the mechanism), *"the backend is only for fetching and parsing and reading, its completely separate from the database"* (true but doesn't explain why a restart doesn't touch the data). Corrected each time per rule 6, precise version given directly rather than re-hinting. **Not downgraded** (was already `practicing`, not `understood`), but the clean 2026-08-06 pass clearly didn't stick over 9 days — good candidate to re-check again after this section's hands-on Postgres work, which may cement it where words alone didn't
 
 ### why-client-side-generation
 - status: practicing
@@ -484,56 +484,73 @@ Shipped 2026-08-05. Full history with detailed evidence lives in
 ## Section 6 — The database
 
 ### postgres-server
-- status: seed
+- status: practicing
 - depends-on: why-postgres-needs-its-own-home
-- introduced: —
-- last-reviewed: —
-- evidence: —
+- introduced: 2026-08-15
+- last-reviewed: 2026-08-15
+- evidence: created a real Supabase project, correctly predicted it would be completely empty ("no tables yet") before checking, then confirmed it live in the dashboard. Connected to it for real from Python (`create_engine(url)` + `conn.execute(text("SELECT 1"))`), correctly predicted `create_engine` alone wouldn't touch the network (no error, no connection yet — just a blueprint object), then got a real `(1,)` back from the actual server on the actual connect call. First hands-on proof that Postgres is a separate running program, not a file — landed better than the words-only version he failed on cold review the same day (see [[why-postgres-needs-its-own-home]])
+<!-- New leaf, not distinguished from why-postgres-needs-its-own-home in the original plan concept list -->
 
 ### connection-strings
-- status: seed
+- status: practicing
 - depends-on: postgres-server
-- introduced: —
-- last-reviewed: —
-- evidence: —
+- introduced: 2026-08-15
+- last-reviewed: 2026-08-15
+- evidence: given the real URI (`postgresql://postgres:PW@db.xxxx.supabase.co:5432/postgres`), first pass at breaking down its four parts was mixed — correctly identified the port (`5432`), honestly said "no idea" on the username rather than guessing, called the hostname "just the link" (vague, corrected to "the network address of the server machine"), and mislabeled the trailing `postgres` as "the language" (wrong — corrected to database name, since one Postgres server can host multiple separate databases). After correction, restated the whole string as one sentence correctly. Independently noticed `%23` in his own real string and asked what it was before being told anything — correct guess implied by the question itself, confirmed as percent-encoding for the `#` character his password contained
+<!-- New leaf -->
 
 ### environment-secrets
-- status: seed
+- status: practicing
 - depends-on: connection-strings
-- introduced: —
-- last-reviewed: —
-- evidence: —
+- introduced: 2026-08-15
+- last-reviewed: 2026-08-15
+- evidence: correctly predicted, unprompted, that an ungitignored `.env` committed to GitHub would leak the password permanently. Real mistake caught mid-task: first `.env` had the literal placeholder text `YOUR_REAL_PASSWORD` copied in verbatim instead of his actual password — self-corrected once shown the printed value didn't look like a real password. Correctly reasoned through the `KeyError` → `load_dotenv()` → success sequence live (predicted, then confirmed, that `os.environ["DATABASE_URL"]` would fail before `load_dotenv()` and succeed after) — though one prediction along the way was wrong and not self-caught: claimed `DATABASE_URL` was already visible in a raw `os.environ` dump before `load_dotenv()` had been called at all; the actual `KeyError` a moment later was what corrected it, not his own re-check. Final explain-back (what breaks on a friend's laptop with no `.env`) was vague on the first pass — *"it would work as long as we have the database url"* — corrected to the full mechanism (`load_dotenv()` finds nothing → same `KeyError` as before → the secret must be shared out-of-band, never via git). **Did not derive** *why* the root `.gitignore`'s bare `.env` line already covered `backend/.env` — asked "shouldn't it be backend/.env", was told the no-slash-matches-every-directory rule, and declined to verify it himself (*"I trust you, keep going"*) — worth a cold check later, this one is told, not earned
 <!-- 🔑 His first real secret. He has only ever used $PORT, which isn't sensitive -->
 
+### python-repl
+- status: introduced
+- depends-on: none
+- introduced: 2026-08-15
+- last-reviewed: 2026-08-15
+- evidence: real first-contact struggle — said *"I don't get it"* then *"no idea"* when asked which part was confusing, a full stop-and-rebuild from zero. Once rebuilt with `1 + 1` → `2` as the concrete anchor, correctly understood the core mechanic (type a line, it runs immediately, result auto-prints, no `print()` needed) well enough to use it correctly for the rest of the session — connecting to Postgres, checking `os.environ`, diagnosing a `KeyError`. Capped at `introduced`: the struggle was real and the recovery was mostly re-explanation landing on retry, not something he derived himself
+<!-- New leaf, not in original section 6 concept list — needed because task 6.1/6.2's verification happened in the REPL rather than a script -->
+
 ### sqlalchemy-models
-- status: seed
+- status: practicing
 - depends-on: postgres-server
-- introduced: —
-- last-reviewed: —
-- evidence: —
-<!-- New mental model: tables as Python classes. Connect to the raw SQL he already wrote -->
+- introduced: 2026-08-15
+- last-reviewed: 2026-08-15
+- evidence: wrote all three models (`Course`, `Section`, `Meeting`) himself from a plain-language description each time, with decreasing scaffolding as the pattern repeated — `Meeting` was written with almost no code shown, just "follow the same pattern as `Section`." First contact with `declarative_base()` was wrong (*"its a table that represent database tables"*) — corrected to "a base class every model inherits from, not a table itself." `primary_key` first answer was vague (*"the main key thats always constant"*) — corrected to "uniquely identifies each row; the role is fixed, not the value." Real, self-made typo caught and self-explained: `primary-key=True` (hyphen) on `Meeting.id` produced a confusing `ImportError` rather than the expected `SyntaxError`, because Python's module cache (`sys.modules`) was serving a stale version from an early-session import — he correctly predicted, when asked, that Python "remembers what it saw the first time" rather than re-reading the file, then fixed the typo and confirmed the fresh-REPL import succeeded silently, matching his own prediction. Verified `Course` for real by instantiating it in the REPL (`Course(code=..., credits=...)`) and printing real attribute values, correctly predicting the values themselves (off by one detail — expected quoted string output from `print()`, corrected that `print()` shows raw text, not `repr()`). **2026-08-15, task 6.6:** correctly identified a new table (not a new column) was the right home for a fetch timestamp, reasoning that it describes "a refresh event," not any one course. First answer on `DateTime` vs `String` was vague (*"an actual date and time variable"*) — accepted the direction but given the precise reason it matters here specifically (Postgres can do real date comparisons/sorting on it, unlike the meeting-time strings which only ever get parsed client-side)
+<!-- New mental model: tables as Python classes. Connected to the raw SQL he already wrote -->
 
 ### orm-relationships
-- status: seed
+- status: practicing
 - depends-on: sqlalchemy-models
-- introduced: —
-- last-reviewed: —
-- evidence: —
+- introduced: 2026-08-15
+- last-reviewed: 2026-08-15
+- evidence: correctly explained, unprompted, what `course_id` stores on a `Section` row ("the primary id from another table" — accepted, refined to "one specific row's id"). First guess at *why* `Course` gets `sections` (plural) and `Section` gets `course` (singular) was wrong — guessed "1 to 1 relationship" — corrected to one-to-many (one course, several sections), and that the plural/singular naming tracks how many objects come back, not the relationship type. Final synthesis question (ForeignKey vs. `relationship()`) was answered backwards — said `relationship()` is "what actually connects them" — corrected: `ForeignKey` is the real, database-level link; `relationship()` is a Python-only convenience for *using* that link without a manual query. Real first-contact struggle on the conceptual side even though the code itself (all three `relationship()` calls, correctly matched `back_populates` pairs) was written correctly with decreasing help each time — good candidate for a cold re-check before section 7 leans on `sqlalchemy-queries`. **2026-08-15, task 6.5 (same day, not a separate review):** built the real loader using `course.sections.append(section)` / `section.meetings.append(meeting)` instead of manually setting `course_id`/`section_id`, and correctly reasoned why `session.add(course)` alone was enough to persist the whole attached graph (see [[sqlalchemy-session]]). Also independently caught two real schema gaps before being shown them: that `Course` had no `subject` column at all (matching his own section-5 catch of the same subject/code split), and that `instructor` shouldn't be `nullable=True` given the parser always normalizes missing teachers to `"TBA"` rather than leaving them empty — correctly reasoned through the `day`/`start_time`/`end_time` case himself once the `instructor` pattern was named, tying it back to the section-5 decision to keep (not filter) no-meeting sections
 
 ### alembic-migrations
-- status: seed
+- status: practicing
 - depends-on: sqlalchemy-models
-- introduced: —
-- last-reviewed: —
-- evidence: —
+- introduced: 2026-08-15
+- last-reviewed: 2026-08-15
+- evidence: correctly predicted `alembic init` would create a folder structure, not a single file, before running it. First prediction of what `revision --autogenerate` does was wrong — *"it generates 3 tables in supabase?"* — corrected to "connects to compare against `Base.metadata`, writes a migration script, changes nothing in the database yet"; he then confirmed this himself by reading the real log lines (`Detected added table 'courses'`, etc.) after running it. Hit and worked through a real, non-trivial bug: `configparser`'s special use of `%` collided with the `%23` in his own password inside `set_main_option`, producing a `ValueError` — correctly diagnosed (with help) that the traceback never reached Postgres at all, staying inside `alembic/config.py`, and applied the `.replace("%", "%%")` fix once given. Explain-back on why `downgrade()` drops tables in the reverse order of `upgrade()` was vague first pass (*"because we're undoing the change"*) — corrected to the real mechanism, foreign-key dependency direction (child tables must drop before the parent they reference). **Real, unprompted verification instinct**: when told `alembic_version` already existed before `upgrade` had been run, said "yes I obviously checked" but then supplied an actual screenshot rather than leaving it as an assertion — good, since it let the (correct, if surprising) explanation land on real evidence instead of a claim. Final prediction — `alembic upgrade head` creates the real tables and stores a version row — was correct and confirmed live via the Supabase schema visualizer, showing all three tables with their foreign-key lines connected exactly as designed. **2026-08-15, task 6.5:** ran a real second migration (adding `subject` to `courses`) after correctly predicting `revision --autogenerate` would detect the new column and generate an `ALTER`-style migration — confirmed against the actual log line (`Detected added column 'courses.subject'`). First use of `downgrade`: correctly predicted the *order* (most-recent migration undone first), but wrongly predicted `downgrade base` would take two separate runs to fully unwind two migrations — corrected: `base` walks the whole chain in one command, confirmed against the real log showing both `Running downgrade` lines from a single invocation. Consolidated two migrations into one clean "initial" migration (delete old version files, regenerate) — reasonable real-world move pre-launch, when no live data is at stake yet
 <!-- Motivation: last project his schema-change process was "delete tasks.db and restart" -->
 
 ### idempotent-full-replace
-- status: seed
+- status: practicing
 - depends-on: sqlalchemy-models
-- introduced: —
-- last-reviewed: —
-- evidence: —
+- introduced: 2026-08-15
+- last-reviewed: 2026-08-15
+- evidence: **Motivation surfaced concretely in 6.5**: correctly predicted, when asked, that running the loader script twice would NOT be safe — first guess was wrong (*"it wouldn't change anything because its a comparison"*), corrected to the real mechanism (no ids yet on new objects → Postgres just inserts fresh rows → silent duplication). **6.6, building the real fix:** correctly reasoned through the child-before-parent delete order himself, though the first explanation of *why* was imprecise — said `Course` "would never be deleted... like a linked list," corrected to the real failure mode (an immediate `IntegrityError` from the FK constraint, not a silent no-op). Made a real, serious mistake applying it: mis-indented the reindented loop body so `for section_data`/`session.add(course)` sat as siblings of the `course_data` loop rather than nested inside it — caught and flagged before running, since it would have silently dropped every course but the last one per subject with no error. Fixed correctly once shown precisely which lines needed to move. **Proved the actual property the task is about**, not just typed code that happened to work: ran the script twice in a row, confirmed `courses`' row count stayed identical rather than doubling, and correctly reasoned (unprompted, when shown `fetch_log.id = 2` instead of `1`) that this — one row, non-reset auto-increment — was expected, not a bug, once the DELETE-vs-TRUNCATE distinction was named. Real friction this session: asked to stop the predict-before-run cadence partway through (*"stop asking these questions"*), honored for the remainder of the task per the impatience protocol — checks stayed on for the two genuinely new/risky pieces (the transaction wrapping, the reindent bug) but dropped for routine mechanics. **Follow-up same day, his own initiative:** asked whether the ever-growing ids could be reset, correctly updated his own worry once shown the real numbers (Postgres `Integer` overflow is practically unreachable at this scale) but still chose the `TRUNCATE ... RESTART IDENTITY` swap for cleanliness — applied it correctly, verified it worked live. One real moment of self-inflicted confusion, resolved by asking rather than guessing: hand-edited a row's `id` in the Supabase dashboard mid-verification, got a puzzling result, and correctly named that he'd done it once asked directly rather than letting the confusion stand
+
+### sqlalchemy-session
+- status: practicing
+- depends-on: sqlalchemy-models
+- introduced: 2026-08-15
+- last-reviewed: 2026-08-15
+- evidence: honestly said "I have no idea" when asked why `sessionmaker` + `Session()` are two separate steps rather than one — given the real reason (one `engine` manages the connection pool; many independent `Session`s get created against it over the app's life, e.g. one per FastAPI request in section 7). Correctly explained, in his own words, why `session.add(course)` alone was enough to save the attached sections and meetings too — *"because the sections are already appended into the list of sections for that course, and meetings are appended into list of meetings for that section"* — refined with the real term (cascade), but the mechanism itself was his
 
 ## Section 7 — Connecting the halves
 

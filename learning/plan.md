@@ -273,7 +273,7 @@ dropping one update (stale closure over `rows`).
 > ternaries, `key`, immutable array updates, `for...of` and classic `for` loops, recursion with a base case,
 > CSS Grid with explicit `gridColumn`/`gridRow`, React state and what triggers a re-render.
 
-### 5. The parser  [ ] not started
+### 5. The parser  [x] done 2026-08-14
 **Deliverable:** A Python script that prints 700 real courses pulled from AURAK's live schedule page.
 **Concepts:** http-requests-python, html-parsing, data-cleaning, multi-value-fields
 
@@ -286,7 +286,7 @@ dropping one update (stale closure over `rows`).
 - [x] 5.6 Normalize at the boundary — `to_24_hour()` built (mirrors `to12Hour()`), `"To Be Announced"` → `"TBA"`; verified against real edge cases (`12:00AM`, `12:00PM`, `9:00AM`) and all 421 rows
 - [x] 5.7 Split the raw `"Course Code"` column (e.g. `"ACCT 204"`) into separate `subject` and `code` fields — `data.js` already keeps them apart, the parser currently doesn't. Verified against all 421 rows, no exceptions to the "one space" pattern
 - [x] 5.8 Restructure the flat list of 421 section-records into the nested shape `data.js` actually uses: Subject → Course → Section → Meeting, instead of one flat record per section. Verified with an unprompted sanity check: total nested sections still sums to 421
-- [ ] 5.9 Commit — deliverable reached
+- [x] 5.9 Commit — deliverable reached (`b09e41f parser completed...`)
 
 > #### 📌 Added 2026-08-14, at Akeem's request — a real structural gap he caught, not the agent
 > He compared his parser's output directly against `data.js`'s shape and found two things the parser was still missing: `code` bundles subject and number together (`"ACCT 204"`) instead of matching `data.js`'s separate `subject`/`code` fields, and the parser produces a flat list — one record per section-row — while `data.js` is nested three levels deep (Subject → Course → Section, with Meeting inside Section). Both are real, and both matter: section 7 swaps `data.js` for real data with as little frontend rework as possible, which only works if the shapes actually match.
@@ -308,9 +308,18 @@ dropping one update (stale closure over `rows`).
 - **The real difficulty is `Day/Time/Room`** — it spans multiple lines when a section meets more than once a week. That single field is where nearly all the parsing effort goes, and it's what makes the `Meeting` table necessary.
 - Expect the parse to be wrong several times. That's normal and worth saying out loud so it doesn't read as failure.
 
-### 6. The database  [ ] not started
+### 6. The database  [x] done 2026-08-15
 **Deliverable:** Run the script, then look at 700 real rows sitting in Supabase.
 **Concepts:** postgres-server, connection-strings, environment-secrets, sqlalchemy-models, orm-relationships, alembic-migrations, idempotent-full-replace
+
+**Tasks:**
+- [x] 6.1 Create the Supabase project, get the connection string, verify it works (connect once, see an empty database)
+- [x] 6.2 `.env` file holding the connection string, gitignored before it ever holds a real value; load it with `python-dotenv`
+- [x] 6.3 Define the three tables as SQLAlchemy models (Course, Section, Meeting) with their relationships
+- [x] 6.4 Set up Alembic and run the first migration to actually create the tables in Supabase
+- [x] 6.5 Write the loader — turn the parser's nested output into ORM objects and insert them
+- [x] 6.6 Full replace inside one transaction: clear + reinsert + store the fetch timestamp; run it twice to prove it's safe
+- [ ] 6.7 Commit — deliverable reached
 
 **Notes for the lesson:**
 - 🔑 **First real secret he's ever handled.** He's only used `$PORT`, which isn't sensitive. The database connection string is. `.env` file, gitignored from the very first commit — before it ever contains a real value. Getting a credential into git history is genuinely hard to undo.

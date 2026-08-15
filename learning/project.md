@@ -13,18 +13,18 @@
 
 ---
 
-## 📌 State of play — updated 2026-08-14
+## 📌 State of play — updated 2026-08-15
 
-**Sections 1–4 done. Section 5 (the parser) built and verified — 421 real rows fetched, parsed, normalized, and correctly nested into `data.js`'s Subject→Course→Section shape; only the final commit is left (5.9).** Real row count is 421, not the ~700 originally estimated — nothing wrong, just the actual current number.
+**Sections 1–6 done.** Section 5 (the parser) and section 6 (the database) are both complete: 421 real AURAK rows are fetched, parsed, normalized, and now living in real Postgres tables on Supabase (`courses`, `sections`, `meetings`, `fetch_log`), loaded by a safely re-runnable script. Real row count is 421, not the ~700 originally estimated — nothing wrong, just the actual current number.
 
 | | |
 |---|---|
-| Live | https://schedule-finder-delta.vercel.app — **still on fake data** (15 courses in `src/data.js`) |
-| Works today | Pick courses → narrow sections → generate → page through a styled weekly grid. Responsive to 320px, light + dark |
-| Last commit | `ba6c5a6 final polish` |
+| Live | https://schedule-finder-delta.vercel.app — **still on fake data** (15 courses in `src/data.js`) — real data lives in Supabase now, but nothing serves it to the frontend yet (section 7) |
+| Works today | Pick courses → narrow sections → generate → page through a styled weekly grid, against fake data. Responsive to 320px, light + dark. Separately: real AURAK data loads into Supabase on demand via `python fetch_schedule.py`, safe to re-run anytime |
+| Last commit | `b09e41f parser completed...` — section 6's work (models, migrations, loader) is uncommitted, by his own call, to commit once at section close |
 | Open from section 4 | Nothing. Loading state + arrow-key paging moved to v1.1 |
 
-**Three things a fresh session should know before starting section 5:**
+**Three things a fresh session should know before starting section 7:**
 
 1. **Section 4 was renamed** from *"Usable on a phone"* to *"Styling and responsiveness"* because the design pass — explicitly deferred to v1.1 — happened there anyway and became the bulk of it. Recorded honestly in `plan.md`; the point is the pacing warning, which still applies.
 2. **The knowledge-graph caps for section 4 are deliberately low.** A lot of CSS shipped, but most values were measured by the agent and handed to Akeem to type — not evidence under rule 1. Don't read shipped CSS as CSS fluency. The one genuine `practicing` entry there, `slot-granularity-must-divide-the-data`, is his outright and worth a cold quiz.
@@ -102,7 +102,7 @@ An AURAK student who has never met Akeem opens a link on their phone during regi
 - **Raise refresh to ~30 min** during registration week
 
 ### Parking lot (v2+)
-Displaying seat counts (prefer coarse **Open / Almost full / Full**) · accounts and saved schedules · sharing a schedule · calendar export · multiple semesters · button icons *(cosmetic; an icon package is a rabbit hole)* · a page header *(an `<h1>` already exists)* · a download/screenshot button *(needs a rendering library; the phone's own screenshot works)*
+Displaying seat counts (prefer coarse **Open / Almost full / Full**) · accounts and saved schedules · sharing a schedule · calendar export · multiple semesters · button icons *(cosmetic; an icon package is a rabbit hole)* · a page header *(an `<h1>` already exists)* · a download/screenshot button *(needs a rendering library; the phone's own screenshot works)* · an LLM Q&A feature over course data (his idea, 2026-08-15 — RAG-style, via `pgvector`, one of the reasons Postgres was picked over MySQL in the first place)
 
 **Scoping history, 2026-08-11.** Out of the parking lot into **section 4** (then called *"Usable on a phone"*, renamed *"Styling and responsiveness"* on 2026-08-14): **fade-out error popups** (his idea, 2026-08-09 — was parked pending `setTimeout`) and **mobile polish** (never really optional — "usable on a phone" is in the MVP). Into **v1.1**: the **no-8am** and **days-off** filters, generalised into one time window plus an excluded-days control. **Still parked:** instructor preference and max-days-on-campus — he rejected both explicitly.
 
@@ -130,7 +130,7 @@ Displaying seat counts (prefer coarse **Open / Almost full / Full**) · accounts
 ### Data model — three tables, two relationships
 - **Course** — code, title, credits *(CMP 220, Data Structures, 3)*
 - **Section** — belongs to a Course. Section number, instructor, seats available, seats registered
-- **Meeting** — belongs to a Section. Day, start time, end time, room
+- **Meeting** — belongs to a Section. Day, start time, end time. *(Room deliberately left out — decided 2026-08-15 when the real model was built; the parser already dropped it in section 5)*
 
 **Meeting is separate because a section can meet more than once a week** (Mon 9am *and* Wed 11am). Flattening it into Section is the mistake that makes conflict detection painful later. This is settled — don't re-design it.
 
