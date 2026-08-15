@@ -40,7 +40,7 @@ function App() {
     const subjects = groupBySubject(courses)
 
     useEffect(() => {
-        fetch('https://schedule-finder-ghpt.onrender.com/courses')
+        fetch('https://aurak-schedule-finder.onrender.com/courses')
             .then(r => r.json())
             .then(data => {
                 console.log(data)

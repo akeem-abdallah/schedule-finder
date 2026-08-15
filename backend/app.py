@@ -6,6 +6,7 @@ from dotenv import load_dotenv
 import os
 from pydantic import BaseModel
 from models import Course, Section
+from starlette.middleware.gzip import GZipMiddleware
 
 load_dotenv()
 engine = create_engine(os.environ["DATABASE_URL"])
@@ -19,6 +20,8 @@ app.add_middleware(
     allow_methods=["*"],
     allow_headers=["*"],
 )
+
+app.add_middleware(GZipMiddleware)
 
 @app.get("/")
 def home():
