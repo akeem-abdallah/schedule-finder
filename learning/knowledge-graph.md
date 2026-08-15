@@ -637,12 +637,12 @@ Shipped 2026-08-05. Full history with detailed evidence lives in
 ## Section 8 — Tests and safety rails
 
 ### pytest-recap
-- status: seed
+- status: practicing
 - depends-on: none
-- introduced: —
-- last-reviewed: —
-- evidence: —
-<!-- Recall, not new learning. `pytest` runs bare — PATH permanently fixed 2026-08-05 -->
+- introduced: 2026-08-15
+- last-reviewed: 2026-08-15
+- evidence: installed `pytest` fresh into the backend venv (different from last project's global PATH install) with no issue. First prediction — "1 passed" for a bare `assert 1 + 1 == 2` at module level — was wrong: `pytest` collected 0 items, since it only runs **functions named `test_*`**, not bare assertions anywhere in a file. Didn't self-diagnose (asked the agent to read the file rather than reasoning about it himself), but once shown the actual file content, correctly wrapped it in `def test_something(): assert 1 + 1 == 2` and correctly predicted "1 passed" the second time, confirmed live. Also independently ran `pip freeze > requirements.txt` to close a real gap the agent flagged (missing `fastapi`/`uvicorn`) without needing the mechanism re-explained
+<!-- Recall, not new learning. `pytest` runs bare — PATH permanently fixed 2026-08-05. This project needed a fresh per-venv install, which is what's actually new -->
 
 ### testing-a-parser
 - status: seed

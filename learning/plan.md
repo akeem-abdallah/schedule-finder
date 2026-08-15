@@ -329,7 +329,7 @@ dropping one update (stale closure over `rows`).
 - **Full replace inside one transaction**: parse everything, then atomically clear and reinsert. Simpler than upserts at 700 rows, and makes re-running the job safe. Store the fetch timestamp in the same transaction.
 - Good understanding check: **why does re-running the loader twice have to be safe?** (Because a scheduled job will run it unattended, forever, and nobody will be watching.)
 
-### 7. Connecting the halves  [x] done — commit pending (7.6)
+### 7. Connecting the halves  [x] done 2026-08-15
 **Deliverable:** Your React app showing real AURAK courses instead of the fake ones.
 **Concepts:** fastapi-routes, pydantic-models, sqlalchemy-queries, fetch-in-react, useeffect, cors
 
@@ -339,7 +339,7 @@ dropping one update (stale closure over `rows`).
 - [x] 7.3 CORS — `CORSMiddleware`, verified the Vite dev server can actually reach the backend
 - [x] 7.4 React fetch — `useEffect` + `fetch`, load real courses into state, replace the `data.js` import — deliverable reached, verified live (MGMT 401 → real generated schedule)
 - [x] 7.5 Fix the `formatMeetings` crash on no-meeting sections (flagged since section 5, now fixed)
-- [ ] 7.6 Commit — deliverable reached
+- [x] 7.6 Commit — deliverable reached (`0a71280 connect frontend to real AURAK data via FastAPI, fix N+1 query and no-meeting crash`)
 
 **Notes for the lesson:**
 - FastAPI's routes will feel familiar — decorator, function, return. Lean on the Flask comparison hard; the jump is small.
@@ -349,9 +349,22 @@ dropping one update (stale closure over `rows`).
 - 💡 Vite's dev proxy can sidestep CORS *in development*. Tempting — but it hides the problem until deployment, where it reappears with no dev server to help. **Recommend meeting CORS properly here rather than deferring it to section 9.**
 - `useEffect` is where beginners get hurt. React's StrictMode deliberately double-invokes effects in development, so a fetch appearing to run twice is *expected*, not a bug. Say this before he sees it and panics.
 
-### 8. Tests and safety rails  [ ] not started
+### 8. Tests and safety rails  [ ] not started, paused after 8.1 — resumes after section 9
+
+> 🔄 **Reordered 2026-08-15, at Akeem's request.** He said plainly this section felt like it wasn't moving the visible product forward and he wanted a live URL — real signal, not something to argue him out of. Nothing about section 9 (going live) actually depends on section 8 being done first, so **section 9 now runs before section 8**, honestly reflected here rather than pretending this was the original order. Task 8.1 is done (`pytest` set up); 8.2 was interrupted mid-discussion (a real design question about `fetch_schedule.py` running its whole load pipeline on import — unresolved, pick back up there).
+
 **Deliverable:** One command that checks your parser and your algorithm still work.
 **Concepts:** pytest-recap, testing-a-parser, testing-the-algorithm, fixtures
+
+> ⚠️ **Discovered 2026-08-15, when this section's tasks were broken down:** the plan's "one command" phrasing predates the fact that the algorithm lives in `schedule.js` (JavaScript), not Python — `pytest` can't touch it. **Decided with Akeem:** build the two suites separately in their natural tools (`pytest` for the parser, **Vitest** for the algorithm — new tool, not in the original concept list), then add one trivial wrapper script at the end so "one command" still holds. Vitest is a new tool; treat its setup like `pytest-recap` was treated for Python — quick, not a deep new concept.
+
+**Tasks:**
+- [x] 8.1 Set up `pytest` for the backend (recap — he's done this before) — install, confirm it runs with one trivial test. Real gap caught along the way: `requirements.txt` was missing `fastapi`/`uvicorn` (installed but never frozen) — fixed by the same `pip freeze` re-run
+- [ ] 8.2 Write real parser tests against the saved `aurak_schedule.html` fixture — at least the row count, a hand-checked known course, the `'Full'` seats edge case, and the no-meeting (`BIOL 494`) edge case
+- [ ] 8.3 Set up Vitest for the frontend — install, minimal config, confirm it runs with one trivial test
+- [ ] 8.4 Write real algorithm tests against `schedule.js` — small hand-worked examples: a known conflict, a known non-conflict, a schedule count worked out on paper
+- [ ] 8.5 Wire the one-command wrapper — a single `npm` script running both suites in sequence
+- [ ] 8.6 Commit — deliverable reached
 
 **Notes for the lesson:**
 - He wrote four pytest tests last project, so the tooling is recall, not new learning. **`pytest` runs as a bare command on his machine** — PATH was fixed permanently on 2026-08-05.
@@ -359,9 +372,18 @@ dropping one update (stale closure over `rows`).
 - **Test the algorithm with small hand-checked inputs** — two courses, known conflicts, a schedule count you worked out on paper. His DSA background makes this natural.
 - ⚠️ Last project he wrote correct, passing test code he could not explain, and said so himself. **Watch for it here.** Ask him to explain what each test would catch before moving on.
 
-### 9. Going live  [ ] not started
+### 9. Going live  [ ] not started — now runs before section 8, see the reorder note there
 **Deliverable:** A URL an AURAK student can open on their phone, with data that refreshes itself daily.
 **Concepts:** github-actions, yaml-workflows, scheduled-jobs, secrets-in-ci, deploying-two-services, custom-domain *(optional)*
+
+**Tasks:**
+- [ ] 9.1 Deploy `backend/` to Render as a live web service — uvicorn bound to `$PORT`, `DATABASE_URL` set as a Render env var. Verify `/docs` works on the real Render URL
+- [ ] 9.2 Update CORS in `app.py` to allow the real Vercel domain (not just localhost)
+- [ ] 9.3 Point the already-deployed Vercel frontend at the real Render backend URL and redeploy — verify live, end to end, on a phone
+- [ ] 9.4 GitHub Actions — a scheduled workflow that runs `fetch_schedule.py` daily, with `DATABASE_URL` as a repo secret
+- [ ] 9.5 Verify the workflow actually works — trigger it manually once, confirm Supabase data refreshes and `fetch_log` gets a new row
+- [ ] 9.6 *(optional)* Custom domain
+- [ ] 9.7 Commit — deliverable reached
 
 **Notes for the lesson:**
 - ⚠️ **Vercel is already deployed** — done early in section 4 (2026-08-11) so the mobile work could be tested on a real phone. So this section is **two new deploys, not three**: Render (API) → GitHub Actions (refresh), plus *reconnecting* the existing Vercel frontend to the real API instead of fake data. Don't re-teach the Vercel setup; do verify the redeploy picks up the API URL.
