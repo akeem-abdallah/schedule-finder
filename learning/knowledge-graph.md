@@ -544,7 +544,7 @@ Shipped 2026-08-05. Full history with detailed evidence lives in
 - depends-on: sqlalchemy-models
 - introduced: 2026-08-15
 - last-reviewed: 2026-08-15
-- evidence: **Motivation surfaced concretely in 6.5**: correctly predicted, when asked, that running the loader script twice would NOT be safe — first guess was wrong (*"it wouldn't change anything because its a comparison"*), corrected to the real mechanism (no ids yet on new objects → Postgres just inserts fresh rows → silent duplication). **6.6, building the real fix:** correctly reasoned through the child-before-parent delete order himself, though the first explanation of *why* was imprecise — said `Course` "would never be deleted... like a linked list," corrected to the real failure mode (an immediate `IntegrityError` from the FK constraint, not a silent no-op). Made a real, serious mistake applying it: mis-indented the reindented loop body so `for section_data`/`session.add(course)` sat as siblings of the `course_data` loop rather than nested inside it — caught and flagged before running, since it would have silently dropped every course but the last one per subject with no error. Fixed correctly once shown precisely which lines needed to move. **Proved the actual property the task is about**, not just typed code that happened to work: ran the script twice in a row, confirmed `courses`' row count stayed identical rather than doubling, and correctly reasoned (unprompted, when shown `fetch_log.id = 2` instead of `1`) that this — one row, non-reset auto-increment — was expected, not a bug, once the DELETE-vs-TRUNCATE distinction was named. Real friction this session: asked to stop the predict-before-run cadence partway through (*"stop asking these questions"*), honored for the remainder of the task per the impatience protocol — checks stayed on for the two genuinely new/risky pieces (the transaction wrapping, the reindent bug) but dropped for routine mechanics. **Follow-up same day, his own initiative:** asked whether the ever-growing ids could be reset, correctly updated his own worry once shown the real numbers (Postgres `Integer` overflow is practically unreachable at this scale) but still chose the `TRUNCATE ... RESTART IDENTITY` swap for cleanliness — applied it correctly, verified it worked live. One real moment of self-inflicted confusion, resolved by asking rather than guessing: hand-edited a row's `id` in the Supabase dashboard mid-verification, got a puzzling result, and correctly named that he'd done it once asked directly rather than letting the confusion stand
+- evidence: **2026-08-15, task 9.5 tour check:** correctly explained *why* `fetch_log` is its own table, unprompted and precisely — *"its not even a course and its completely unrelated"*, correctly identifying it records a refresh event, not course data. First half of the same answer was graded as not-yet-true, not vague: claimed the timestamp is *"used to display"* on the page currently, but a grep of `src/` confirmed nothing in the frontend reads it yet — that's a planned v1.1-adjacent feature, not current behavior. Corrected and recorded honestly. **Motivation surfaced concretely in 6.5**: correctly predicted, when asked, that running the loader script twice would NOT be safe — first guess was wrong (*"it wouldn't change anything because its a comparison"*), corrected to the real mechanism (no ids yet on new objects → Postgres just inserts fresh rows → silent duplication). **6.6, building the real fix:** correctly reasoned through the child-before-parent delete order himself, though the first explanation of *why* was imprecise — said `Course` "would never be deleted... like a linked list," corrected to the real failure mode (an immediate `IntegrityError` from the FK constraint, not a silent no-op). Made a real, serious mistake applying it: mis-indented the reindented loop body so `for section_data`/`session.add(course)` sat as siblings of the `course_data` loop rather than nested inside it — caught and flagged before running, since it would have silently dropped every course but the last one per subject with no error. Fixed correctly once shown precisely which lines needed to move. **Proved the actual property the task is about**, not just typed code that happened to work: ran the script twice in a row, confirmed `courses`' row count stayed identical rather than doubling, and correctly reasoned (unprompted, when shown `fetch_log.id = 2` instead of `1`) that this — one row, non-reset auto-increment — was expected, not a bug, once the DELETE-vs-TRUNCATE distinction was named. Real friction this session: asked to stop the predict-before-run cadence partway through (*"stop asking these questions"*), honored for the remainder of the task per the impatience protocol — checks stayed on for the two genuinely new/risky pieces (the transaction wrapping, the reindent bug) but dropped for routine mechanics. **Follow-up same day, his own initiative:** asked whether the ever-growing ids could be reset, correctly updated his own worry once shown the real numbers (Postgres `Integer` overflow is practically unreachable at this scale) but still chose the `TRUNCATE ... RESTART IDENTITY` swap for cleanliness — applied it correctly, verified it worked live. One real moment of self-inflicted confusion, resolved by asking rather than guessing: hand-edited a row's `id` in the Supabase dashboard mid-verification, got a puzzling result, and correctly named that he'd done it once asked directly rather than letting the confusion stand
 
 ### sqlalchemy-session
 - status: practicing
@@ -692,47 +692,50 @@ Shipped 2026-08-05. Full history with detailed evidence lives in
 <!-- New leaf, not in original section 9 concept list -->
 
 ### github-actions
-- status: introduced
+- status: practicing
 - depends-on: data-pipeline-concept
 - introduced: 2026-08-15
 - last-reviewed: 2026-08-15
-- evidence: first contact came via the keep-alive ping (9.4b), not the planned daily-refresh workflow, and was delivered more directly than usual — he was explicitly overwhelmed after a long hosting-platform detour, so the compromise was fewer checks, not zero. He created the `.github/workflows/` folder himself once the nesting was clarified (`.github` outer, `workflows` inner), correctly found the **Actions** tab and read "0 workflow runs / this workflow has a workflow_dispatch trigger" as expected-and-correct rather than broken, and used the manual **Run workflow** button to trigger and verify it himself, reading the green checkmark as success. The YAML content itself (trigger, cron, job, step) was given, not derived — good candidate for a real teach when 9.4 (the daily refresh) is built for real
+- evidence: first contact came via the keep-alive ping (9.4b), not the planned daily-refresh workflow, and was delivered more directly than usual — he was explicitly overwhelmed after a long hosting-platform detour, so the compromise was fewer checks, not zero. He created the `.github/workflows/` folder himself once the nesting was clarified (`.github` outer, `workflows` inner), correctly found the **Actions** tab and read "0 workflow runs / this workflow has a workflow_dispatch trigger" as expected-and-correct rather than broken, and used the manual **Run workflow** button to trigger and verify it himself, reading the green checkmark as success. **Task 9.4, same day:** correctly predicted the whole pipeline in his own words before running it — *"it does cd backend, installs requirements, runs fetch_schedule.py by using the env stored in secrets"* — real, mostly-independent recall of a multi-step workflow's purpose, confirmed live (real fetch, real DB load, on GitHub's own servers). Also independently investigated and fixed a real regression in `fetch_schedule.py` (see plan.md task 9.4) once told the docs and code disagreed, rather than being handed the diagnosis
 <!-- New leaf. Built out of planned order — 9.4b before 9.4 -->
 
 ### yaml-workflows
-- status: introduced
+- status: practicing
 - depends-on: github-actions
 - introduced: 2026-08-15
 - last-reviewed: 2026-08-15
-- evidence: pasted a given `keep-alive.yml` (name/on/schedule/cron/workflow_dispatch/jobs/steps) rather than writing it, but got a one-pass plain-language explanation of each piece (schedule+cron = automatic recurring trigger, workflow_dispatch = manual run button, the one job's single `curl` step = enough to count as traffic). Not yet quizzed or self-derived — `introduced` only, same re-teach flag as `github-actions`
+- evidence: pasted a given `keep-alive.yml` (name/on/schedule/cron/workflow_dispatch/jobs/steps) rather than writing it, but got a one-pass plain-language explanation of each piece (schedule+cron = automatic recurring trigger, workflow_dispatch = manual run button, the one job's single `curl` step = enough to count as traffic). **Task 9.4:** typed the fuller `daily-refresh.yml` himself (checkout/setup-python/working-directory/secrets syntax all newly explained), and correctly predicted its run order unprompted before triggering it — real forward progress from pure transcription to correct prediction, though the YAML content itself was still supplied, not derived from scratch
+<!-- New leaf. Built out of planned order — 9.4b before 9.4 -->
 
 ### scheduled-jobs
-- status: introduced
+- status: practicing
 - depends-on: github-actions
 - introduced: 2026-08-15
 - last-reviewed: 2026-08-15
-- evidence: the cron trigger (`*/10 * * * *`, every 10 minutes) is the first scheduled (not event-triggered) automation he's built. Correctly read the dashboard state ("no runs yet" on a schedule-only trigger, before the first 10-minute window had passed) as expected rather than broken — real evidence, even though the underlying cron syntax itself was supplied, not written by him
+- evidence: the cron trigger (`*/10 * * * *`, every 10 minutes) is the first scheduled (not event-triggered) automation he's built. Correctly read the dashboard state ("no runs yet" on a schedule-only trigger, before the first 10-minute window had passed) as expected rather than broken. When the keep-alive workflow's actual first scheduled fire came ~30 minutes late (not 10), he flagged it as a real concern rather than ignoring it, and — after being told this is a documented GitHub limitation, not a bug — made his own call to tighten the interval to `*/5`, applied correctly and unprompted. Real engagement with the tradeoff, even though the underlying cron syntax itself was still supplied
 
 ### secrets-in-ci
-- status: seed
+- status: introduced
 - depends-on: github-actions, environment-secrets
-- introduced: —
-- last-reviewed: —
-- evidence: —
-
-### deploying-two-services
-- status: seed
-- depends-on: why-split-hosting
-- introduced: —
-- last-reviewed: —
-- evidence: —
+- introduced: 2026-08-15
+- last-reviewed: 2026-08-15
+- evidence: correctly bridged from `.env`, unprompted framing already understood — "same idea, different location" was accepted with no confusion. Created the real GitHub repository secret himself (`DATABASE_URL`, the Session pooler string) following plain instructions, no errors. Mechanism (`${{ secrets.X }}` injected as an env var only inside the workflow run) was explained, not derived — good candidate for a from-scratch check later
 
 ### custom-domain
-- status: seed
+- status: practicing
 - depends-on: deploying-two-services
-- introduced: —
-- last-reviewed: —
-- evidence: —
+- introduced: 2026-08-15
+- last-reviewed: 2026-08-15
+- evidence: real, hands-on domain purchase and DNS setup. Made his own branding call after being shown the tradeoff (keeping `aurak-scheduler.com`'s university name despite the plan's "keep it unofficial" principle — his call, respected). Correctly identified the checkout page's "free trial" upsells as unwanted before being told twice, only needed the pattern named once. Navigated to Spaceship's DNS settings and added the real `A` record (`@` → `216.198.79.1`) himself once shown where to look, self-corrected a stray-character "Invalid host value" error by clearing and retyping cleanly. Verified the live result himself — real HTTPS, real custom domain, working app — and made his own (reasonable, debated openly) design call on `www` vs. apex as the canonical URL. DNS/A-record mechanism itself (what a record actually does, why propagation takes time) was explained, not derived — good candidate for a from-scratch check later
+<!-- New leaf, realizes the seed concept planned for this section -->
+
+### dns-a-records
+- status: introduced
+- depends-on: custom-domain
+- introduced: 2026-08-15
+- last-reviewed: 2026-08-15
+- evidence: correctly recalled "DNS" as the underlying system when the concept was introduced (didn't answer the prediction question directly in the moment, but engaged with the explanation and applied it correctly moments later without confusion). Understood TTL's role well enough to ask a good clarifying question unprompted (*"why 30 min"*) and accepted the tradeoff explanation (faster propagation vs. more repeated lookups) with no further confusion. Mechanism was explained, not derived from scratch
+<!-- New leaf, not in original section 9 concept list -->
 
 ## Section 10 — Wrapping the MVP
 
