@@ -667,26 +667,51 @@ Shipped 2026-08-05. Full history with detailed evidence lives in
 
 ## Section 9 — Going live
 
+### deploying-two-services
+- status: practicing
+- depends-on: why-split-hosting
+- introduced: 2026-08-15
+- last-reviewed: 2026-08-15
+- evidence: real independent contributions in the Render setup — correctly identified **Web Services** as the right service type from the four options shown, unprompted from its description alone. When Render auto-detected the wrong runtime (Node, guessed from the repo root's `package.json`), correctly self-diagnosed and fixed both broken fields himself: language → Python, Root Directory → `backend`. First recall of the start command's actual mechanism (why `0.0.0.0`/`$PORT` are needed) was vague — *"connect the local gunicorn host to render"* — corrected with the precise mechanism (all-interfaces binding vs. localhost; Render-assigned port read from env). Also asked a good clarifying question unprompted about free-tier sleep behavior before proceeding, and engaged genuinely with a real multi-option tradeoff discussion (pay / keep-alive ping / loading state / static export / Vercel serverless) before choosing
+<!-- New leaf, realizes the seed concept planned for this section -->
+
+### windows-text-encoding-bom
+- status: introduced
+- depends-on: none
+- introduced: 2026-08-15
+- last-reviewed: 2026-08-15
+- evidence: 🔴 real production bug, but diagnosis was mostly agent-led — he asked to skip the explanation twice (*"bro please just tell me"*, and ran the diagnostic commands given without deriving them himself). What's genuinely his: ran `git diff` and correctly reported "Binary files differ" as the symptom; ran `Format-Hex` on request and correctly read back the `EF BB BF` bytes and, on the second check, correctly noticed their absence confirmed the fix. The actual mechanism — PowerShell's `>`/`Out-File` defaulting to UTF-16 or UTF-8-with-BOM, and git/pip's binary/parsing heuristics reacting to it — was explained, not derived. Good candidate for a from-scratch re-teach later, since this is a real Windows-specific gotcha he'll hit again
+<!-- New leaf, not in original section 9 concept list -->
+
+### ipv4-ipv6-network-reachability
+- status: seed — told directly, declined engagement
+- depends-on: connection-strings
+- introduced: 2026-08-15
+- last-reviewed: 2026-08-15
+- evidence: hit a real `OperationalError: Network is unreachable` connecting to Supabase's direct (IPv6) connection string from Render. Explicitly declined the explanation (*"dont explain just fix it man"*) before it was given, so this stays at `seed` despite being applied correctly (switched to Supabase's Session pooler, an IPv4-compatible alternative). Worth a genuine from-scratch lesson later — he doesn't have the mental model, just a working fix he didn't examine
+<!-- New leaf, not in original section 9 concept list -->
+
 ### github-actions
-- status: seed
+- status: introduced
 - depends-on: data-pipeline-concept
-- introduced: —
-- last-reviewed: —
-- evidence: —
+- introduced: 2026-08-15
+- last-reviewed: 2026-08-15
+- evidence: first contact came via the keep-alive ping (9.4b), not the planned daily-refresh workflow, and was delivered more directly than usual — he was explicitly overwhelmed after a long hosting-platform detour, so the compromise was fewer checks, not zero. He created the `.github/workflows/` folder himself once the nesting was clarified (`.github` outer, `workflows` inner), correctly found the **Actions** tab and read "0 workflow runs / this workflow has a workflow_dispatch trigger" as expected-and-correct rather than broken, and used the manual **Run workflow** button to trigger and verify it himself, reading the green checkmark as success. The YAML content itself (trigger, cron, job, step) was given, not derived — good candidate for a real teach when 9.4 (the daily refresh) is built for real
+<!-- New leaf. Built out of planned order — 9.4b before 9.4 -->
 
 ### yaml-workflows
-- status: seed
+- status: introduced
 - depends-on: github-actions
-- introduced: —
-- last-reviewed: —
-- evidence: —
+- introduced: 2026-08-15
+- last-reviewed: 2026-08-15
+- evidence: pasted a given `keep-alive.yml` (name/on/schedule/cron/workflow_dispatch/jobs/steps) rather than writing it, but got a one-pass plain-language explanation of each piece (schedule+cron = automatic recurring trigger, workflow_dispatch = manual run button, the one job's single `curl` step = enough to count as traffic). Not yet quizzed or self-derived — `introduced` only, same re-teach flag as `github-actions`
 
 ### scheduled-jobs
-- status: seed
+- status: introduced
 - depends-on: github-actions
-- introduced: —
-- last-reviewed: —
-- evidence: —
+- introduced: 2026-08-15
+- last-reviewed: 2026-08-15
+- evidence: the cron trigger (`*/10 * * * *`, every 10 minutes) is the first scheduled (not event-triggered) automation he's built. Correctly read the dashboard state ("no runs yet" on a schedule-only trigger, before the first 10-minute window had passed) as expected rather than broken — real evidence, even though the underlying cron syntax itself was supplied, not written by him
 
 ### secrets-in-ci
 - status: seed

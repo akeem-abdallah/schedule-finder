@@ -40,7 +40,7 @@ Entries stay **one line** forever. They record *why a file exists*, not what's i
 
 ### /backend — added 2026-08-14
 - backend/venv/ — known (2026-08-14) — generated — Python's isolated per-project package folder, created with `python -m venv venv`; never hand-edited, gitignored, rebuildable from `requirements.txt` → [[python-venv]]
-- backend/requirements.txt — known (2026-08-14, refreshed 2026-08-15) — the Python packages this project needs, pinned to exact versions via `pip freeze`; same relationship to `pip install` as `package-lock.json` has to `npm install`. Re-frozen in section 8 to pick up `pytest` plus `fastapi`/`uvicorn`, which had been installed but never frozen → [[python-venv]], [[pytest-recap]]
+- backend/requirements.txt — known (2026-08-14, refreshed 2026-08-15, re-saved 2026-08-15) — the Python packages this project needs, pinned to exact versions via `pip freeze`; same relationship to `pip install` as `package-lock.json` has to `npm install`. Re-frozen in section 8 to pick up `pytest` plus `fastapi`/`uvicorn`, which had been installed but never frozen. **Section 9:** a PowerShell `>` redirect had silently saved this file as UTF-16/UTF-8-with-BOM, which git saw as binary and pip silently misparsed on Render (skipped installing `fastapi`/`uvicorn`) — re-saved with `Out-File -Encoding ascii` (correct here since the content is plain ASCII) to fix it → [[python-venv]], [[pytest-recap]], [[windows-text-encoding-bom]]
 - backend/fetch_schedule.py — known (2026-08-14, extended 2026-08-15) — **section 6's finished deliverable.** Fetches AURAK's live page, saves raw HTML, parses and normalizes all 421 rows, groups them into nested Subject→Course→Section(→Meeting) dicts, then **safely loads them**: one raw-SQL `TRUNCATE TABLE meetings, sections, courses, fetch_log RESTART IDENTITY` (via `text()`, his own follow-up improvement over the initial four `.delete()` calls — resets auto-increment ids too, and sidesteps manual FK ordering since all four tables are named together), rebuilds the whole object graph via `relationship()` `.append()` calls, adds a fresh `FetchLog` row, commits everything inside one `try`/`except`/`rollback` block. Verified idempotent — run twice in a row, `courses`' row count stayed identical both times; verified `TRUNCATE ... RESTART IDENTITY` too, confirming ids reset to 1 on a subsequent run → [[http-requests-python]], [[html-parsing]], [[data-cleaning]], [[multi-value-fields]], [[normalize-at-the-boundary]], [[dict-based-grouping]], [[sqlalchemy-session]], [[orm-relationships]], [[idempotent-full-replace]]
 - backend/aurak_schedule.html — known (2026-08-14) — a saved copy of AURAK's real page (~700 rows), fetched once so the rest of section 5 develops against a local file instead of hitting AURAK's server every run; will double as the test fixture in section 8 → [[http-requests-python]]
 - backend/.env — known (2026-08-15) — 🔑 holds the real Supabase connection string (`DATABASE_URL`), never committed — already covered by the root `.gitignore`'s bare `.env` line before this file existed → [[environment-secrets]], [[connection-strings]]
@@ -55,6 +55,9 @@ Entries stay **one line** forever. They record *why a file exists*, not what's i
 ### /docs/design — added 2026-08-12
 - docs/design/amber.md — known (2026-08-12) — the design spec the app now implements: colour tokens for both themes, the two-family type scale (mono for data, sans for language), layout primitives, the eight course hues, the responsive column budget, and a build order. Deliberately written as **tables of values, not CSS**, so transcribing it is the work → [[responsive-design]], [[css-custom-properties]]
 - docs/design/view3-build.md — known (2026-08-13) — an 8-task build spec for rebuilding the results grid to match the mockup, with the measured before-state (645px of dead space, grid overflowing its card) and the reasoning behind each non-obvious call. Written by the agent at Akeem's request so the work could continue on a cheaper model
+
+### /.github/workflows — added 2026-08-15
+- .github/workflows/keep-alive.yml — known (2026-08-15) — pings the Render backend URL every 10 minutes via `curl` (cron `*/10 * * * *`, plus a manual `workflow_dispatch` trigger) so it mostly avoids Render's free-tier sleep. Built out of order, ahead of the planned daily-refresh workflow (task 9.4), as a fast fallback after a long hosting-platform detour → [[github-actions]], [[yaml-workflows]], [[scheduled-jobs]]
 
 Nothing else exists yet.
 
@@ -72,7 +75,7 @@ Not on disk yet. Listed so that when a command creates them, the lesson can tour
 - `__pycache__/` — generated — Python's compiled-bytecode cache. Gitignore it; he hit exactly this last project and had to untrack it after the fact
 
 ### Section 9 will create
-- `.github/workflows/` — the YAML file telling GitHub Actions to run the refresh on a schedule → [[github-actions]], [[yaml-workflows]]
+- `.github/workflows/` — the daily-refresh YAML file still to come (task 9.4) → [[github-actions]], [[yaml-workflows]], [[scheduled-jobs]]
 
 ### Section 10 will create
 - `README.md` — the repo's front door: what it is, the live URL, tech stack, how to run it, and the disclaimer → [[readme-portfolio-framing]], [[disclaimer-and-unofficial-framing]]
