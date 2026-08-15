@@ -5,6 +5,13 @@ from sqlalchemy import create_engine, text
 from sqlalchemy.orm import sessionmaker
 from models import Base, Course, Section, Meeting, FetchLog
 from datetime import datetime, timezone
+import requests
+
+URL = "https://eums.aurak.ac.ae/Public/Schedule?h42blu9ygNZPnBJmMbXuWAu8XR3hS4tcKtMIP6xFd2U="
+response = requests.get(URL)
+
+with open("aurak_schedule.html", "w", encoding="utf-8") as f:
+    f.write(response.text)
 
 load_dotenv()
 engine = create_engine(os.environ["DATABASE_URL"])
