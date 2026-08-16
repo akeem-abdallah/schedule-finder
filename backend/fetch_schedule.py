@@ -7,27 +7,6 @@ from models import Base, Course, Section, Meeting, FetchLog
 from datetime import datetime, timezone
 import requests
 
-URL = "https://eums.aurak.ac.ae/Public/Schedule?h42blu9ygNZPnBJmMbXuWAu8XR3hS4tcKtMIP6xFd2U="
-response = requests.get(URL)
-
-with open("aurak_schedule.html", "w", encoding="utf-8") as f:
-    f.write(response.text)
-
-load_dotenv()
-engine = create_engine(os.environ["DATABASE_URL"])
-Session = sessionmaker(bind=engine)
-session = Session()
-
-session.execute(text("TRUNCATE TABLE meetings, sections, courses, fetch_log RESTART IDENTITY"))
-
-with open("aurak_schedule.html", "r", encoding="utf-8") as f:
-    html = f.read()
-
-soup = BeautifulSoup(html, "html.parser")
-table = soup.find("table", id="dt_basic")
-tbody = table.find("tbody")
-rows = tbody.find_all("tr")
-
 def parse_row(row):
     cells = row.find_all("td")
 
@@ -88,66 +67,91 @@ def parse_section(row):
     info["meetings"] = parse_meetings(cells[7])
     return info
 
-sections = []
-for row in rows:
-    sections.append(parse_section(row))
+def load_rows(path):
+    with open(path, encoding="utf-8") as f:
+        html = f.read()
+    soup = BeautifulSoup(html, "html.parser")
+    table = soup.find("table", id="dt_basic")
+    tbody = table.find("tbody")
+    return tbody.find_all("tr")
 
-subjects_dict = {}
+if __name__ == "__main__":
 
-for record in sections:
-    subj = record["subject"]
-    if subj not in subjects_dict:
-        subjects_dict[subj] = {"subject": subj, "courses": {}}
+    URL = "https://eums.aurak.ac.ae/Public/Schedule?h42blu9ygNZPnBJmMbXuWAu8XR3hS4tcKtMIP6xFd2U="
+    response = requests.get(URL)
 
-    courses = subjects_dict[subj]["courses"]
-    code = record["code"]
-    if code not in courses:
-        courses[code] = {
-            "code": code,
-            "description": record["description"],
-            "credits": record["credits"],
-            "sections": [],
-        }
+    with open("aurak_schedule.html", "w", encoding="utf-8") as f:
+        f.write(response.text)
 
-    courses[code]["sections"].append({
-        "section": record["section"],
-        "instructor": record["teacher"],
-        "available_seats": record["available_seats"],
-        "registered": record["registered"],
-        "meetings": record["meetings"],
-    })
+    load_dotenv()
+    engine = create_engine(os.environ["DATABASE_URL"])
+    Session = sessionmaker(bind=engine)
+    session = Session()
 
-subjects = []
-for subj_data in subjects_dict.values():
-    subj_data["courses"] = list(subj_data["courses"].values())
-    subjects.append(subj_data)
+    session.execute(text("TRUNCATE TABLE meetings, sections, courses, fetch_log RESTART IDENTITY"))
 
-try:
-    for subj_data in subjects:
-        for course_data in subj_data["courses"]:
-            course = Course(
-            subject=subj_data["subject"],
-            code=course_data["code"],
-            title=course_data["description"],
-            credits=course_data["credits"],
-        )
-            for section_data in course_data["sections"]:
-                section = Section(
-                    section_number=section_data["section"],
-                    instructor=section_data["instructor"],
-                )
-                for meeting_data in section_data["meetings"]:
-                    meeting = Meeting(
-                        day=meeting_data["day"],
-                        start_time=meeting_data["start"],
-                        end_time=meeting_data["end"],
+    rows = load_rows("aurak_schedule.html")
+
+    sections = []
+    for row in rows:
+        sections.append(parse_section(row))
+
+    subjects_dict = {}
+
+    for record in sections:
+        subj = record["subject"]
+        if subj not in subjects_dict:
+            subjects_dict[subj] = {"subject": subj, "courses": {}}
+
+        courses = subjects_dict[subj]["courses"]
+        code = record["code"]
+        if code not in courses:
+            courses[code] = {
+                "code": code,
+                "description": record["description"],
+                "credits": record["credits"],
+                "sections": [],
+            }
+
+        courses[code]["sections"].append({
+            "section": record["section"],
+            "instructor": record["teacher"],
+            "available_seats": record["available_seats"],
+            "registered": record["registered"],
+            "meetings": record["meetings"],
+        })
+
+    subjects = []
+    for subj_data in subjects_dict.values():
+        subj_data["courses"] = list(subj_data["courses"].values())
+        subjects.append(subj_data)
+
+    try:
+        for subj_data in subjects:
+            for course_data in subj_data["courses"]:
+                course = Course(
+                subject=subj_data["subject"],
+                code=course_data["code"],
+                title=course_data["description"],
+                credits=course_data["credits"],
+            )
+                for section_data in course_data["sections"]:
+                    section = Section(
+                        section_number=section_data["section"],
+                        instructor=section_data["instructor"],
                     )
-                    section.meetings.append(meeting)
-                course.sections.append(section)
-            session.add(course)
-    session.add(FetchLog(fetched_at=datetime.now(timezone.utc)))
-    session.commit()
-    print("Loaded", len(subjects), "subjects into the database.")
-except Exception:
-    session.rollback()
-    raise
+                    for meeting_data in section_data["meetings"]:
+                        meeting = Meeting(
+                            day=meeting_data["day"],
+                            start_time=meeting_data["start"],
+                            end_time=meeting_data["end"],
+                        )
+                        section.meetings.append(meeting)
+                    course.sections.append(section)
+                session.add(course)
+        session.add(FetchLog(fetched_at=datetime.now(timezone.utc)))
+        session.commit()
+        print("Loaded", len(subjects), "subjects into the database.")
+    except Exception:
+        session.rollback()
+        raise
