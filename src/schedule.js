@@ -32,14 +32,15 @@ export function formatMeetings(meetings) {
 
 // extracts all eligible sections in a row
 export function getEligibleSections(row, subjects) {
-
     const eligibleSubject = subjects.find((r) => r.subject === row.subject)
+    if (!eligibleSubject) return []
+
     const eligibleCourse = eligibleSubject.courses.find((c) => c.code === row.code)
+    if (!eligibleCourse) return []
 
     const eligible = row.sections.length === 0 ? eligibleCourse.sections : eligibleCourse.sections.filter((s) => row.sections.includes(s.section_number))
 
     return eligible.map((s) => ({ ...s, courseSubject: eligibleSubject.subject, courseCode: eligibleCourse.code }))
-
 }
 
 // orders those eligible sections

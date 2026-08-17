@@ -10,9 +10,9 @@ Sentry.init({
 })
 
 createRoot(document.getElementById('root')).render(
-    <StrictMode>
+<StrictMode>
     <ErrorBoundary>
-    <App />
+        <App />
     </ErrorBoundary>
-  </StrictMode>,
+</StrictMode>,
 )

@@ -1,5 +1,5 @@
 import './App.css'
-import { useState, Fragment, useEffect } from 'react'
+import { useState, Fragment, useEffect, useMemo } from 'react'
 import { DAYS, generateSchedules, orderedEligibleLists, timeToMinutes, to12Hour, formatMeetings } from './schedule'
 import { Analytics } from "@vercel/analytics/react"
 
@@ -23,6 +23,29 @@ function groupBySubject(courses) {
     return grouped
 }
 
+function loadRowsFromStorage() {
+    const saved = localStorage.getItem("rows")
+    if (!saved) return null
+
+    try {
+        const parsed = JSON.parse(saved)
+
+        if (!Array.isArray(parsed)) return null
+
+        const isValid = parsed.every((row) =>
+            typeof row === "object" && row !== null &&
+            typeof row.subject === "string" &&
+            typeof row.code === "string" &&
+            Array.isArray(row.sections)
+        )
+
+        return isValid ? parsed : null
+
+    } catch {
+        return null
+    }
+}
+
 function App() {
 
     const [rows, setRows] = useState([{ id: 1, subject: "", code: "", sections: [] }])
@@ -31,6 +54,7 @@ function App() {
     const [error, setError] = useState("")
     const [errorId, setErrorId] = useState(0)
 
+    const [loading, setLoading] = useState(false)
     const [results, setResults] = useState(null)
     const [currentIndex, setCurrentIndex] = useState(0)
 
@@ -38,11 +62,11 @@ function App() {
     const hasDuplicates = new Set(combos).size !== combos.length
 
     const [courses, setCourses] = useState([])
-    const subjects = groupBySubject(courses)
+    const subjects = useMemo(() => groupBySubject(courses), [courses])
 
     const [lastUpdated, setLastUpdated] = useState(null)
 
-
+    // fetches courses
     useEffect(() => {
         fetch('https://aurak-schedule-finder.onrender.com/courses')
             .then(r => r.json())
@@ -52,6 +76,7 @@ function App() {
             })
     }, [])
 
+    // fetches last updated
     useEffect(() => {
 
         fetch('https://aurak-schedule-finder.onrender.com/fetch_log')
@@ -62,16 +87,60 @@ function App() {
             })
     }, [])
 
+    // sets error toast
     useEffect(() => {
         if (!error) return
         const timer = setTimeout(() => setError(""), 5000)
         return () => clearTimeout(timer)
     }, [error, errorId])
 
+    // checks if rows are still valid in case of updates, strip out if not
+    useEffect(() => {
+        if (courses.length === 0) return
+
+        const validRows = rows
+            .map((row) => {
+                if (row.subject === "") return row
+
+                const subj = subjects.find((s) => s.subject === row.subject)
+                if (!subj) return null
+
+                if (row.code === "") return row
+
+                const course = subj.courses.find((c) => c.code === row.code)
+                if (!course) return null
+
+                const validSections = row.sections.filter((num) => course.sections.some((s) => s.section_number === num))
+                return { ...row, sections: validSections }
+            })
+            .filter((row) => row !== null)
+
+        if (JSON.stringify(rows) !== JSON.stringify(validRows)) {
+            setRows(validRows.length === 0 ? [{ id: 1, subject: "", code: "", sections: [] }] : validRows)
+            showError("Some of your saved courses are no longer available and were removed.")
+        }
+
+    }, [courses])
+
+    // loads courses from localStorage
+    useEffect(() => {
+        const loaded = loadRowsFromStorage()
+        if (loaded) {
+            setRows(loaded)
+        }
+    }, [])
+
+    // saves courses to localStorage
+    useEffect(() => {
+        localStorage.setItem("rows", JSON.stringify(rows))
+    }, [rows])
+
     const creditList = rows.map((row) => {
         if (row.subject == "") return 0
 
         const subj = subjects.find((s) => row.subject === s.subject)
+        if (!subj) return 0
+
         const course = subj.courses.find((c) => c.code === row.code)
 
         return course ? course.credits : 0
@@ -118,22 +187,39 @@ function App() {
             showError("Please remove all duplicates.")
 
         } else {
-            const generated = generateSchedules(orderedEligibleLists(rows, subjects))
+            setLoading(true)
 
-            if (generated.length === 0) {
-                showError("No schedules found.")
+            setTimeout(() => {
+                const generated = generateSchedules(orderedEligibleLists(rows, subjects))
 
-            } else {
-                setError("")
-                setResults(generated)
-                setCurrentIndex(0)
+                if (generated.length === 0) {
+                    showError("No schedules found.")
 
-            }
+                } else {
+                    setError("")
+                    setResults(generated)
+                    setCurrentIndex(0)
+
+                }
+
+                setLoading(false)
+            }, 0)
         }
     }
 
     const customizingRow = rows.find((row) => row.id === customizingID)
-    const customizingCourse = customizingRow ? subjects.find((s) => s.subject === customizingRow.subject).courses.find((c) => c.code === customizingRow.code) : null
+
+    function getCustomizingCourse() {
+        if (!customizingRow) return null
+
+        const subj = subjects.find((s) => s.subject === customizingRow.subject)
+        if (!subj) return null
+
+        return subj.courses.find((c) => c.code === customizingRow.code)
+
+    }
+
+    const customizingCourse = getCustomizingCourse()
 
     const usedDays = new Set()
     const meetingTimes = []
@@ -362,7 +448,7 @@ function App() {
                                 <button className="btn-secondary" onClick={addRow}>+ ADD COURSE</button>
                                 <div className="spacer"></div>
                                 <span className="footer-credits">TOTAL CREDITS: <span className="credits-value">{totalCredits}.0</span></span>
-                                <button className="btn-primary" onClick={handleSubmit}>GENERATE →</button>
+                                <button className="btn-primary" onClick={handleSubmit} disabled={loading}>{loading ? "GENERATING…" : "GENERATE →"}</button>
 
                             </div>
 
