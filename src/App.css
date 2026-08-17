@@ -287,7 +287,15 @@ select:focus-visible, button:focus-visible, input[type="checkbox"]:focus-visible
     gap: 9px;
     padding: 11px 13px;
     justify-content: space-between;
-    border-bottom: 1px solid var(--rule);
+}
+
+.footer-top-row {
+    display: flex;
+    align-items: center;
+}
+
+.footer-clear-mobile {
+    display: none;
 }
 
 .footer-credits {
@@ -791,19 +799,29 @@ select:focus-visible, button:focus-visible, input[type="checkbox"]:focus-visible
     .table-footer {
         flex-direction: column;
         align-items: stretch;
-        gap: 7px;
+        gap: 4px;
+        padding-top: 4px
+    }
+
+    .footer-top-row {
+        order: -1;
+        justify-content: space-between;
+        padding: 2px 0 2px 0;
     }
 
     .footer-credits {
-        order: -1;
         margin-right: 0;
-        text-align: right;
-        padding-bottom: 4px;
         font-size: 10px;
     }
 
     .table-footer button {
-        padding: 15px;
+        padding: 18px;
+    }
+
+    .table-footer .footer-clear-mobile {
+        display: inline-block;
+        padding: 4px 12px;
+        font-size: 10px;
     }
 
     .sub-strip {

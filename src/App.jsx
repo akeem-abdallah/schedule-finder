@@ -447,7 +447,11 @@ function App() {
 
                                 <button className="btn-secondary" onClick={addRow}>+ ADD COURSE</button>
                                 <div className="spacer"></div>
-                                <span className="footer-credits">TOTAL CREDITS: <span className="credits-value">{totalCredits}.0</span></span>
+                                <div className="footer-top-row">
+                                    <span className="footer-credits">TOTAL CREDITS: <span className="credits-value">{totalCredits}.0</span></span>
+                                    <button className="btn-clear-all footer-clear-mobile" onClick={() => setRows([])} disabled={rows.length === 0}
+                                        aria-label="Remove all courses" title="Remove all courses">CLEAR</button>
+                                </div>
                                 <button className="btn-primary" onClick={handleSubmit} disabled={loading}>{loading ? "GENERATING…" : "GENERATE →"}</button>
 
                             </div>
