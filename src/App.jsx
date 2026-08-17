@@ -76,23 +76,13 @@ function App() {
 
     const [lastUpdated, setLastUpdated] = useState(null)
 
-    // fetches courses
+    // fetches courses + last updated in one request
     useEffect(() => {
-        fetch('https://aurak-schedule-finder.onrender.com/courses')
+        fetch('https://aurak-schedule-finder.onrender.com/initial-data')
             .then(r => r.json())
             .then(data => {
                 console.log(data)
-                setCourses(data)
-            })
-    }, [])
-
-    // fetches last updated
-    useEffect(() => {
-
-        fetch('https://aurak-schedule-finder.onrender.com/fetch_log')
-            .then(r => r.json())
-            .then(data => {
-                console.log(data)
+                setCourses(data.courses)
                 setLastUpdated(data.fetched_at)
             })
     }, [])

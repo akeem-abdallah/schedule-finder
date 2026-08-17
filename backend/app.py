@@ -24,10 +24,6 @@ app.add_middleware(
 
 app.add_middleware(GZipMiddleware)
 
-@app.get("/")
-def home():
-    return {"message": "hello"}
-
 def get_db():
     db = SessionLocal()
     try:
@@ -60,10 +56,20 @@ class FetchLogOut(BaseModel):
     model_config = {"from_attributes": True}
     fetched_at: datetime
 
+class InitialDataOut(BaseModel):
+    courses: list[CourseOut]
+    fetched_at: datetime
+
 
 @app.get("/courses", response_model=list[CourseOut])
 def get_courses(db=Depends(get_db)):
     return db.query(Course).options(selectinload(Course.sections).selectinload(Section.meetings)).all()
+
+@app.get("/initial-data", response_model=InitialDataOut)
+def get_initial_data(db=Depends(get_db)):
+    courses = db.query(Course).options(selectinload(Course.sections).selectinload(Section.meetings)).all()
+    log = db.query(FetchLog).first()
+    return {"courses": courses, "fetched_at": log.fetched_at}
 
 @app.get("/fetch_log", response_model=FetchLogOut)
 def get_log(db=Depends(get_db)):
