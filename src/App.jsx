@@ -5,6 +5,16 @@ import { Analytics } from "@vercel/analytics/react"
 
 const COURSE_HUES = ["#2f6bff", "#e0561f", "#17a06a", "#9d4edd", "#c9910d", "#00a0b8", "#e0447f", "#7cb518"]
 
+function LockIcon({ locked, className }) {
+    return (
+        <svg className={className} viewBox="0 0 16 16" width="14" height="14"
+            fill="none" stroke="currentColor" strokeWidth="2.25">
+            <rect x="3" y="7" width="10" height="7" />
+            <path d={locked ? "M5 7V5a3 3 0 0 1 6 0v2" : "M5 7V5a3 3 0 0 1 6 0"} />
+        </svg>
+    )
+}
+
 function groupBySubject(courses) {
     const bySubject = {}
 
@@ -48,7 +58,7 @@ function loadRowsFromStorage() {
 
 function App() {
 
-    const [rows, setRows] = useState([{ id: 1, subject: "", code: "", sections: [] }])
+    const [rows, setRows] = useState([{ id: 1, subject: "", code: "", sections: [], locked: null}])
     const [customizingID, setCustomizingID] = useState(null)
 
     const [error, setError] = useState("")
@@ -116,7 +126,7 @@ function App() {
             .filter((row) => row !== null)
 
         if (JSON.stringify(rows) !== JSON.stringify(validRows)) {
-            setRows(validRows.length === 0 ? [{ id: 1, subject: "", code: "", sections: [] }] : validRows)
+            setRows(validRows.length === 0 ? [{ id: 1, subject: "", code: "", sections: [], locked: null }] : validRows)
             showError("Some of your saved courses are no longer available and were removed.")
         }
 
@@ -167,11 +177,15 @@ function App() {
 
     function addRow() {
         const nextId = rows.length === 0 ? 1 : Math.max(...rows.map((r) => r.id)) + 1
-        setRows([...rows, { id: nextId, subject: "", code: "", sections: [] }])
+        setRows([...rows, { id: nextId, subject: "", code: "", sections: [], locked: null }])
     }
 
     function removeRow(id) {
         setRows(rows.filter((row) => row.id !== id))
+    }
+
+    function clearRows() {
+        setRows(rows.filter((row) => row.locked !== null))
     }
 
     function handleSubmit() {
@@ -359,9 +373,11 @@ function App() {
 
                             {customizingCourse.sections.map((s) => {
                                 const isSelected = customizingRow.sections.includes(s.section_number)
+                                const isLockedSection = customizingRow.locked === s.section_number
+                                const otherLocked = customizingRow.locked && !isLockedSection
                                 return (
-                                    <label key={s.section_number} className={isSelected ? "section-row section-row-selected" : "section-row"}>
-                                        <input type="checkbox" checked={isSelected} onChange={() => {
+                                    <label key={s.section_number} className={`section-row${isSelected ? " section-row-selected" : ""}${otherLocked ? " section-row-disabled" : ""}`}>
+                                        <input type="checkbox" checked={isSelected} disabled={otherLocked || isLockedSection} onChange={() => {
                                             const alreadyIn = customizingRow.sections.includes(s.section_number)
                                             const newSections = alreadyIn
                                                 ? customizingRow.sections.filter((sec) => sec !== s.section_number)
@@ -370,7 +386,16 @@ function App() {
                                         }} />
                                         <span className="section-num">{s.section_number.length === 1 ? "0" + s.section_number : s.section_number}</span>
                                         <span className="section-instructor">{s.instructor}</span>
+                                        {isSelected && !otherLocked && (
+                                            <button type="button" className={isLockedSection ? "lock-toggle lock-toggle-active" : "lock-toggle"} aria-label={isLockedSection ? "Unlock section" : "Lock section"}
+                                                onClick={() => {
+                                                    updateRow(customizingID, { locked: isLockedSection ? null : s.section_number })
+                                                }}>
+                                                <LockIcon locked={isLockedSection} />
+                                            </button>
+                                        )}
                                         <span className="section-meeting">{formatMeetings(s.meetings)}</span>
+                                        
                                     </label>
                                 )
                             })}
@@ -388,7 +413,7 @@ function App() {
                                 <span>CODE</span>
                                 <span>TITLE</span>
                                 <span>SEC</span>
-                                <button className="btn-clear-all" onClick={() => setRows([])} disabled={rows.length === 0}
+                                <button className="btn-clear-all" onClick={clearRows} disabled={rows.length === 0 || rows.every((row) => row.locked !== null)}
                                     aria-label="Remove all courses" title="Remove all courses">CLEAR</button>
                             </div>
 
@@ -403,14 +428,14 @@ function App() {
 
                                     <div key={row.id} className={isInProgress ? "row row-active" : "row"}>
 
-                                        <select value={row.subject} aria-label="Subject" onChange={(e) => updateRow(row.id, { subject: e.target.value, code: "", sections: [] })}>
+                                        <select value={row.subject} aria-label="Subject" disabled={!!row.locked} onChange={(e) => updateRow(row.id, { subject: e.target.value, code: "", sections: [], locked: null })}>
                                             <option value="">--</option>
                                             {subjects.map((s) => (
                                                 <option key={s.subject} value={s.subject}>{s.subject}</option>
                                             ))}
                                         </select>
 
-                                        <select value={row.code} aria-label="Course code" onChange={(e) => updateRow(row.id, { code: e.target.value, sections: [] })}>
+                                        <select value={row.code} aria-label="Course code" disabled={!!row.locked} onChange={(e) => updateRow(row.id, { code: e.target.value, sections: [], locked: null })}>
                                             <option value="">--</option>
                                             {courses.map((c) => (
                                                 <option key={c.code} value={c.code}>
@@ -429,8 +454,8 @@ function App() {
                                                 <>
                                                     <button className="btn-secondary" aria-label={`Edit sections for ${row.subject} ${row.code}`}
                                                         onClick={() => setCustomizingID(row.id)}>EDIT</button>
-                                                    <span className={row.sections.length === 0 ? "sec-text" : "sec-text sec-text-accent"}>
-                                                        {row.sections.length === 0 ? "ALL" : `${row.sections.length}/${rowCourse.sections.length}`}</span>
+                                                    <span className={row.locked || row.sections.length !== 0 ? "sec-text sec-text-accent" : "sec-text"}>
+                                                        {row.locked ? <LockIcon locked={true} /> : (row.sections.length === 0 ? "ALL" : `${row.sections.length}/${rowCourse.sections.length}`)}</span>
 
                                                 </>
                                             )}
@@ -449,7 +474,7 @@ function App() {
                                 <div className="spacer"></div>
                                 <div className="footer-top-row">
                                     <span className="footer-credits">TOTAL CREDITS: <span className="credits-value">{totalCredits}.0</span></span>
-                                    <button className="btn-clear-all footer-clear-mobile" onClick={() => setRows([])} disabled={rows.length === 0}
+                                <button className="btn-clear-all footer-clear-mobile" onClick={clearRows} disabled={rows.length === 0 || rows.every((row) => row.locked !== null)}
                                         aria-label="Remove all courses" title="Remove all courses">CLEAR</button>
                                 </div>
                                 <button className="btn-primary" onClick={handleSubmit} disabled={loading}>{loading ? "GENERATING…" : "GENERATE →"}</button>

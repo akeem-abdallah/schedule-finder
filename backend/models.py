@@ -1,5 +1,5 @@
 from sqlalchemy.orm import declarative_base, relationship
-from sqlalchemy import Column, Integer, String, Float, ForeignKey, DateTime
+from sqlalchemy import Column, Integer, String, Float, ForeignKey, DateTime, cast
 
 Base = declarative_base()
 
@@ -11,7 +11,8 @@ class Course(Base):
     code = Column(String, nullable=False)
     title = Column(String, nullable=False)
     credits = Column(Float, nullable=False)
-    sections = relationship("Section", back_populates="course")
+    sections = relationship("Section", back_populates="course",
+    order_by="cast(Section.section_number, Integer)")
 
 
 class Section(Base):

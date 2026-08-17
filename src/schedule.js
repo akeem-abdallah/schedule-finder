@@ -2,8 +2,6 @@ export const DAYS = ["Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"]
 export const DAY_START = 480
 export const SLOTS_PER_DAY = 156
 
-// TODO(you): "13:30" -> "1:30 PM". Split the string like timeToMinutes does,
-// figure out AM/PM from the hour, convert the hour with % 12, then build the string.
 export function to12Hour(time) {
 
     const parts = time.split(":")
@@ -38,7 +36,14 @@ export function getEligibleSections(row, subjects) {
     const eligibleCourse = eligibleSubject.courses.find((c) => c.code === row.code)
     if (!eligibleCourse) return []
 
-    const eligible = row.sections.length === 0 ? eligibleCourse.sections : eligibleCourse.sections.filter((s) => row.sections.includes(s.section_number))
+    let eligible
+    if (row.locked) {
+        eligible = eligibleCourse.sections.filter((s) => s.section_number === row.locked)
+    } else if (row.sections.length === 0) {
+        eligible = eligibleCourse.sections
+    } else {
+        eligible = eligibleCourse.sections.filter((s) => row.sections.includes(s.section_number))
+    }
 
     return eligible.map((s) => ({ ...s, courseSubject: eligibleSubject.subject, courseCode: eligibleCourse.code }))
 }
