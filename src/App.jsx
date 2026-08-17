@@ -1,6 +1,7 @@
 import './App.css'
 import { useState, Fragment, useEffect } from 'react'
 import { DAYS, generateSchedules, orderedEligibleLists, timeToMinutes, to12Hour, formatMeetings } from './schedule'
+import { Analytics } from "@vercel/analytics/react"
 
 const COURSE_HUES = ["#2f6bff", "#e0561f", "#17a06a", "#9d4edd", "#c9910d", "#00a0b8", "#e0447f", "#7cb518"]
 
@@ -141,6 +142,9 @@ function App() {
 
     return (
         <>
+
+            <Analytics></Analytics>
+
             <div className="page-main">
 
                 <div className="card">
