@@ -376,7 +376,7 @@ function App() {
                                 const isLockedSection = customizingRow.locked === s.section_number
                                 const otherLocked = customizingRow.locked && !isLockedSection
                                 return (
-                                    <label key={s.section_number} className={`section-row${isSelected ? " section-row-selected" : ""}${otherLocked ? " section-row-disabled" : ""}`}>
+                                    <label key={s.section_number} className={`section-row${isSelected ? " section-row-selected" : ""}${otherLocked ? " section-row-disabled" : ""}${isLockedSection ? " section-row-locked" : ""}`}>
                                         <input type="checkbox" checked={isSelected} disabled={otherLocked || isLockedSection} onChange={() => {
                                             const alreadyIn = customizingRow.sections.includes(s.section_number)
                                             const newSections = alreadyIn
@@ -455,13 +455,13 @@ function App() {
                                                     <button className="btn-secondary" aria-label={`Edit sections for ${row.subject} ${row.code}`}
                                                         onClick={() => setCustomizingID(row.id)}>EDIT</button>
                                                     <span className={row.locked || row.sections.length !== 0 ? "sec-text sec-text-accent" : "sec-text"}>
-                                                        {row.locked ? <LockIcon locked={true} /> : (row.sections.length === 0 ? "ALL" : `${row.sections.length}/${rowCourse.sections.length}`)}</span>
+                                                        {row.locked ? <LockIcon locked={true} /> : (row.sections.length === 0 || row.sections.length === rowCourse.sections.length ? "ALL" : `${row.sections.length}/${rowCourse.sections.length}`)}</span>
 
                                                 </>
                                             )}
                                         </div>
 
-                                        <button className="btn-destructive" onClick={() => removeRow(row.id)} aria-label="Remove course">×</button>
+                                        <button className="btn-destructive" disabled={!!row.locked} onClick={() => removeRow(row.id)} aria-label="Remove course">×</button>
 
                                     </div>
 
