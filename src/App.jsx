@@ -168,7 +168,7 @@ function App() {
 
     function formatLastUpdated(iso) {
         if (!iso) return "…"
-        const date = new Date(iso)
+        const date = new Date(iso + "Z")
         return date.toLocaleString('en-US', { hour: 'numeric', minute: '2-digit' })
     }
 
