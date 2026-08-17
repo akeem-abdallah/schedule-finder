@@ -13,7 +13,19 @@ class ErrorBoundary extends Component {
 
     render() {
         if (this.state.hasError) {
-            return <h2>Something went wrong. Please refresh the page.</h2>
+            return (
+                <div className="page-main">
+                    <div className="card">
+                        <div className="status-strip">
+                            <h1 className="strip-title">AURAK Schedule Finder</h1>
+                        </div>
+                        <div style={{ padding: "24px 13px", textAlign: "center" }}>
+                            <p style={{ marginBottom: "16px" }}>Something went wrong. Please refresh the page.</p>
+                            <button className="btn-primary" onClick={() => window.location.reload()}>RELOAD</button>
+                        </div>
+                    </div>
+                </div>
+            )
         }
         return this.props.children
     }
