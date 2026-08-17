@@ -636,7 +636,7 @@ select:focus-visible, button:focus-visible, input[type="checkbox"]:focus-visible
 }
 
 .page-footer {
-    margin-top: 40px;
+    margin-top: 50px;
     padding: 20px;
     text-align: center;
     font-size: 12px;
@@ -651,7 +651,10 @@ select:focus-visible, button:focus-visible, input[type="checkbox"]:focus-visible
     margin: 0 auto 6px;
 }
 
-
+.footer-feedback {
+    font-size: 10px;
+    opacity: 0.8;
+}
 
 
 

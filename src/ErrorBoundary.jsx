@@ -1,0 +1,26 @@
+import { Component } from "react"
+import * as Sentry from "@sentry/react"
+
+class ErrorBoundary extends Component {
+    constructor(props) {
+        super(props)
+        this.state = { hasError: false }
+    }
+
+    static getDerivedStateFromError(error) {
+        return { hasError: true }
+    }
+
+    render() {
+        if (this.state.hasError) {
+            return <h2>Something went wrong. Please refresh the page.</h2>
+        }
+        return this.props.children
+    }
+
+    componentDidCatch(error, info) {
+        Sentry.captureException(error)
+    }
+}
+
+export default ErrorBoundary
