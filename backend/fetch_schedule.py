@@ -77,8 +77,21 @@ def load_rows(path):
 
 if __name__ == "__main__":
 
+    # AURAK EUMS URL
     URL = "https://eums.aurak.ac.ae/Public/Schedule?h42blu9ygNZPnBJmMbXuWAu8XR3hS4tcKtMIP6xFd2U="
     response = requests.get(URL)
+
+    # checks for error response
+    response.raise_for_status()
+
+    soup = BeautifulSoup(response.text, "html.parser")
+    table = soup.find("table", id="dt_basic")
+    tbody = table.find("tbody")
+    rows = tbody.find_all("tr")
+
+    # checks if page was empty, raise if its less than 100
+    if len(rows) < 100:
+        raise Exception(f"Only found {len(rows)} rows, expected at least 100")
 
     with open("aurak_schedule.html", "w", encoding="utf-8") as f:
         f.write(response.text)
@@ -87,10 +100,6 @@ if __name__ == "__main__":
     engine = create_engine(os.environ["DATABASE_URL"])
     Session = sessionmaker(bind=engine)
     session = Session()
-
-    session.execute(text("TRUNCATE TABLE meetings, sections, courses, fetch_log RESTART IDENTITY"))
-
-    rows = load_rows("aurak_schedule.html")
 
     sections = []
     for row in rows:
@@ -127,6 +136,7 @@ if __name__ == "__main__":
         subjects.append(subj_data)
 
     try:
+        session.execute(text("TRUNCATE TABLE meetings, sections, courses, fetch_log RESTART IDENTITY"))
         for subj_data in subjects:
             for course_data in subj_data["courses"]:
                 course = Course(
