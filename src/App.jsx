@@ -40,6 +40,9 @@ function App() {
     const [courses, setCourses] = useState([])
     const subjects = groupBySubject(courses)
 
+    const [lastUpdated, setLastUpdated] = useState(null)
+
+
     useEffect(() => {
         fetch('https://aurak-schedule-finder.onrender.com/courses')
             .then(r => r.json())
@@ -50,10 +53,32 @@ function App() {
     }, [])
 
     useEffect(() => {
+
+        fetch('https://aurak-schedule-finder.onrender.com/fetch_log')
+            .then(r => r.json())
+            .then(data => {
+                console.log(data)
+                setLastUpdated(data.fetched_at)
+            })
+    }, [])
+
+    useEffect(() => {
         if (!error) return
         const timer = setTimeout(() => setError(""), 5000)
         return () => clearTimeout(timer)
     }, [error, errorId])
+
+    const creditList = rows.map((row) => {
+        if (row.subject == "") return 0
+
+        const subj = subjects.find((s) => row.subject === s.subject)
+        const course = subj.courses.find((c) => c.code === row.code)
+
+        return course ? course.credits : 0
+
+    })
+
+    const totalCredits = creditList.reduce((sum, c) => sum + c, 0)
 
     function setIndex(increment) {
         const newIndex = currentIndex + increment
@@ -136,8 +161,15 @@ function App() {
     const startHour = Math.floor(earliestMinute / 60)
     const endHour = Math.ceil(latestMinute / 60)
     const activeHours = []
+
     for (let hour = startHour; hour < endHour; hour++) {
         activeHours.push(hour)
+    }
+
+    function formatLastUpdated(iso) {
+        if (!iso) return "…"
+        const date = new Date(iso)
+        return date.toLocaleString('en-US', { hour: 'numeric', minute: '2-digit' })
     }
 
     return (
@@ -152,10 +184,12 @@ function App() {
                     <div className="status-strip">
                         <h1 className="strip-title">AURAK Schedule Finder</h1>
                         <span className="spacer"></span>
-                        <a className="chip" href="https://eums.aurak.ac.ae/Public/Schedule?h42blu9ygNZPnBJmMbXuWAu8XR3hS4tcKtMIP6xFd2U="
-                            target="_blank" rel="noopener noreferrer">Semester: Fall 2026</a>
+                        <div className="chip-row">
+                            <a className="chip" href="https://eums.aurak.ac.ae/Public/Schedule?h42blu9ygNZPnBJmMbXuWAu8XR3hS4tcKtMIP6xFd2U="
+                                target="_blank" rel="noopener noreferrer">Fall 2026 · Updated {formatLastUpdated(lastUpdated)}</a>
+                        </div>
                     </div>
-                    
+
                     {/*Schedule view*/}
                     {results ? (
                         <>
@@ -192,7 +226,8 @@ function App() {
                                             {activeDays.map((day, dayIndex) => {
                                                 const hourCellClass = ["hour-cell", hourIndex === 0 && "no-rule-top", dayIndex === 0 && "no-rule-left"].filter(Boolean).join(" ")
                                                 return <div key={day} className={hourCellClass} style={{
-                                                    gridColumn: dayIndex + 2, gridRow: `${hourIndex * 12 + 2} / span 12` }}></div>
+                                                    gridColumn: dayIndex + 2, gridRow: `${hourIndex * 12 + 2} / span 12`
+                                                }}></div>
                                             })}
                                         </Fragment>
                                     ))}
@@ -226,9 +261,9 @@ function App() {
 
                         // Edit sections view
                     ) : customizingID ? (
-                        
+
                         <>
-                        
+
                             <div className="sub-strip">
                                 <button onClick={() => setCustomizingID(null)}>← BACK</button>
                                 <span className="spacer"></span>
@@ -255,13 +290,13 @@ function App() {
                             })}
 
                             <p className="section-note">Leave all sections unchecked to include every one of them.</p>
-                         </>
+                        </>
 
-                    // Course selection view
+                        // Course selection view
                     ) : (
 
-                        <> 
-                            
+                        <>
+
                             <div className="table-header">
                                 <span>SUBJ</span>
                                 <span>CODE</span>
@@ -302,7 +337,7 @@ function App() {
                                             {rowCourse ? rowCourse.title : "select a course"}
                                         </span>
 
-                             
+
                                         <div className="sec-cell">
                                             {rowCourse && (
                                                 <>
@@ -314,7 +349,7 @@ function App() {
                                                 </>
                                             )}
                                         </div>
-                                  
+
                                         <button className="btn-destructive" onClick={() => removeRow(row.id)} aria-label="Remove course">×</button>
 
                                     </div>
@@ -325,7 +360,8 @@ function App() {
                             <div className="table-footer">
 
                                 <button className="btn-secondary" onClick={addRow}>+ ADD COURSE</button>
-
+                                <div className="spacer"></div>
+                                <span className="footer-credits">TOTAL CREDITS: <span className="credits-value">{totalCredits}.0</span></span>
                                 <button className="btn-primary" onClick={handleSubmit}>GENERATE →</button>
 
                             </div>

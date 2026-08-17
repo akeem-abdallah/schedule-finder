@@ -99,7 +99,12 @@ body {
     text-decoration: none;
 }
 
-.chip:hover {
+.chip-row {
+    display: flex;
+    align-items: center;
+}
+
+a.chip:hover {
     border-color: var(--accent);
     color: var(--accent);
 }
@@ -283,6 +288,19 @@ select:focus-visible, button:focus-visible, input[type="checkbox"]:focus-visible
     padding: 11px 13px;
     justify-content: space-between;
     border-bottom: 1px solid var(--rule);
+}
+
+.footer-credits {
+    font-family: var(--font-data);
+    font-size: 10px;
+    letter-spacing: .08em;
+    color: var(--muted);
+    margin-right: 13px;
+}
+
+.credits-value {
+    color: var(--accent);
+    font-weight: 700;
 }
 
 .spacer {
@@ -690,8 +708,13 @@ select:focus-visible, button:focus-visible, input[type="checkbox"]:focus-visible
     }
 
     .chip {
-        font-size: 9px;
+        font-size: 8px;
+        letter-spacing: .07em;
         white-space: nowrap;
+        padding: 2px 4px;
+    }
+
+    .chip-row {
         margin-left: auto;
     }
 
@@ -769,6 +792,14 @@ select:focus-visible, button:focus-visible, input[type="checkbox"]:focus-visible
         flex-direction: column;
         align-items: stretch;
         gap: 7px;
+    }
+
+    .footer-credits {
+        order: -1;
+        margin-right: 0;
+        text-align: right;
+        padding-bottom: 4px;
+        font-size: 10px;
     }
 
     .table-footer button {
@@ -902,12 +933,6 @@ select:focus-visible, button:focus-visible, input[type="checkbox"]:focus-visible
 
         .class-block-short .block-time {
             display: block;
-        }
-    }
-
-    @media (max-width: 360px) {
-        .chip {
-            font-size: 8px;
         }
     }
 }

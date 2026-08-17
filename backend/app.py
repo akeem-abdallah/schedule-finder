@@ -5,7 +5,8 @@ from sqlalchemy.orm import sessionmaker, selectinload
 from dotenv import load_dotenv
 import os
 from pydantic import BaseModel
-from models import Course, Section
+from datetime import datetime
+from models import Course, Section, FetchLog
 from starlette.middleware.gzip import GZipMiddleware
 
 load_dotenv()
@@ -55,7 +56,15 @@ class CourseOut(BaseModel):
     credits: float
     sections: list[SectionOut]
 
+class FetchLogOut(BaseModel):
+    model_config = {"from_attributes": True}
+    fetched_at: datetime
+
 
 @app.get("/courses", response_model=list[CourseOut])
 def get_courses(db=Depends(get_db)):
     return db.query(Course).options(selectinload(Course.sections).selectinload(Section.meetings)).all()
+
+@app.get("/fetch_log", response_model=FetchLogOut)
+def get_log(db=Depends(get_db)):
+    return db.query(FetchLog).first()
