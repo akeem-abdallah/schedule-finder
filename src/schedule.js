@@ -49,8 +49,9 @@ export function getEligibleSections(row, subjects) {
 }
 
 // orders those eligible sections
-export function orderedEligibleLists(rows, subjects) {
-    const lists = rows.map((row) => getEligibleSections(row, subjects))
+export function orderedEligibleLists(rows, subjects, blockedMask) {
+    const lists = rows.map((row) => row.locked ? getEligibleSections(row, subjects) :
+        getEligibleSections(row, subjects).filter((section) => !masksConflict(sectionToMask(section), blockedMask)))
     return lists.sort((a, b) => a.length - b.length)
 }
 
@@ -90,6 +91,25 @@ export function sectionToMask(section) {
     }
 
     return mask
+}
+
+// creates a blocked mask for excluded days
+export function buildBlockedMask(filters) {
+    const mask = new Array(MASK_WORDS).fill(0)
+
+    for (const day of filters.excludedDays) {
+
+        let startSlot = DAYS.indexOf(day) * SLOTS_PER_DAY
+        let endSlot = (DAYS.indexOf(day) + 1) * SLOTS_PER_DAY
+
+        for (let slot = startSlot; slot < endSlot; slot++) {
+
+            setSlot(mask, slot)
+        }
+    }
+
+    return mask
+
 }
 
 // check if both masks conflict by AND, if even one bit conflicts then its invalid 

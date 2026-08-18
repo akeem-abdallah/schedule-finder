@@ -1,3 +1,4 @@
+/* ── Design tokens ── */
 
 :root {
     color-scheme: light;
@@ -45,6 +46,8 @@
     }
 }
 
+/* ── Base ── */
+
 body {
     background-color: var(--bg);
     color: var(--text);
@@ -52,6 +55,8 @@ body {
     padding: 0;
     margin: 0;
 }
+
+/* ── Layout shell (card, header strip) ── */
 
 .page-main {
     max-width: 900px;
@@ -109,6 +114,8 @@ a.chip:hover {
     border-color: var(--accent);
     color: var(--accent);
 }
+
+/* ── Buttons & form controls ── */
 
 button {
     font-family: var(--font-ui);
@@ -183,6 +190,8 @@ select:focus-visible, button:focus-visible, input[type="checkbox"]:focus-visible
     outline: none;
     box-shadow: 0 0 0 3px var(--focus);
 }
+
+/* ── Shortlist table (view 1) ── */
 
 .row {
     display: grid;
@@ -297,9 +306,15 @@ select:focus-visible, button:focus-visible, input[type="checkbox"]:focus-visible
 .table-footer {
     display: flex;
     align-items: center;
-    gap: 9px;
+    gap: 12px;
     padding: 11px 13px;
     justify-content: space-between;
+}
+
+.footer-primary-actions {
+    display: flex;
+    gap: 12px;
+    flex: 1;
 }
 
 .footer-top-row {
@@ -316,7 +331,7 @@ select:focus-visible, button:focus-visible, input[type="checkbox"]:focus-visible
     font-size: 10px;
     letter-spacing: .08em;
     color: var(--muted);
-    margin-right: 13px;
+    margin-right: 10px;
 }
 
 .credits-value {
@@ -337,6 +352,18 @@ select:focus-visible, button:focus-visible, input[type="checkbox"]:focus-visible
 
 
 
+
+
+
+
+
+
+
+
+
+
+
+/* ── Section-picker panel (view 2) ── */
 
 .section-row {
     display: flex;
@@ -473,6 +500,7 @@ select:focus-visible, button:focus-visible, input[type="checkbox"]:focus-visible
 
 .lock-toggle-active {
     color: var(--accent);
+    cursor: pointer;
 }
 
 .section-note {
@@ -495,6 +523,11 @@ select:focus-visible, button:focus-visible, input[type="checkbox"]:focus-visible
 
 
 
+
+
+
+
+/* ── Weekly grid (view 3) ── */
 
 .weekly-grid {
     display: grid;
@@ -521,6 +554,8 @@ select:focus-visible, button:focus-visible, input[type="checkbox"]:focus-visible
     text-overflow: ellipsis;
 }
 
+/* dark-mode wash — must stay AFTER .class-block above, same reason as the
+   checkbox override: equal specificity, so position decides the winner */
 @media (prefers-color-scheme: dark) {
     .class-block {
         background-color: color-mix(in srgb, var(--hue) 24%, transparent);
@@ -644,20 +679,7 @@ select:focus-visible, button:focus-visible, input[type="checkbox"]:focus-visible
     display: none;
 }
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
+/* ── Toast ── */
 
 .toast {
     position: fixed;
@@ -699,6 +721,8 @@ select:focus-visible, button:focus-visible, input[type="checkbox"]:focus-visible
     color: var(--danger);
 }
 
+/* ── Footer ── */
+
 .page-footer {
     margin-top: 50px;
     padding: 20px;
@@ -720,21 +744,7 @@ select:focus-visible, button:focus-visible, input[type="checkbox"]:focus-visible
     opacity: 0.8;
 }
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
+/* ── Responsive (mobile) ── */
 
 @media (max-width: 640px) {
 
@@ -820,7 +830,7 @@ select:focus-visible, button:focus-visible, input[type="checkbox"]:focus-visible
         grid-row: 2;
         font-size: 14px;
         padding: 3px 0 2px 5px;
-        
+
     }
 
     select {
@@ -846,6 +856,14 @@ select:focus-visible, button:focus-visible, input[type="checkbox"]:focus-visible
         order: -1;
         justify-content: space-between;
         padding: 3px 0 3px 0;
+    }
+
+    .footer-primary-actions {
+        gap: 9px;
+    }
+
+    .footer-primary-actions button {
+        flex: 1;
     }
 
     .footer-credits {
@@ -953,7 +971,7 @@ select:focus-visible, button:focus-visible, input[type="checkbox"]:focus-visible
 
     @media (max-width: 480px) {
 
-        
+
 
         .gutter-full {
             display: none;
@@ -999,4 +1017,3 @@ select:focus-visible, button:focus-visible, input[type="checkbox"]:focus-visible
         }
     }
 }
-
