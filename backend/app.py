@@ -24,6 +24,10 @@ app.add_middleware(
 
 app.add_middleware(GZipMiddleware)
 
+@app.get("/health")
+def app_health():
+    return {"status": "ok!"}
+
 def get_db():
     db = SessionLocal()
     try:
