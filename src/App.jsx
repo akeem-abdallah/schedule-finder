@@ -1,6 +1,6 @@
 import './App.css'
 import { useState, Fragment, useEffect, useMemo } from 'react'
-import { DAYS, generateSchedules, orderedEligibleLists, timeToMinutes, to12Hour, formatMeetings } from './schedule'
+import { DAYS, generateSchedules, orderedEligibleLists, findIncompatiblePairs, timeToMinutes, to12Hour, formatMeetings } from './schedule'
 import { Analytics } from "@vercel/analytics/react"
 
 const COURSE_HUES = ["#2f6bff", "#e0561f", "#17a06a", "#9d4edd", "#c9910d", "#00a0b8", "#e0447f", "#7cb518"]
@@ -194,10 +194,13 @@ function App() {
             setLoading(true)
 
             setTimeout(() => {
-                const generated = generateSchedules(orderedEligibleLists(rows, subjects))
+                const eligibleLists = orderedEligibleLists(rows, subjects)
+                const generated = generateSchedules(eligibleLists)
 
                 if (generated.length === 0) {
-                    showError("No schedules found.")
+                    const pairs = findIncompatiblePairs(eligibleLists)
+
+                    pairs.length === 0 ? showError("No schedules found.") : showError(`${pairs[0].a[0].courseSubject} ${pairs[0].a[0].courseCode} is incompatible with ${pairs[0].b[0].courseSubject} ${pairs[0].b[0].courseCode}`)
 
                 } else {
                     setError("")

@@ -104,6 +104,33 @@ export function masksConflict(maskA, maskB) {
     return false
 }
 
+// checks whether at least one section of A can coexist with at least one section of B
+export function sectionsCompatible(sectionsA, sectionsB) {
+    return sectionsA.some((secA) => sectionsB.some((secB) => {
+
+        if(!masksConflict(sectionToMask(secA), sectionToMask(secB))) {
+            return true
+        }
+    }))
+}
+
+// checks every pair of course section-lists, returns the ones that can't coexist at all
+export function findIncompatiblePairs(eligibleLists) {
+    const incompatible = []
+
+    for (let i = 0; i < eligibleLists.length; i++) {
+
+        for (let j = 0; j < i; j++) {
+
+            if (!sectionsCompatible(eligibleLists[i], eligibleLists[j])) {
+                incompatible.push({ a: eligibleLists[i], b: eligibleLists[j]})
+            }
+        }
+    }
+
+    return incompatible
+}
+
 // combine both masks when nothing conflicts
 export function combineMasks(maskA, maskB) {
     const combined = new Array(MASK_WORDS).fill(0)
