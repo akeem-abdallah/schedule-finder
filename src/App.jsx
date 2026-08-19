@@ -87,6 +87,8 @@ function App() {
     busyBlocks: []
   })
 
+  const [newBusy, setNewBusy] = useState({ day: "ALL", start_time: "", end_time: "", note: "" })
+
   const [lastUpdated, setLastUpdated] = useState(null)
 
   // EFFECT HOOKS
@@ -126,7 +128,8 @@ function App() {
         if (!course) return null
 
         const validSections = row.sections.filter((num) => course.sections.some((s) => s.section_number === num))
-        return { ...row, sections: validSections }
+        const validLocked = row.locked && course.sections.some((s) => s.section_number === row.locked) ? row.locked : null
+        return { ...row, sections: validSections, locked: validLocked }
       })
       .filter((row) => row !== null)
 
@@ -228,6 +231,16 @@ function App() {
 
   const START_TIMES = ["", "08:00", "09:00", "10:30", "12:00", "13:30"]
   const END_TIMES = ["11:45", "13:15", "14:45", "16:15", "17:45", ""]
+
+  function removeBusyBlock(id) {
+    updateFilters({ busyBlocks: filters.busyBlocks.filter((block) => block.id !== id) })
+  }
+
+  function addBusyBlock() {
+    const nextId = filters.busyBlocks.length === 0 ? 1 : Math.max(...filters.busyBlocks.map((f) => f.id)) + 1
+    updateFilters({ busyBlocks: [...filters.busyBlocks, { ...newBusy, id: nextId }] })
+    setNewBusy({ day: "ALL", start_time: "", end_time: "", note: "" })
+  }
 
   // goes through checks when generate is clicked
   function handleSubmit() {
@@ -514,6 +527,28 @@ function App() {
             ))}
           </div>
         </div>
+
+        {/* <div className="filter-block">
+          <div className="filter-label">BUSY TIMES</div>
+          <div>
+            {filters.busyBlocks.map((block) => (
+              <div key={block.id} className="busy-row">
+                <select value={newBusy.day} className="busy-day"
+                  onChange={(e) => setNewBusy({ ...newBusy, day: e.target.value })}>
+                  <option value="ALL">ALL</option>
+                  {DAYS.map((day) => (
+                    <option key={day} value={day}>{day}</option>
+                  ))}
+                </select>
+                <span className="busy-time">{to12Hour(block.start_time)} - {to12Hour(block.end_time)}</span>
+                <span className="busy-note">{block.note}</span>
+                <button className="busy-remove" onClick={() => removeBusyBlock(block.id)} >x</button>
+              </div>
+            ))}
+          </div>
+
+          <button className="btn-add-busy" onClick={addBusyBlock}>+ ADD BUSY TIME</button>
+        </div> */}
 
       </>
     )
