@@ -472,13 +472,13 @@ function App() {
             {DAYS.map((day) => (
               <button
                 key={day}
-                className={`filter-chip filter-chip-day ${filters.excludedDays.includes(day) ? "filter-chip-active" : ""}`}
+                className={`filter-chip ${filters.excludedDays.includes(day) ? "filter-chip-active" : ""}`}
                 onClick={() => toggleExcludedDay(day)}>
                 {day.toUpperCase()}
               </button>
             ))}
             <button
-              className={`filter-chip filter-chip-gap filter-chip-weekend ${WEEKEND.every((day) => filters.excludedDays.includes(day)) ? "filter-chip-active" : ""}`}
+              className={`filter-chip filter-chip-weekend ${WEEKEND.every((day) => filters.excludedDays.includes(day)) ? "filter-chip-active" : ""}`}
               onClick={toggleWeekend}>
               WEEKEND
             </button>
