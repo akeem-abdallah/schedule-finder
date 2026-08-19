@@ -131,6 +131,7 @@ button {
   color: var(--muted);
   padding: 8px 14px;
   cursor: pointer;
+  white-space: nowrap;
 }
 
 .btn-primary {
@@ -541,21 +542,23 @@ select {
 .filter-chips {
   display: flex;
   flex-wrap: wrap;
-  gap: 4px;
+  gap: 6px;
 }
 
 .filter-chip {
   font-family: var(--font-data);
-  font-size: 11px;
-  font-weight: 700;
+  font-size: 12px;
+  font-weight: 600;
   letter-spacing: .04em;
   border: 1px solid var(--rule-med);
   background: none;
   color: var(--muted);
-  padding: 5px 8px;
+  padding: 6px 10px;
   text-align: center;
   cursor: pointer;
   border-radius: 0;
+  min-width: 0;
+  flex: 1;
 }
 
 .filter-chip:hover {
@@ -570,7 +573,12 @@ select {
 }
 
 .filter-chip-weekend {
-  margin-left: 10px;
+  margin-left: 15px;
+}
+
+.filter-chips-times .filter-chip {
+  flex: 1;
+  min-width: 0;
 }
 
 .btn-reset {
@@ -582,14 +590,14 @@ select {
   background: none;
   color: var(--muted);
   padding: 3px 8px;
-  margin-right: 12px;
+  margin-right: 15px;
   cursor: pointer;
   border-radius: 0;
 }
 
 .btn-reset:hover {
-  color: var(--accent);
-  border-color: var(--accent);
+  color: var(--danger);
+  border-color: var(--danger);
 }
 
 
@@ -1042,12 +1050,21 @@ select {
 
   .filter-chips-days .filter-chip {
     padding: 11px 0;
-    min-width: 0px;
+    min-width: 0;
   }
 
   .filter-chips-days .filter-chip-weekend {
-    grid-column: 1 / -1;
+    grid-column: 5 / -1;
     margin-left: 0;
+  }
+
+  .filter-chips-times {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+  }
+
+  .filter-chips-times .filter-chip {
+    padding: 11px 0;
   }
 
 

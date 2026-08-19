@@ -226,6 +226,9 @@ function App() {
     }
   }
 
+  const START_TIMES = ["", "08:00", "09:00", "10:30", "12:00", "13:30"]
+  const END_TIMES = ["11:45", "13:15", "14:45", "16:15", "17:45", ""]
+
   // goes through checks when generate is clicked
   function handleSubmit() {
     const incomplete = rows.some((row) => row.subject === "" || row.code === "")
@@ -410,6 +413,7 @@ function App() {
         <div className="sub-strip">
           <button onClick={() => setCustomizingID(null)}>← BACK</button>
           <span className="spacer"></span>
+          <button className="btn-reset" onClick={() => { updateRow(customizingID, { sections: [], locked: null }) }}>RESET</button>
           <span className="section-code">{customizingRow.subject} {customizingCourse.code}</span>
         </div>
         <div className="section-desc">{customizingCourse.title}</div>
@@ -449,8 +453,6 @@ function App() {
   }
 
   function filtersView() {
-
-
     return (
       <>
         <div className="sub-strip">
@@ -462,7 +464,7 @@ function App() {
               nothingBefore: "",
               nothingAfter: "",
               busyBlocks: []
-            })}}>Reset</button>
+            })}}>RESET ALL</button>
           <span className="section-code">FILTERS</span>
         </div>
 
@@ -482,6 +484,34 @@ function App() {
               onClick={toggleWeekend}>
               WEEKEND
             </button>
+          </div>
+        </div>
+
+        <div className="filter-block">
+          <div className="filter-label">EARLIEST</div>
+          <div className="filter-chips filter-chips-times">
+            {START_TIMES.map((time) => (
+              <button
+                key={time}
+                className={`filter-chip ${filters.nothingBefore === time ? "filter-chip-active" : ""}`}
+                onClick={() => updateFilters({ nothingBefore: time })}>
+                {time === "" ? "ANY" : to12Hour(time)}
+              </button>
+            ))}
+          </div>
+        </div>
+
+        <div className="filter-block">
+          <div className="filter-label">LATEST</div>
+          <div className="filter-chips filter-chips-times">
+            {END_TIMES.map((time) => (
+              <button
+                key={time}
+                className={`filter-chip ${filters.nothingAfter === time ? "filter-chip-active" : ""}`}
+                onClick={() => updateFilters({ nothingAfter: time })}>
+                {time === "" ? "ANY" : to12Hour(time)}
+              </button>
+            ))}
           </div>
         </div>
 
