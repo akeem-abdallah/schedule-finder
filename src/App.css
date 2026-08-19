@@ -1042,6 +1042,7 @@ select {
 
   .filter-chips-days .filter-chip {
     padding: 11px 0;
+    min-width: 0px;
   }
 
   .filter-chips-days .filter-chip-weekend {
