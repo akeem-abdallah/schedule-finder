@@ -1,0 +1,213 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>FILTERS panel — pixel reference</title>
+<!--
+  APPROVED DESIGN, 2026-08-19. This file is the source of truth for section 14's
+  FILTERS panel. Open it next to the real app and diff. Phone and desktop must
+  look identical — that is what --filter-col: 420px enforces.
+  Spec + rationale: docs/design/filters-panel.md
+-->
+<style>
+:root {
+  color-scheme: light;
+  --bg:#f2f1ee; --surface:#ffffff; --surface-alt:#f4f3f0;
+  --text:#16150f; --muted:#787369; --faint:#b8b3a8;
+  --rule:#e9e7e1; --rule-med:#97927f; --rule-strong:#16150f;
+  --accent:#a3560c; --accent-fg:#ffffff; --danger:#a8321a;
+  --section-selected-bg:rgba(163,86,12,.12);
+  --chip-active-bg:rgba(163,86,12,.12);
+  --font-ui: system-ui, "Segoe UI", -apple-system, sans-serif;
+  --font-data: ui-monospace, "Cascadia Mono", "Segoe UI Mono", "SF Mono", Consolas, monospace;
+  --filter-col: 420px;
+}
+@media (prefers-color-scheme: dark) {
+  :root {
+    color-scheme: dark;
+    --bg:#000000; --surface:#141413; --surface-alt:#1c1b19;
+    --text:#e8e6df; --muted:#8a867c; --faint:#5c5a55;
+    --rule:#2c2b29; --rule-med:#66635c; --rule-strong:#e4e1d9;
+    --accent:#ffb020; --accent-fg:#16150f; --danger:#ff6b4a;
+    --section-selected-bg:rgba(255,176,32,.18);
+    --chip-active-bg:rgba(255,176,32,.14);
+  }
+}
+body { background:var(--bg); color:var(--text); font-family:var(--font-ui); margin:0; padding:24px 16px; }
+.page-main { max-width:900px; margin:0 auto; }
+.card { background:var(--surface); border:1px solid var(--rule-med); }
+.status-strip { display:flex; align-items:center; border-bottom:3px solid var(--rule-strong); padding:8px 16px; }
+.strip-title { font-size:13px; font-weight:800; letter-spacing:.10em; margin:0; }
+
+/* sub-strip: BACK - RESET - title */
+.sub-strip { display:flex; align-items:center; padding:11px 16px; border-bottom:1px solid var(--rule); }
+.sub-strip > button { padding:0; font-size:11px; font-weight:800; letter-spacing:.10em;
+  text-transform:uppercase; background:none; border:none; color:var(--muted); cursor:pointer; }
+.spacer { flex:1; }
+.btn-reset { font-size:11px; font-weight:800; letter-spacing:.08em; text-transform:uppercase;
+  border:1px solid var(--rule-med); background:none; color:var(--muted);
+  padding:4px 9px; margin-right:12px; cursor:pointer; border-radius:0; }
+.btn-reset:hover { color:var(--accent); border-color:var(--accent); }
+.section-code { font-family:var(--font-data); font-size:15px; font-weight:600; color:var(--text); }
+
+/* a labelled block of chips */
+.filter-block { padding:14px 16px 12px 16px; border-bottom:1px solid var(--rule); }
+.filter-block-end { border-bottom:1px solid var(--rule-med); }
+.filter-label { font-size:11px; font-weight:800; letter-spacing:.08em; color:var(--muted); margin-bottom:9px; }
+.filter-chips { display:grid; gap:4px; max-width:var(--filter-col); }
+.filter-chips-7 { grid-template-columns:repeat(7,1fr); }
+.filter-chips-3 { grid-template-columns:repeat(3,1fr); gap:5px; }
+.filter-chips-5 { grid-template-columns:repeat(5,1fr); }
+.filter-chips + .filter-chips { margin-top:4px; }
+.filter-chip { font-family:var(--font-data); font-size:11px; font-weight:700;
+  border:1px solid var(--rule-med); background:none; color:var(--muted);
+  padding:12px 0; text-align:center; cursor:pointer; border-radius:0; }
+.filter-chips-3 .filter-chip { font-size:12px; }
+.filter-chip:hover { border-color:var(--accent); color:var(--accent); }
+.filter-chip-active { border-color:var(--accent); background:var(--chip-active-bg); color:var(--accent); }
+.filter-chip-wide { grid-column:span 3; }
+
+/* toggle + busy rows: same DNA as .section-row */
+.filter-row { display:flex; align-items:center; gap:14px; padding:13px 16px 13px 13px;
+  border-bottom:1px solid var(--rule); border-left:3px solid transparent; cursor:pointer; user-select:none; }
+.filter-row-selected { border-left-color:var(--accent); background:var(--section-selected-bg); }
+.filter-row-end { border-bottom:1px solid var(--rule-med); }
+.filter-row-disabled { opacity:.35; cursor:default; }
+.filter-row-text { flex:1; font-size:14px; }
+.filter-row input[type="checkbox"] { appearance:none; -webkit-appearance:none; width:17px; height:17px;
+  margin:0; flex:none; border:1px solid var(--rule-med); background-color:var(--surface); }
+.filter-row input[type="checkbox"]:checked { background-color:var(--accent); border-color:var(--accent);
+  background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 12 10' fill='none'%3E%3Cpath d='M1 5l3.5 3.5L11 1.5' stroke='%23ffffff' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E");
+  background-repeat:no-repeat; background-position:center; background-size:10px 8px; }
+@media (prefers-color-scheme: dark) {
+  .filter-row input[type="checkbox"]:checked {
+    background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 12 10' fill='none'%3E%3Cpath d='M1 5l3.5 3.5L11 1.5' stroke='%2316150f' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E"); }
+}
+.chip-soon { font-family:var(--font-data); font-size:11px; font-weight:700; letter-spacing:.08em;
+  border:1px solid var(--rule-med); color:var(--muted); padding:3px 6px; }
+
+.busy-row { display:flex; align-items:center; gap:12px; padding:12px 16px 12px 13px;
+  border-bottom:1px solid var(--rule); border-left:3px solid var(--accent); background:var(--section-selected-bg); }
+.busy-day { font-family:var(--font-data); font-size:14px; font-weight:600; color:var(--accent); width:32px; flex:none; }
+.busy-time { font-family:var(--font-data); font-size:14px; color:var(--text); }
+.busy-remove { font-size:18px; color:var(--faint); background:none; border:none; cursor:pointer; padding:0; line-height:1; }
+.busy-remove:hover { color:var(--danger); }
+
+.busy-add-wrap { padding:12px 16px; border-bottom:1px solid var(--rule-med); }
+.btn-add-busy { display:block; width:100%; max-width:var(--filter-col); text-align:center;
+  font-size:11px; font-weight:800; letter-spacing:.10em; text-transform:uppercase;
+  border:1px solid var(--rule-med); background:none; color:var(--text); padding:14px 0; cursor:pointer; border-radius:0; }
+.btn-add-busy:hover { border-color:var(--rule-strong); }
+
+.filter-footer { padding:14px 16px 16px 16px; }
+.filter-count { font-family:var(--font-data); font-size:11px; letter-spacing:.06em; color:var(--muted);
+  text-align:center; margin-bottom:12px; max-width:var(--filter-col); }
+.filter-count b { color:var(--accent); font-weight:700; }
+.btn-done { display:block; width:100%; max-width:var(--filter-col); text-align:center;
+  font-size:12px; font-weight:800; letter-spacing:.12em; text-transform:uppercase;
+  background:var(--accent); color:var(--accent-fg); border:none; padding:17px 0; cursor:pointer; border-radius:0; }
+</style>
+</head>
+<body>
+<div class="page-main">
+  <div class="card">
+
+    <div class="status-strip"><h1 class="strip-title">AURAK Schedule Finder</h1></div>
+
+    <div class="sub-strip">
+      <button>← Back</button>
+      <span class="spacer"></span>
+      <button class="btn-reset">Reset</button>
+      <span class="section-code">FILTERS</span>
+    </div>
+
+    <div class="filter-block">
+      <div class="filter-label">DAYS OFF</div>
+      <div class="filter-chips filter-chips-7">
+        <button class="filter-chip">MON</button>
+        <button class="filter-chip">TUE</button>
+        <button class="filter-chip">WED</button>
+        <button class="filter-chip">THU</button>
+        <button class="filter-chip filter-chip-active">FRI</button>
+        <button class="filter-chip filter-chip-active">SAT</button>
+        <button class="filter-chip filter-chip-active">SUN</button>
+      </div>
+      <div class="filter-chips filter-chips-7">
+        <button class="filter-chip filter-chip-active filter-chip-wide">WEEKEND</button>
+      </div>
+    </div>
+
+    <div class="filter-block">
+      <div class="filter-label">EARLIEST</div>
+      <div class="filter-chips filter-chips-3">
+        <button class="filter-chip">ANY</button>
+        <button class="filter-chip">8:00</button>
+        <button class="filter-chip">9:00</button>
+        <button class="filter-chip filter-chip-active">10:30</button>
+        <button class="filter-chip">12:00</button>
+        <button class="filter-chip">1:30</button>
+      </div>
+    </div>
+
+    <div class="filter-block">
+      <div class="filter-label">LATEST</div>
+      <div class="filter-chips filter-chips-3">
+        <button class="filter-chip">11:45</button>
+        <button class="filter-chip">1:15</button>
+        <button class="filter-chip">2:45</button>
+        <button class="filter-chip">4:15</button>
+        <button class="filter-chip filter-chip-active">5:45</button>
+        <button class="filter-chip">ANY</button>
+      </div>
+    </div>
+
+    <div class="filter-block filter-block-end">
+      <div class="filter-label">LONGEST GAP</div>
+      <div class="filter-chips filter-chips-5">
+        <button class="filter-chip">NONE</button>
+        <button class="filter-chip">1 HR</button>
+        <button class="filter-chip filter-chip-active">2 HR</button>
+        <button class="filter-chip">3 HR</button>
+        <button class="filter-chip">ANY</button>
+      </div>
+    </div>
+
+    <label class="filter-row filter-row-selected">
+      <input type="checkbox" checked>
+      <span class="filter-row-text">Instructor assigned</span>
+    </label>
+    <label class="filter-row filter-row-end filter-row-disabled">
+      <input type="checkbox" disabled>
+      <span class="filter-row-text">Include full sections</span>
+      <span class="chip-soon">SOON</span>
+    </label>
+
+    <div class="filter-block" style="border-bottom:none; padding-bottom:8px;">
+      <div class="filter-label" style="margin-bottom:0;">BUSY TIMES</div>
+    </div>
+    <div class="busy-row">
+      <span class="busy-day">TUE</span>
+      <span class="busy-time">2:00–5:00 PM</span>
+      <span class="spacer"></span>
+      <button class="busy-remove" aria-label="Remove busy time">×</button>
+    </div>
+    <div class="busy-row">
+      <span class="busy-day">ALL</span>
+      <span class="busy-time">12:00–1:00 PM</span>
+      <span class="spacer"></span>
+      <button class="busy-remove" aria-label="Remove busy time">×</button>
+    </div>
+    <div class="busy-add-wrap">
+      <button class="btn-add-busy">+ Add busy time</button>
+    </div>
+
+    <div class="filter-footer">
+      <div class="filter-count">EXCLUDED <b>23</b> OF <b>61</b> SECTIONS</div>
+      <button class="btn-done">Done →</button>
+    </div>
+
+  </div>
+</div>
+</body>
+</html>

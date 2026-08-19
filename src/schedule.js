@@ -18,7 +18,7 @@ export function to12Hour(time) {
 }
 
 export function formatMeetings(meetings) {
-  if (meetings.length === 0) return "TBA"
+  if (meetings.length === 0) return ""
 
   const days = meetings.map(m => m.day.toUpperCase()).join(" ")
   let s = to12Hour(meetings[0].start_time)

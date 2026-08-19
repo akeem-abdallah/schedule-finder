@@ -18,6 +18,7 @@
   --focus: rgba(184,96,13,.35);
   --row-active-bg: #fffdf7;
   --section-selected-bg: rgba(163,86,12,.12);
+  --chip-active-bg: rgba(163,86,12,.12);
   --font-ui: system-ui, "Segoe UI", -apple-system, sans-serif;
   --font-data: ui-monospace, "Cascadia Mono", "Segoe UI Mono", "SF Mono", Consolas, monospace;
   --sec-w: 40px;
@@ -43,6 +44,7 @@
     --focus: rgba(255,176,32,.35);
     --row-active-bg: #241d10;
     --section-selected-bg: rgba(255,176,32,.18);
+    --chip-active-bg: rgba(255,176,32,.14);
   }
 }
 
@@ -439,7 +441,7 @@ select {
   border-bottom: 1px solid var(--rule);
 }
 
-  .sub-strip > button {
+  .sub-strip > button:not(.btn-reset) {
     padding: 0;
     font-size: 9px;
   }
@@ -517,6 +519,79 @@ select {
 
 
 
+/* ── Filters view (view 3) ── */
+
+.filter-block {
+  padding: 14px 14px 15px 14px;
+  border-bottom: 1px solid var(--rule);
+}
+
+.filter-block-end {
+  border-bottom: 1px solid var(--rule-med);
+}
+
+.filter-label {
+  font-size: 11px;
+  font-weight: 800;
+  letter-spacing: .08em;
+  color: var(--muted);
+  margin-bottom: 9px;
+}
+
+.filter-chips {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+}
+
+.filter-chip {
+  font-family: var(--font-data);
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: .04em;
+  border: 1px solid var(--rule-med);
+  background: none;
+  color: var(--muted);
+  padding: 5px 8px;
+  text-align: center;
+  cursor: pointer;
+  border-radius: 0;
+  white-space: nowrap;
+}
+
+.filter-chip:hover {
+  border-color: var(--accent);
+  color: var(--accent);
+}
+
+.filter-chip-active {
+  border-color: var(--accent);
+  background: var(--chip-active-bg);
+  color: var(--accent);
+}
+
+.filter-chip-gap {
+  margin-left: 10px;
+}
+
+.btn-reset {
+  font-size: 10px;
+  font-weight: 800;
+  letter-spacing: .08em;
+  text-transform: uppercase;
+  border: 1px solid var(--rule-med);
+  background: none;
+  color: var(--muted);
+  padding: 3px 8px;
+  margin-right: 12px;
+  cursor: pointer;
+  border-radius: 0;
+}
+
+.btn-reset:hover {
+  color: var(--accent);
+  border-color: var(--accent);
+}
 
 
 
@@ -526,7 +601,14 @@ select {
 
 
 
-/* ── Weekly grid (view 3) ── */
+
+
+
+
+
+
+
+/* ── Weekly grid (view 4) ── */
 
 .weekly-grid {
   display: grid;
@@ -883,7 +965,7 @@ select {
     padding: 4px 13px 0 13px;
   }
 
-    .sub-strip > button {
+    .sub-strip > button:not(.btn-reset) {
       padding: 16px 0;
       min-width: 44px;
     }
@@ -946,6 +1028,37 @@ select {
     left: 0;
     z-index: 3;
   }
+
+
+
+
+  .filter-chip {
+    padding: 11px 14px;
+    font-size: 12px;
+  }
+
+  .filter-chips {
+    gap: 7px;
+  }
+
+  .filter-chips-days {
+    display: grid;
+    grid-template-columns: repeat(7, 1fr);
+  }
+
+    .filter-chips-days .filter-chip-day {
+      min-width: 0;
+    }
+
+  .filter-chips-days .filter-chip-weekend {
+    grid-column: 1 / -1;
+    margin-left: 0;
+    margin-top: 3px;
+  }
+
+
+
+
 
   .weekly-grid {
     --day-w: calc((100% - var(--gutter-w, 70px)) / 4);
@@ -1015,3 +1128,4 @@ select {
     }
   }
 }
+

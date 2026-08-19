@@ -213,6 +213,19 @@ function App() {
       updateFilters({ excludedDays: [...filters.excludedDays, day] })
   }
 
+  const WEEKEND = ["Fri", "Sat", "Sun"]
+
+  function toggleWeekend() {
+    const allExcluded = WEEKEND.every((day) => filters.excludedDays.includes(day))
+
+    if (allExcluded) {
+      updateFilters({ excludedDays: filters.excludedDays.filter((d) => !WEEKEND.includes(d))})
+    } else {
+      const merged = [...new Set([...filters.excludedDays, ...WEEKEND])]
+      updateFilters({ excludedDays: merged })
+    }
+  }
+
   // goes through checks when generate is clicked
   function handleSubmit() {
     const incomplete = rows.some((row) => row.subject === "" || row.code === "")
@@ -443,29 +456,34 @@ function App() {
         <div className="sub-strip">
           <button onClick={() => setFiltersOpen(false)}>← BACK</button>
           <span className="spacer"></span>
+          <button className="btn-reset" onClick={() => {
+            updateFilters({
+              excludedDays: [],
+              nothingBefore: "",
+              nothingAfter: "",
+              busyBlocks: []
+            })}}>Reset</button>
           <span className="section-code">FILTERS</span>
         </div>
 
-        {DAYS.map((day) => (
-
-          <label key={day}>
-
-            <input type="checkbox" checked={filters.excludedDays.includes(day)} onChange={() => toggleExcludedDay(day)} />
-            <span>{day}</span>
-
-          </label>
-
-        ))}
-
-        <label>
-          Nothing before
-          <input type="time" value={filters.nothingBefore} onChange={(e) => updateFilters({ nothingBefore: e.target.value })} />
-        </label>
-
-        <label>
-          Nothing after
-          <input type="time" value={filters.nothingAfter} onChange={(e) => updateFilters({ nothingAfter: e.target.value })} />
-        </label>
+        <div className="filter-block">
+          <div className="filter-label">DAYS OFF</div>
+          <div className="filter-chips filter-chips-days">
+            {DAYS.map((day) => (
+              <button
+                key={day}
+                className={`filter-chip filter-chip-day ${filters.excludedDays.includes(day) ? "filter-chip-active" : ""}`}
+                onClick={() => toggleExcludedDay(day)}>
+                {day.toUpperCase()}
+              </button>
+            ))}
+            <button
+              className={`filter-chip filter-chip-gap filter-chip-weekend ${WEEKEND.every((day) => filters.excludedDays.includes(day)) ? "filter-chip-active" : ""}`}
+              onClick={toggleWeekend}>
+              WEEKEND
+            </button>
+          </div>
+        </div>
 
       </>
     )
