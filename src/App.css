@@ -623,14 +623,15 @@ select {
   font-size: 13px;
   color: var(--text);
   background: none;
-  border: none;
+  border: 1px solid var(--rule-med);
   border-radius: 0;
-  padding: 0;
+  padding: 3px 5px;
   flex: none;
 }
 
 .busy-time:focus-visible {
-  outline: 1px solid var(--accent);
+  outline: none;
+  border-color: var(--accent);
 }
 
 .busy-note {
@@ -638,15 +639,16 @@ select {
   font-size: 13px;
   color: var(--muted);
   background: none;
-  border: none;
+  border: 1px solid var(--rule-med);
   border-radius: 0;
-  padding: 0;
+  padding: 3px 6px;
   flex: 1 1 120px;
   min-width: 0;
 }
 
 .busy-note:focus-visible {
-  outline: 1px solid var(--accent);
+  outline: none;
+  border-color: var(--accent);
 }
 
 .busy-note::placeholder {
