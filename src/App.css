@@ -626,7 +626,7 @@ select {
   border: none;
   border-radius: 0;
   padding: 0;
-  min-width: 0;
+  flex: none;
 }
 
 .busy-time:focus-visible {
@@ -1175,11 +1175,10 @@ select {
 
   .busy-row {
     display: grid;
-    grid-template-columns: 1fr auto;
+    grid-template-columns: auto 1fr;
     grid-template-areas:
       "day remove"
-      "times times"
-      "note note";
+      "times note";
     row-gap: 8px;
     column-gap: 8px;
     padding: 12px 14px 12px 11px;
@@ -1195,24 +1194,18 @@ select {
     grid-area: times;
   }
 
-  .busy-time-pair .busy-time {
-    flex: 1;
-  }
-
   .busy-time {
     font-size: 14px;
-    padding: 8px 6px;
   }
 
   .busy-note {
     grid-area: note;
-    padding: 8px;
   }
 
   .busy-remove {
     grid-area: remove;
     font-size: 15px;
-    margin-bottom: 2px;
+    justify-self: end;
   }
 
   .btn-add-busy {
