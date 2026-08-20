@@ -87,8 +87,6 @@ function App() {
     busyBlocks: []
   })
 
-  const [newBusy, setNewBusy] = useState({ day: "ALL", start_time: "", end_time: "", note: "" })
-
   const [lastUpdated, setLastUpdated] = useState(null)
 
   // EFFECT HOOKS
@@ -238,8 +236,11 @@ function App() {
 
   function addBusyBlock() {
     const nextId = filters.busyBlocks.length === 0 ? 1 : Math.max(...filters.busyBlocks.map((f) => f.id)) + 1
-    updateFilters({ busyBlocks: [...filters.busyBlocks, { ...newBusy, id: nextId }] })
-    setNewBusy({ day: "ALL", start_time: "", end_time: "", note: "" })
+    updateFilters({ busyBlocks: [...filters.busyBlocks, { ...{ day: "ALL", start_time: "", end_time: "", note: "" }, id: nextId }] })
+  }
+
+  function updateBusyBlock(id, changes) {
+    updateFilters({ busyBlocks: filters.busyBlocks.map((block) => block.id === id ? { ...block, ...changes } : block) })
   }
 
   // goes through checks when generate is clicked
@@ -528,27 +529,34 @@ function App() {
           </div>
         </div>
 
-        {/* <div className="filter-block">
+        <div className="filter-block">
           <div className="filter-label">BUSY TIMES</div>
           <div>
             {filters.busyBlocks.map((block) => (
               <div key={block.id} className="busy-row">
-                <select value={newBusy.day} className="busy-day"
-                  onChange={(e) => setNewBusy({ ...newBusy, day: e.target.value })}>
-                  <option value="ALL">ALL</option>
-                  {DAYS.map((day) => (
-                    <option key={day} value={day}>{day}</option>
-                  ))}
-                </select>
-                <span className="busy-time">{to12Hour(block.start_time)} - {to12Hour(block.end_time)}</span>
-                <span className="busy-note">{block.note}</span>
-                <button className="busy-remove" onClick={() => removeBusyBlock(block.id)} >x</button>
+                  <select value={block.day} className="busy-day" onChange={(e) => updateBusyBlock(block.id, { day: e.target.value })}>
+                    <option value="ALL">ALL</option>
+                    {DAYS.map((day) => (
+                      <option key={day} value={day}>{day}</option>
+                    ))}
+                  </select>
+                <div className="busy-time-pair">
+                  <input type="time" className="busy-time" value={block.start_time}
+                    onChange={(e) => updateBusyBlock(block.id, { start_time: e.target.value })} />
+                  <span className="busy-time-sep">to </span>
+                  <input type="time" className="busy-time" value={block.end_time}
+                    onChange={(e) => updateBusyBlock(block.id, { end_time: e.target.value })} />
+                </div>
+                <input type="text" className="busy-note" value={block.note} placeholder="note (optional)"
+                  onChange={(e) => updateBusyBlock(block.id, { note: e.target.value })} />
+                <button className="busy-remove" aria-label="Remove busy time" onClick={() => removeBusyBlock(block.id)}>×</button>
               </div>
             ))}
           </div>
 
+
           <button className="btn-add-busy" onClick={addBusyBlock}>+ ADD BUSY TIME</button>
-        </div> */}
+        </div>
 
       </>
     )

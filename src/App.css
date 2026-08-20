@@ -432,7 +432,7 @@ select {
   color: var(--muted);
   text-align: right;
   line-height: 1.4;
-  width: 100px;
+  width: 110px;
 }
 
 .sub-strip {
@@ -583,8 +583,10 @@ select {
 
 .busy-row {
   display: flex;
+  flex-wrap: wrap;
   align-items: center;
-  gap: 13px;
+  gap: 8px 13px;
+  margin: 0 -14px;
   padding: 9px 14px 9px 11px;
   border-bottom: 1px solid var(--rule);
   border-left: 3px solid var(--accent);
@@ -592,29 +594,67 @@ select {
 }
 
 .busy-day {
-  font-family: var(--font-data);
-  font-size: 12px;
+  font-size: 13px;
   font-weight: 700;
   color: var(--accent);
-  width: 32px;
   flex: none;
-  padding: 0px 0px;
+}
+
+.busy-day:focus-visible {
+  outline: 1px solid var(--accent);
+}
+
+.busy-time-pair {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  flex: none;
+}
+
+.busy-time-sep {
+  font-family: var(--font-data);
+  font-size: 13px;
+  color: var(--text);
+  margin: 5px;
 }
 
 .busy-time {
   font-family: var(--font-data);
   font-size: 13px;
   color: var(--text);
+  background: none;
+  border: none;
+  border-radius: 0;
+  padding: 0;
+  min-width: 0;
+}
+
+.busy-time:focus-visible {
+  outline: 1px solid var(--accent);
 }
 
 .busy-note {
+  font-family: var(--font-ui);
   font-size: 13px;
   color: var(--muted);
-  flex: 1;
+  background: none;
+  border: none;
+  border-radius: 0;
+  padding: 0;
+  flex: 1 1 120px;
+  min-width: 0;
+}
+
+.busy-note:focus-visible {
+  outline: 1px solid var(--accent);
+}
+
+.busy-note::placeholder {
+  color: var(--faint);
 }
 
 .busy-remove {
-  font-size: 17px;
+  font-size: 16px;
   color: var(--faint);
   background: none;
   border: none;
@@ -625,18 +665,6 @@ select {
 
 .busy-remove:hover {
   color: var(--danger);
-}
-
-.busy-add-wrap {
-  display: flex;
-  gap: 8px;
-  padding: 11px 14px;
-  border-bottom: 1px solid var(--rule-med);
-}
-
-.busy-add-wrap select,
-.busy-add-wrap input {
-  font-size: 12px;
 }
 
 .btn-add-busy {
@@ -651,6 +679,7 @@ select {
   cursor: pointer;
   border-radius: 0;
   white-space: nowrap;
+  margin-top: 5px;
 }
 
 .btn-add-busy:hover {
@@ -894,14 +923,14 @@ select {
   font-size: 12px;
 }
 
-  .page-footer a {
-    color: var(--accent);
-  }
+.page-footer a {
+  color: var(--accent);
+}
 
-  .page-footer p {
-    max-width: 640px;
-    margin: 0 auto 6px;
-  }
+.page-footer p {
+  max-width: 640px;
+  margin: 0 auto 6px;
+}
 
 .footer-feedback {
   font-size: 10px;
@@ -923,7 +952,7 @@ select {
   }
 
   .strip-title {
-    font-size: 13px;
+    font-size: 12px;
     white-space: nowrap;
   }
 
@@ -932,6 +961,7 @@ select {
     letter-spacing: .07em;
     white-space: nowrap;
     padding: 3px 4px;
+    margin-top: 2px;
   }
 
   .chip-row {
@@ -1144,25 +1174,50 @@ select {
   }
 
   .busy-row {
-    padding: 12px 16px 12px 13px;
+    display: grid;
+    grid-template-columns: 1fr auto;
+    grid-template-areas:
+      "day remove"
+      "times times"
+      "note note";
+    row-gap: 8px;
+    column-gap: 8px;
+    padding: 12px 14px 12px 11px;
   }
 
-  .busy-day,
+  .busy-day {
+    grid-area: day;
+    font-size: 14px;
+    justify-self: start;
+  }
+
+  .busy-time-pair {
+    grid-area: times;
+  }
+
+  .busy-time-pair .busy-time {
+    flex: 1;
+  }
+
   .busy-time {
     font-size: 14px;
+    padding: 8px 6px;
+  }
+
+  .busy-note {
+    grid-area: note;
+    padding: 8px;
   }
 
   .busy-remove {
-    font-size: 18px;
-  }
-
-  .busy-add-wrap {
-    flex-wrap: wrap;
-    padding: 12px 16px;
+    grid-area: remove;
+    font-size: 15px;
+    margin-bottom: 2px;
   }
 
   .btn-add-busy {
-    flex: 1 1 100%;
+    display: block;
+    width: 100%;
     padding: 14px 0;
     text-align: center;
   }

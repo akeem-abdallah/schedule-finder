@@ -110,6 +110,14 @@ export function buildBlockedMask(filters) {
   }
 
   const validDays = DAYS.filter((day) => !filters.excludedDays.includes(day))
+  function setSlots(startSlot, endSlot) {
+
+    for (let slot = startSlot; slot < endSlot; slot++) {
+
+      setSlot(mask, slot)
+    }
+  }
+
 
   // filters nothing before
   if (filters.nothingBefore !== "") {
@@ -119,25 +127,31 @@ export function buildBlockedMask(filters) {
       let startSlot = DAYS.indexOf(day) * SLOTS_PER_DAY
       let endSlot = timeToSlot(day, filters.nothingBefore)
 
-      for (let slot = startSlot; slot < endSlot; slot++) {
-
-        setSlot(mask, slot)
-      }
+      setSlots(startSlot, endSlot)
     }
   }
 
   //filters nothing after
   if (filters.nothingAfter !== "") {
 
-    for (const day of validDays) {
+    for (let day of validDays) {
 
       let startSlot = timeToSlot(day, filters.nothingAfter)
       let endSlot = (DAYS.indexOf(day) + 1) * SLOTS_PER_DAY
 
-      for (let slot = startSlot; slot < endSlot; slot++) {
+      setSlots(startSlot, endSlot)
+    }
+  }
 
-        setSlot(mask, slot)
+  if (filters.busyBlocks.length === 0) return mask
+  for (const block of filters.busyBlocks) {
+    if (block.start_time === "" || block.end_time === "") continue
+    if (block.day === "ALL") {
+      for (const day of validDays) {
+        setSlots(timeToSlot(day, block.start_time), timeToSlot(day, block.end_time))
       }
+    } else {
+      setSlots(timeToSlot(block.day, block.start_time), timeToSlot(block.day, block.end_time))
     }
   }
 
