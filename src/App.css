@@ -624,7 +624,7 @@ select {
   color: var(--text);
   background: none;
   border: 1px solid var(--rule-med);
-  border-radius: 0;
+  border-radius: 2px;
   padding: 3px 5px;
   flex: none;
 }
@@ -639,9 +639,8 @@ select {
   font-size: 13px;
   color: var(--muted);
   background: none;
-  border: 1px solid var(--rule-med);
-  border-radius: 0;
-  padding: 3px 6px;
+  border: none;
+  padding: 4px 6px;
   flex: 1 1 120px;
   min-width: 0;
 }
@@ -663,6 +662,7 @@ select {
   cursor: pointer;
   padding: 0;
   line-height: 1;
+  margin-bottom: 2px;
 }
 
 .busy-remove:hover {
@@ -1202,6 +1202,7 @@ select {
 
   .busy-note {
     grid-area: note;
+    padding: 5px 10px;
   }
 
   .busy-remove {
