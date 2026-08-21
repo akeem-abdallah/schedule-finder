@@ -45,13 +45,24 @@ export function getEligibleSections(row, subjects) {
     eligible = eligibleCourse.sections.filter((s) => row.sections.includes(s.section_number))
   }
 
-  return eligible.map((s) => ({ ...s, courseSubject: eligibleSubject.subject, courseCode: eligibleCourse.code }))
+  return eligible.map((s) => ({ ...s, courseSubject: eligibleSubject.subject, courseCode: eligibleCourse.code, mask: sectionToMask(s) }))
+}
+
+export function passesFilters(section, blockedMask, filters) {
+
+  return !masksConflict(section.mask, blockedMask)
+    && (!filters.instructorAssigned || section.instructor !== "TBA")
+}
+
+export function emptyFilteredRow(rows, subjects, blockedMask, filters) {
+  return rows.find((row) => row.locked === null && getEligibleSections(row, subjects).length > 0 &&
+    getEligibleSections(row, subjects).filter((section) => passesFilters(section, blockedMask, filters)).length === 0)
 }
 
 // orders those eligible sections
-export function orderedEligibleLists(rows, subjects, blockedMask) {
+export function orderedEligibleLists(rows, subjects, blockedMask, filters) {
   const lists = rows.map((row) => row.locked ? getEligibleSections(row, subjects) :
-    getEligibleSections(row, subjects).filter((section) => !masksConflict(sectionToMask(section), blockedMask)))
+    getEligibleSections(row, subjects).filter((section) => passesFilters(section, blockedMask, filters)))
   return lists.sort((a, b) => a.length - b.length)
 }
 
@@ -75,6 +86,13 @@ export function setSlot(mask, slot) {
   const word = slot >> 5 // which sub mask
   const bit = slot & 31 // which position inside sub mask
   mask[word] |= 1 << bit // adds new bit into mask and moves by bit without removing anything because of |=
+}
+
+export function isSlotSet(mask, slot) {
+  const word = slot >> 5
+  const bit = slot & 31
+  return mask[word] & 1 << bit
+
 }
 
 // converts a section to a mask, so 9:00 to 10:15 would create 5 slots in a mask
@@ -175,7 +193,7 @@ export function masksConflict(maskA, maskB) {
 export function sectionsCompatible(sectionsA, sectionsB) {
   return sectionsA.some((secA) => sectionsB.some((secB) => {
 
-    if (!masksConflict(sectionToMask(secA), sectionToMask(secB))) {
+    if (!masksConflict(secA.mask, secB.mask)) {
       return true
     }
   }))
@@ -209,6 +227,36 @@ export function combineMasks(maskA, maskB) {
   return combined
 }
 
+export function combinedScheduleMask(schedule) {
+  const mask = new Array(MASK_WORDS).fill(0)
+
+  return schedule.reduce((accumulatedMask, section) => combineMasks(accumulatedMask, section.mask), mask)
+}
+
+export function longestGapMinutes(mask) {
+
+  let largestGap = 0
+  for (let dayIndex = 0; dayIndex < DAYS.length; dayIndex++) {
+    let firstSlot = null
+    let lastSlot = null
+    let occupiedSlots = 0
+    let gap = 0
+
+    for (let slot = dayIndex * SLOTS_PER_DAY; slot < dayIndex * SLOTS_PER_DAY + SLOTS_PER_DAY; slot++) {
+      if (firstSlot === null && isSlotSet(mask, slot)) firstSlot = slot
+      if (isSlotSet(mask, slot)) { lastSlot = slot, occupiedSlots++ }
+    }
+
+    if (occupiedSlots === 0) { continue } else {
+      gap = ((lastSlot - firstSlot + 1) - occupiedSlots) * 5
+    }
+    largestGap = Math.max(largestGap, gap)
+
+  }
+
+  return largestGap
+}
+
 // generate schedules
 export function generateSchedules(orderedLists) {
   const results = []
@@ -224,8 +272,8 @@ export function generateSchedules(orderedLists) {
     for (const section of schedulableLists[courseIndex]) {
 
       // if masks don't conflict, recurse with new acculumatedMask
-      if (!masksConflict(sectionToMask(section), accumulatedMask)) {
-        solve(courseIndex + 1, combineMasks(sectionToMask(section), accumulatedMask), [...chosenSoFar, section])
+      if (!masksConflict(section.mask, accumulatedMask)) {
+        solve(courseIndex + 1, combineMasks(section.mask, accumulatedMask), [...chosenSoFar, section])
       }
     }
   }

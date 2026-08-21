@@ -66,7 +66,6 @@ body {
   padding: 30px 20px 20px 20px;
 }
 
-/* desktop only — the card sits too high against the top of the viewport */
 @media (min-width: 641px) {
   .page-main {
     padding-top: 64px;
@@ -139,9 +138,9 @@ button {
   color: var(--accent-fg);
 }
 
-  .btn-primary:hover {
-    background-color: var(--accent-hover);
-  }
+.btn-primary:hover {
+  background-color: var(--accent-hover);
+}
 
 .btn-secondary {
   background: none;
@@ -149,9 +148,9 @@ button {
   color: var(--text);
 }
 
-  .btn-secondary:hover {
-    border-color: var(--rule-strong);
-  }
+.btn-secondary:hover {
+  border-color: var(--rule-strong);
+}
 
 .btn-destructive {
   color: var(--faint);
@@ -506,7 +505,7 @@ select {
 }
 
 .section-note {
-  padding: 8px 13px;
+  padding: 8px 0px;
   font-size: 13px;
   color: var(--muted);
   margin: 0;
@@ -531,6 +530,11 @@ select {
   border-bottom: 1px solid var(--rule-med);
 }
 
+.filter-block-tight {
+  border-bottom: none;
+  padding-bottom: 0px;
+}
+
 .filter-label {
   font-size: 11px;
   font-weight: 800;
@@ -553,7 +557,7 @@ select {
   border: 1px solid var(--rule-med);
   background: none;
   color: var(--muted);
-  padding: 6px 10px;
+  padding: 7px 10px;
   text-align: center;
   cursor: pointer;
   border-radius: 0;
@@ -586,7 +590,6 @@ select {
   flex-wrap: wrap;
   align-items: center;
   gap: 8px 13px;
-  margin: 0 -14px;
   padding: 9px 14px 9px 11px;
   border-bottom: 1px solid var(--rule);
   border-left: 3px solid var(--accent);
@@ -598,6 +601,7 @@ select {
   font-weight: 700;
   color: var(--accent);
   flex: none;
+
 }
 
 .busy-day:focus-visible {
@@ -669,6 +673,11 @@ select {
   color: var(--danger);
 }
 
+.busy-add-wrap {
+  padding: 11px 14px;
+  border-bottom: 1px solid var(--rule);
+}
+
 .btn-add-busy {
   font-size: 10px;
   font-weight: 800;
@@ -681,11 +690,94 @@ select {
   cursor: pointer;
   border-radius: 0;
   white-space: nowrap;
-  margin-top: 5px;
 }
 
 .btn-add-busy:hover {
   border-color: var(--rule-strong);
+}
+
+.filter-row {
+  display: flex;
+  align-items: center;
+  gap: 13px;
+  padding: 12px 14px 12px 11px;
+  border-bottom: 1px solid var(--rule);
+  border-left: 3px solid transparent;
+  cursor: pointer;
+  user-select: none;
+}
+
+.filter-row-selected {
+  border-left-color: var(--accent);
+  background: var(--section-selected-bg);
+}
+
+.filter-row-end {
+  border-bottom: 1px solid var(--rule-med);
+}
+
+.filter-footer {
+  display: flex;
+  align-items: center;
+  padding: 13px 14px;
+}
+
+.filter-count {
+  font-family: var(--font-data);
+  font-size: 11px;
+  letter-spacing: .06em;
+  color: var(--muted);
+}
+
+.filter-count b {
+  color: var(--accent);
+  font-weight: 700;
+}
+
+.filter-row-text {
+  flex: 1;
+  font-size: 14px;
+}
+
+.filter-row input[type="checkbox"] {
+  appearance: none;
+  -webkit-appearance: none;
+  width: 16px;
+  height: 16px;
+  margin: 0;
+  flex: none;
+  border: 1px solid var(--rule-med);
+  background-color: var(--surface);
+}
+
+.filter-row input[type="checkbox"]:checked {
+  background-color: var(--accent);
+  border-color: var(--accent);
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 12 10' fill='none'%3E%3Cpath d='M1 5l3.5 3.5L11 1.5' stroke='%23ffffff' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E");
+  background-repeat: no-repeat;
+  background-position: center;
+  background-size: 10px 8px;
+}
+
+@media (prefers-color-scheme: dark) {
+  .filter-row input[type="checkbox"]:checked {
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 12 10' fill='none'%3E%3Cpath d='M1 5l3.5 3.5L11 1.5' stroke='%2316150f' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E");
+  }
+}
+
+.filter-row-disabled {
+  opacity: .35;
+  cursor: default;
+}
+
+.chip-soon {
+  font-family: var(--font-data);
+  font-size: 10px;
+  font-weight: 700;
+  letter-spacing: .08em;
+  border: 1px solid var(--rule-med);
+  color: var(--muted);
+  padding: 2px 6px;
 }
 
 .btn-reset {
@@ -705,6 +797,10 @@ select {
 .btn-reset:hover {
   color: var(--danger);
   border-color: var(--danger);
+}
+
+.filter-active {
+  color: var(--accent);
 }
 
 
@@ -749,8 +845,6 @@ select {
   text-overflow: ellipsis;
 }
 
-/* dark-mode wash — must stay AFTER .class-block above, same reason as the
-   checkbox override: equal specificity, so position decides the winner */
 @media (prefers-color-scheme: dark) {
   .class-block {
     background-color: color-mix(in srgb, var(--hue) 24%, transparent);
@@ -774,14 +868,14 @@ select {
   border: none;
 }
 
-  .pager:hover:not(:disabled) {
-    color: var(--text);
-  }
+.pager:hover:not(:disabled) {
+  color: var(--text);
+}
 
-  .pager:disabled {
-    color: var(--faint);
-    cursor: default;
-  }
+.pager:disabled {
+  color: var(--faint);
+  cursor: default;
+}
 
 .counter-current {
   font-family: var(--font-data);
@@ -1102,11 +1196,11 @@ select {
     padding: 9px 15px 9px 10px;
   }
 
-    .section-row input[type="checkbox"] {
-      grid-column: 1;
-      grid-row: 1;
-      border-radius: 0;
-    }
+  .section-row input[type="checkbox"] {
+    grid-column: 1;
+    grid-row: 1;
+    border-radius: 0;
+  }
 
   .section-num {
     grid-column: 2;
@@ -1144,11 +1238,15 @@ select {
     z-index: 3;
   }
 
+  .section-note {
+      margin-top: -2px;
+  }
+
 
 
 
   .filter-chip {
-    padding: 11px 8px;
+    padding: 10px 0px;
   }
 
   .filter-chips-days {
@@ -1157,7 +1255,6 @@ select {
   }
 
   .filter-chips-days .filter-chip {
-    padding: 11px 0;
     min-width: 0;
   }
 
@@ -1169,10 +1266,6 @@ select {
   .filter-chips-times {
     display: grid;
     grid-template-columns: repeat(3, 1fr);
-  }
-
-  .filter-chips-times .filter-chip {
-    padding: 11px 0;
   }
 
   .busy-row {
@@ -1188,7 +1281,7 @@ select {
 
   .busy-day {
     grid-area: day;
-    font-size: 14px;
+    font-size: 13px;
     justify-self: start;
   }
 
@@ -1211,6 +1304,10 @@ select {
     justify-self: end;
   }
 
+  .busy-add-wrap {
+    padding: 12px 14px;
+  }
+
   .btn-add-busy {
     display: block;
     width: 100%;
@@ -1218,8 +1315,25 @@ select {
     text-align: center;
   }
 
+  .filter-row {
+    padding: 13px 14px 13px 11px;
+  }
 
+  .filter-footer {
+    flex-direction: column;
+    align-items: stretch;
+    gap: 11px;
+  }
 
+  .filter-count {
+    text-align: center;
+    padding: 7px 0 2px 0;
+  }
+
+  .btn-done {
+    margin-left: 0;
+    padding: 16px 0;
+  }
 
 
   .weekly-grid {

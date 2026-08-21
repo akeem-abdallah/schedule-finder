@@ -23,16 +23,20 @@ describe("masksConflict", () => {
 
 describe("generateSchedules", () => {
   it("finds the one valid combination when two courses' sections don't conflict", () => {
-    const courseA = [{ meetings: [{ day: "Mon", start_time: "09:00", end_time: "10:15" }] }]
-    const courseB = [{ meetings: [{ day: "Tue", start_time: "09:00", end_time: "10:15" }] }]
-    const results = generateSchedules([courseA, courseB])
+    const sectionA = { meetings: [{ day: "Mon", start_time: "09:00", end_time: "10:15" }] }
+    sectionA.mask = sectionToMask(sectionA)
+    const sectionB = { meetings: [{ day: "Tue", start_time: "09:00", end_time: "10:15" }] }
+    sectionB.mask = sectionToMask(sectionB)
+    const results = generateSchedules([[sectionA], [sectionB]])
     expect(results.length).toBe(1)
   })
 
   it("finds zero combinations when a course's only section always conflicts", () => {
-    const courseA = [{ meetings: [{ day: "Mon", start_time: "09:00", end_time: "10:15" }] }]
-    const courseB = [{ meetings: [{ day: "Mon", start_time: "09:30", end_time: "10:30" }] }]
-    const results = generateSchedules([courseA, courseB])
+    const sectionA = { meetings: [{ day: "Mon", start_time: "09:00", end_time: "10:15" }] }
+    sectionA.mask = sectionToMask(sectionA)
+    const sectionB = { meetings: [{ day: "Mon", start_time: "09:30", end_time: "10:30" }] }
+    sectionB.mask = sectionToMask(sectionB)
+    const results = generateSchedules([[sectionA], [sectionB]])
     expect(results.length).toBe(0)
   })
 })

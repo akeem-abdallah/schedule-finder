@@ -1,6 +1,6 @@
 import './App.css'
 import { useState, Fragment, useEffect, useMemo } from 'react'
-import { DAYS, generateSchedules, orderedEligibleLists, findIncompatiblePairs, timeToMinutes, to12Hour, formatMeetings, buildBlockedMask } from './schedule'
+import { DAYS, generateSchedules, getEligibleSections, orderedEligibleLists, findIncompatiblePairs, timeToMinutes, to12Hour, formatMeetings, buildBlockedMask, combinedScheduleMask, longestGapMinutes, emptyFilteredRow } from './schedule'
 import { Analytics } from "@vercel/analytics/react"
 
 // course colors in weekly grid render
@@ -37,23 +37,36 @@ function groupBySubject(courses) {
 }
 
 // tries to load rows from localStorage by going through checks, otherwise returns null
-function loadRowsFromStorage() {
-  const saved = localStorage.getItem("rows")
+
+function loadFromStorage(type) {
+  const saved = localStorage.getItem(type)
   if (!saved) return null
 
   try {
     const parsed = JSON.parse(saved)
+    let isValid
 
-    if (!Array.isArray(parsed)) return null
+    if (type === "rows") {
+      if (!Array.isArray(parsed)) return null
+      isValid = parsed.every((row) =>
+        typeof row === "object" && row !== null &&
+        typeof row.subject === "string" &&
+        typeof row.code === "string" &&
+        Array.isArray(row.sections)
+      )
 
-    const isValid = parsed.every((row) =>
-      typeof row === "object" && row !== null &&
-      typeof row.subject === "string" &&
-      typeof row.code === "string" &&
-      Array.isArray(row.sections)
-    )
+      return isValid ? parsed : null
 
-    return isValid ? parsed : null
+    } else if (type === "filters") {
+      isValid = typeof parsed === "object" && parsed !== null && !Array.isArray(parsed) &&
+        Array.isArray(parsed.excludedDays) &&
+        Array.isArray(parsed.busyBlocks) &&
+        typeof parsed.instructorAssigned === "boolean"
+
+      return isValid ? parsed : null
+    }
+
+    return null
 
   } catch {
     return null
@@ -84,7 +97,10 @@ function App() {
     excludedDays: [],
     nothingBefore: "",
     nothingAfter: "",
-    busyBlocks: []
+    busyBlocks: [],
+    instructorAssigned: false,
+    fullSections: false,
+    longestGap: ""
   })
 
   const [lastUpdated, setLastUpdated] = useState(null)
@@ -140,9 +156,16 @@ function App() {
 
   // loads courses from localStorage
   useEffect(() => {
-    const loaded = loadRowsFromStorage()
+    const loaded = loadFromStorage("rows")
     if (loaded) {
       setRows(loaded)
+    }
+  }, [])
+
+  useEffect(() => {
+    const loaded = loadFromStorage("filters")
+    if (loaded) {
+      setFilters(loaded)
     }
   }, [])
 
@@ -150,6 +173,10 @@ function App() {
   useEffect(() => {
     localStorage.setItem("rows", JSON.stringify(rows))
   }, [rows])
+
+  useEffect(() => {
+    localStorage.setItem("filters", JSON.stringify(filters))
+  }, [filters])
 
   // creates an array of credits for each re-render
   const creditList = rows.map((row) => {
@@ -166,6 +193,17 @@ function App() {
 
   // .reduce iterates elements of an array into one output
   const totalCredits = creditList.reduce((sum, c) => sum + c, 0)
+  const totalEligibleSections = rows.reduce((sum, row) => sum + getEligibleSections(row, subjects).length, 0)
+  const excludedSections = totalEligibleSections - orderedEligibleLists(rows, subjects, buildBlockedMask(filters), filters).reduce((sum, list) => sum + list.length, 0)
+
+  const activeFilterCount = [
+    filters.excludedDays.length > 0,
+    filters.nothingBefore !== "",
+    filters.nothingAfter !== "",
+    filters.busyBlocks.length > 0,
+    filters.instructorAssigned,
+    filters.longestGap !== ""
+  ].filter(Boolean).length
 
   // sets the schedule index
   function setIndex(increment) {
@@ -229,6 +267,13 @@ function App() {
 
   const START_TIMES = ["", "08:00", "09:00", "10:30", "12:00", "13:30"]
   const END_TIMES = ["11:45", "13:15", "14:45", "16:15", "17:45", ""]
+  const LONGEST_GAP_OPTIONS = [
+    { label: "NONE", minutes: 15 },
+    { label: "1 HR", minutes: 60 },
+    { label: "2 HR", minutes: 120 },
+    { label: "3 HR", minutes: 180 },
+    { label: "ANY", minutes: "" },
+  ]
 
   function removeBusyBlock(id) {
     updateFilters({ busyBlocks: filters.busyBlocks.filter((block) => block.id !== id) })
@@ -261,14 +306,21 @@ function App() {
 
       // setTimeout only runs when the main code finishes running
       setTimeout(() => {
-        const eligibleLists = orderedEligibleLists(rows, subjects, buildBlockedMask(filters))
-        const generated = generateSchedules(eligibleLists)
+        const blockedMask = buildBlockedMask(filters)
+        const eligibleLists = orderedEligibleLists(rows, subjects, blockedMask, filters)
+        let generated = generateSchedules(eligibleLists)
+        if (filters.longestGap !== "") generated = generated.filter((schedule) => longestGapMinutes(combinedScheduleMask(schedule)) <= filters.longestGap)
 
         if (generated.length === 0) {
-          const pairs = findIncompatiblePairs(eligibleLists)
+          const row = emptyFilteredRow(rows, subjects, blockedMask, filters)
+          if (row) {
+            showError(`No sections of ${row.subject} ${row.code} fit your filters.`)
+          } else {
+            const pairs = findIncompatiblePairs(eligibleLists)
 
-          pairs.length === 0 ? showError("No schedules found.") :
-            showError(`${pairs[0].a[0].courseSubject} ${pairs[0].a[0].courseCode} is incompatible with ${pairs[0].b[0].courseSubject} ${pairs[0].b[0].courseCode}`)
+            pairs.length === 0 ? showError("No schedules found.") :
+              showError(`${pairs[0].a[0].courseSubject} ${pairs[0].a[0].courseCode} is incompatible with ${pairs[0].b[0].courseSubject} ${pairs[0].b[0].courseCode}`)
+          }
 
         } else {
           setError("")
@@ -338,9 +390,7 @@ function App() {
   function courseSelectionView() {
 
     return (
-
       <>
-
         <div className="table-header">
           <span>SUBJ</span>
           <span>CODE</span>
@@ -404,7 +454,9 @@ function App() {
 
           <div className="footer-primary-actions">
             <button className="btn-secondary" onClick={addRow}>+ ADD COURSE</button>
-            <button className="btn-secondary" onClick={() => setFiltersOpen(!filtersOpen)}>FILTERS</button>
+            <button className={`btn-secondary ${activeFilterCount !== 0 ? "filter-active" : ""}`} onClick={() => setFiltersOpen(!filtersOpen)}>
+              FILTERS{activeFilterCount > 0 ? ` (${activeFilterCount})` : ""}
+            </button>
           </div>
           <div className="spacer"></div>
           <div className="footer-top-row">
@@ -461,7 +513,10 @@ function App() {
           )
         })}
 
-        <p className="section-note">Leave all sections unchecked to include every one of them.</p>
+        <div className="table-footer">
+          <p className="section-note">Leave all sections unchecked to include every one of them.</p>
+          <button className="btn-primary" onClick={() => setFiltersOpen(false)}>DONE →</button>
+        </div>
       </>
     )
   }
@@ -477,7 +532,10 @@ function App() {
               excludedDays: [],
               nothingBefore: "",
               nothingAfter: "",
-              busyBlocks: []
+              busyBlocks: [],
+              instructorAssigned: false,
+              fullSections: false,
+              longestGap: ""
             })}}>RESET ALL</button>
           <span className="section-code">FILTERS</span>
         </div>
@@ -502,60 +560,88 @@ function App() {
         </div>
 
         <div className="filter-block">
-          <div className="filter-label">EARLIEST</div>
+          <div className="filter-label">COURSES START AFTER</div>
           <div className="filter-chips filter-chips-times">
             {START_TIMES.map((time) => (
               <button
                 key={time}
                 className={`filter-chip ${filters.nothingBefore === time ? "filter-chip-active" : ""}`}
                 onClick={() => updateFilters({ nothingBefore: time })}>
-                {time === "" ? "ANY" : to12Hour(time)}
+                {time === "" ? "NONE" : to12Hour(time)}
               </button>
             ))}
           </div>
         </div>
 
         <div className="filter-block">
-          <div className="filter-label">LATEST</div>
+          <div className="filter-label">COURSES END BEFORE</div>
           <div className="filter-chips filter-chips-times">
             {END_TIMES.map((time) => (
               <button
                 key={time}
                 className={`filter-chip ${filters.nothingAfter === time ? "filter-chip-active" : ""}`}
                 onClick={() => updateFilters({ nothingAfter: time })}>
-                {time === "" ? "ANY" : to12Hour(time)}
+                {time === "" ? "NONE" : to12Hour(time)}
               </button>
             ))}
           </div>
         </div>
 
         <div className="filter-block">
-          <div className="filter-label">BUSY TIMES</div>
-          <div>
-            {filters.busyBlocks.map((block) => (
-              <div key={block.id} className="busy-row">
-                  <select value={block.day} className="busy-day" onChange={(e) => updateBusyBlock(block.id, { day: e.target.value })}>
-                    <option value="ALL">ALL</option>
-                    {DAYS.map((day) => (
-                      <option key={day} value={day}>{day}</option>
-                    ))}
-                  </select>
-                <div className="busy-time-pair">
-                  <input type="time" className="busy-time" value={block.start_time}
-                    onChange={(e) => updateBusyBlock(block.id, { start_time: e.target.value })} />
-                  <span className="busy-time-sep">to </span>
-                  <input type="time" className="busy-time" value={block.end_time}
-                    onChange={(e) => updateBusyBlock(block.id, { end_time: e.target.value })} />
-                </div>
-                <input type="text" className="busy-note" value={block.note} placeholder="note (optional)"
-                  onChange={(e) => updateBusyBlock(block.id, { note: e.target.value })} />
-                <button className="busy-remove" aria-label="Remove busy time" onClick={() => removeBusyBlock(block.id)}>×</button>
-              </div>
+          <div className="filter-label">LONGEST BREAK</div>
+          <div className="filter-chips">
+            {LONGEST_GAP_OPTIONS.map((option) => (
+              <button
+                key={option.label}
+                className={`filter-chip ${filters.longestGap === option.minutes ? "filter-chip-active" : ""}`}
+                onClick={() => updateFilters({ longestGap: option.minutes })}>
+                {option.label.toUpperCase()}
+              </button>
             ))}
           </div>
+        </div>
 
+        <label className={`filter-row ${filters.instructorAssigned ? "filter-row-selected" : ""}`}>
+          <input type="checkbox" checked={filters.instructorAssigned} onChange={() => updateFilters({ instructorAssigned: !filters.instructorAssigned })} />
+          <span className="filter-row-text">Only sections with an assigned instructor</span>
+        </label>
+        <label className="filter-row filter-row-end filter-row-disabled">
+          <input type="checkbox" disabled={true} />
+          <span className="filter-row-text">Include full sections</span>
+          <span className="chip-soon">SOON</span>
+        </label>
 
+        <div className="filter-block filter-block-tight">
+          <div className="filter-label">BUSY TIMES</div>
+        </div>
+        {filters.busyBlocks.map((block) => (
+          <div key={block.id} className="busy-row">
+            <select value={block.day} className="busy-day" onChange={(e) => updateBusyBlock(block.id, { day: e.target.value })}>
+              <option value="ALL">ALL</option>
+              {DAYS.map((day) => (
+                <option key={day} value={day}>{day}</option>
+              ))}
+            </select>
+            <div className="busy-time-pair">
+              <input type="time" className="busy-time" value={block.start_time}
+                onChange={(e) => updateBusyBlock(block.id, { start_time: e.target.value })} />
+              <span className="busy-time-sep">to </span>
+              <input type="time" className="busy-time" value={block.end_time}
+                onChange={(e) => updateBusyBlock(block.id, { end_time: e.target.value })} />
+            </div>
+            <input type="text" className="busy-note" value={block.note} placeholder="note (optional)"
+              onChange={(e) => updateBusyBlock(block.id, { note: e.target.value })} />
+            <button className="busy-remove" aria-label="Remove busy time" onClick={() => removeBusyBlock(block.id)}>×</button>
+          </div>
+        ))}
+        <div className="busy-add-wrap">
           <button className="btn-add-busy" onClick={addBusyBlock}>+ ADD BUSY TIME</button>
+        </div>
+
+        <div className="table-footer">
+          <div className="filter-count">EXCLUDED <b>{excludedSections}</b> OF <b>{totalEligibleSections}</b> SECTIONS</div>
+          <span className="spacer"></span>
+          <button className="btn-primary" onClick={() => setFiltersOpen(false)}>DONE →</button>
         </div>
 
       </>
