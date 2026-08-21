@@ -75,7 +75,8 @@ export function timeToMinutes(time) {
 // converts minutes to slot (156 slots per day, day starts at 8:00) each slot is 5 min, formula: 1(Tue) * 156 + (780 - 480) / 5 = 216
 export function timeToSlot(day, time) {
   const dayIndex = DAYS.indexOf(day)
-  return dayIndex * SLOTS_PER_DAY + (timeToMinutes(time) - DAY_START) / 5
+  const offset = Math.floor((timeToMinutes(time) - DAY_START) / 5)
+  return dayIndex * SLOTS_PER_DAY + Math.max(0, Math.min(SLOTS_PER_DAY, offset))
 }
 
 // js stores each number with 32 bits, so 32 x 35 = 1120, 156 x 7 = 1092
@@ -202,13 +203,14 @@ export function sectionsCompatible(sectionsA, sectionsB) {
 // checks every pair of course section-lists, returns the ones that can't coexist at all
 export function findIncompatiblePairs(eligibleLists) {
   const incompatible = []
+  const lists = eligibleLists.filter((list) => list.length > 0)
 
-  for (let i = 0; i < eligibleLists.length; i++) {
+  for (let i = 0; i < lists.length; i++) {
 
     for (let j = 0; j < i; j++) {
 
-      if (!sectionsCompatible(eligibleLists[i], eligibleLists[j])) {
-        incompatible.push({ a: eligibleLists[i], b: eligibleLists[j] })
+      if (!sectionsCompatible(lists[i], lists[j])) {
+        incompatible.push({ a: lists[i], b: lists[j] })
       }
     }
   }
@@ -258,18 +260,26 @@ export function longestGapMinutes(mask) {
 }
 
 // generate schedules
+export function scheduledLists(orderedLists) {
+  return orderedLists
+    .map((list) => list.filter((section) => section.meetings.length > 0))
+    .filter((list) => list.length > 0)
+}
+
 export function generateSchedules(orderedLists) {
   const results = []
-  const schedulableLists = orderedLists.filter(list => list.some(s => s.meetings.length > 0))
+  if (orderedLists.length === 0 || orderedLists.some((list) => list.length === 0)) return results
+
+  const lists = scheduledLists(orderedLists)
 
   // solves each schedule recursively
   function solve(courseIndex, accumulatedMask, chosenSoFar) {
-    if (courseIndex >= schedulableLists.length) {
+    if (courseIndex >= lists.length) {
       results.push(chosenSoFar)
       return results // base case, push schedule result
     }
 
-    for (const section of schedulableLists[courseIndex]) {
+    for (const section of lists[courseIndex]) {
 
       // if masks don't conflict, recurse with new acculumatedMask
       if (!masksConflict(section.mask, accumulatedMask)) {
@@ -279,7 +289,7 @@ export function generateSchedules(orderedLists) {
   }
 
   // initiate schedule generation
-  if (schedulableLists.length === 0) return results
+  if (lists.length === 0) return results
   solve(0, new Array(MASK_WORDS).fill(0), [])
   return results
 }

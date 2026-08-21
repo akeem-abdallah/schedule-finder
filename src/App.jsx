@@ -1,6 +1,6 @@
 import './App.css'
 import { useState, Fragment, useEffect, useMemo } from 'react'
-import { DAYS, generateSchedules, getEligibleSections, orderedEligibleLists, findIncompatiblePairs, timeToMinutes, to12Hour, formatMeetings, buildBlockedMask, combinedScheduleMask, longestGapMinutes, emptyFilteredRow } from './schedule'
+import { DAYS, generateSchedules, getEligibleSections, orderedEligibleLists, findIncompatiblePairs, scheduledLists, timeToMinutes, to12Hour, formatMeetings, buildBlockedMask, combinedScheduleMask, longestGapMinutes, emptyFilteredRow } from './schedule'
 import { Analytics } from "@vercel/analytics/react"
 
 // course colors in weekly grid render
@@ -36,6 +36,28 @@ function groupBySubject(courses) {
   return grouped
 }
 
+const DEFAULT_FILTERS = {
+  excludedDays: [],
+  nothingBefore: "",
+  nothingAfter: "",
+  busyBlocks: [],
+  instructorAssigned: false,
+  fullSections: false,
+  longestGap: ""
+}
+
+function isTimeValue(value) {
+  return value === "" || (typeof value === "string" && /^\d{1,2}:\d{2}$/.test(value))
+}
+
+function isValidBusyBlock(block) {
+  return typeof block === "object" && block !== null &&
+    typeof block.id === "number" && Number.isFinite(block.id) &&
+    (block.day === "ALL" || DAYS.includes(block.day)) &&
+    isTimeValue(block.start_time) && isTimeValue(block.end_time) &&
+    typeof block.note === "string"
+}
+
 // tries to load rows from localStorage by going through checks, otherwise returns null
 
 function loadFromStorage(type) {
@@ -58,12 +80,18 @@ function loadFromStorage(type) {
       return isValid ? parsed : null
 
     } else if (type === "filters") {
-      isValid = typeof parsed === "object" && parsed !== null && !Array.isArray(parsed) &&
-        Array.isArray(parsed.excludedDays) &&
-        Array.isArray(parsed.busyBlocks) &&
-        typeof parsed.instructorAssigned === "boolean"
+      if (typeof parsed !== "object" || parsed === null || Array.isArray(parsed)) return null
 
-      return isValid ? parsed : null
+      const merged = { ...DEFAULT_FILTERS, ...parsed }
+      isValid =
+        Array.isArray(merged.excludedDays) && merged.excludedDays.every((d) => DAYS.includes(d)) &&
+        isTimeValue(merged.nothingBefore) && isTimeValue(merged.nothingAfter) &&
+        typeof merged.instructorAssigned === "boolean" &&
+        typeof merged.fullSections === "boolean" &&
+        (merged.longestGap === "" || typeof merged.longestGap === "number") &&
+        Array.isArray(merged.busyBlocks) && merged.busyBlocks.every(isValidBusyBlock)
+
+      return isValid ? merged : null
     }
 
     return null
@@ -93,15 +121,7 @@ function App() {
   const [courses, setCourses] = useState([])
   const subjects = useMemo(() => groupBySubject(courses), [courses])
 
-  const [filters, setFilters] = useState({
-    excludedDays: [],
-    nothingBefore: "",
-    nothingAfter: "",
-    busyBlocks: [],
-    instructorAssigned: false,
-    fullSections: false,
-    longestGap: ""
-  })
+  const [filters, setFilters] = useState(DEFAULT_FILTERS)
 
   const [lastUpdated, setLastUpdated] = useState(null)
 
@@ -280,7 +300,8 @@ function App() {
   }
 
   function addBusyBlock() {
-    const nextId = filters.busyBlocks.length === 0 ? 1 : Math.max(...filters.busyBlocks.map((f) => f.id)) + 1
+    const ids = filters.busyBlocks.map((f) => f.id).filter((id) => Number.isFinite(id))
+    const nextId = ids.length === 0 ? 1 : Math.max(...ids) + 1
     updateFilters({ busyBlocks: [...filters.busyBlocks, { ...{ day: "ALL", start_time: "", end_time: "", note: "" }, id: nextId }] })
   }
 
@@ -308,13 +329,31 @@ function App() {
       setTimeout(() => {
         const blockedMask = buildBlockedMask(filters)
         const eligibleLists = orderedEligibleLists(rows, subjects, blockedMask, filters)
-        let generated = generateSchedules(eligibleLists)
-        if (filters.longestGap !== "") generated = generated.filter((schedule) => longestGapMinutes(combinedScheduleMask(schedule)) <= filters.longestGap)
+        const generated = generateSchedules(eligibleLists)
+        const withinGap = filters.longestGap === "" ? generated :
+          generated.filter((schedule) => longestGapMinutes(combinedScheduleMask(schedule)) <= filters.longestGap)
 
-        if (generated.length === 0) {
+        if (withinGap.length === 0) {
+          const gapOption = LONGEST_GAP_OPTIONS.find((option) => option.minutes === filters.longestGap)
+          const impossibleWindow = filters.nothingBefore !== "" && filters.nothingAfter !== "" &&
+            timeToMinutes(filters.nothingBefore) >= timeToMinutes(filters.nothingAfter)
           const row = emptyFilteredRow(rows, subjects, blockedMask, filters)
-          if (row) {
+
+          if (eligibleLists.every((list) => list.length > 0) && scheduledLists(eligibleLists).length === 0) {
+            showError("None of your courses have scheduled meeting times.")
+
+          } else if (generated.length > 0) {
+            showError(`No schedules match LONGEST BREAK: ${gapOption.label}. Try a longer one.`)
+
+          } else if (filters.excludedDays.length === DAYS.length) {
+            showError("Every day is marked as a day off.")
+
+          } else if (impossibleWindow) {
+            showError(`Courses can't both start after ${to12Hour(filters.nothingBefore)} and end before ${to12Hour(filters.nothingAfter)}.`)
+
+          } else if (row) {
             showError(`No sections of ${row.subject} ${row.code} fit your filters.`)
+
           } else {
             const pairs = findIncompatiblePairs(eligibleLists)
 
@@ -324,7 +363,7 @@ function App() {
 
         } else {
           setError("")
-          setResults(generated)
+          setResults(withinGap)
           setCurrentIndex(0)
         }
         setLoading(false)
@@ -376,8 +415,8 @@ function App() {
   const lastIndex = Math.max(3, ...usedIndexes)
   const activeDays = DAYS.slice(firstIndex, lastIndex + 1)
 
-  const earliestMinute = Math.min(...meetingTimes)
-  const latestMinute = Math.max(...meetingTimes)
+  const earliestMinute = meetingTimes.length === 0 ? 480 : Math.min(...meetingTimes)
+  const latestMinute = meetingTimes.length === 0 ? 1020 : Math.max(...meetingTimes)
   const startHour = Math.floor(earliestMinute / 60)
   const endHour = Math.ceil(latestMinute / 60)
   const activeHours = []
@@ -527,16 +566,7 @@ function App() {
         <div className="sub-strip">
           <button onClick={() => setFiltersOpen(false)}>← BACK</button>
           <span className="spacer"></span>
-          <button className="btn-reset" onClick={() => {
-            updateFilters({
-              excludedDays: [],
-              nothingBefore: "",
-              nothingAfter: "",
-              busyBlocks: [],
-              instructorAssigned: false,
-              fullSections: false,
-              longestGap: ""
-            })}}>RESET ALL</button>
+          <button className="btn-reset" onClick={() => updateFilters(DEFAULT_FILTERS)}>RESET ALL</button>
           <span className="section-code">FILTERS</span>
         </div>
 
@@ -623,10 +653,10 @@ function App() {
               ))}
             </select>
             <div className="busy-time-pair">
-              <input type="time" className="busy-time" value={block.start_time}
+              <input type="time" className="busy-time" min="08:00" max="21:00" value={block.start_time}
                 onChange={(e) => updateBusyBlock(block.id, { start_time: e.target.value })} />
               <span className="busy-time-sep">to </span>
-              <input type="time" className="busy-time" value={block.end_time}
+              <input type="time" className="busy-time" min="08:00" max="21:00" value={block.end_time}
                 onChange={(e) => updateBusyBlock(block.id, { end_time: e.target.value })} />
             </div>
             <input type="text" className="busy-note" value={block.note} placeholder="note (optional)"
