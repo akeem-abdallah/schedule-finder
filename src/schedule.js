@@ -52,6 +52,7 @@ export function passesFilters(section, blockedMask, filters) {
 
   return !masksConflict(section.mask, blockedMask)
     && (!filters.instructorAssigned || section.instructor !== "TBA")
+    && (filters.fullSections || section.available_seats > 0)
 }
 
 export function emptyFilteredRow(rows, subjects, blockedMask, filters) {

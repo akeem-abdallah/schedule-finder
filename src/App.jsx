@@ -1,6 +1,6 @@
 import './App.css'
 import { useState, Fragment, useEffect, useMemo } from 'react'
-import { DAYS, generateSchedules, getEligibleSections, orderedEligibleLists, findIncompatiblePairs, scheduledLists, timeToMinutes, to12Hour, formatMeetings, buildBlockedMask, combinedScheduleMask, longestGapMinutes, emptyFilteredRow } from './schedule'
+import { DAYS, generateSchedules, getEligibleSections, orderedEligibleLists, findIncompatiblePairs, scheduledLists, timeToMinutes, to12Hour, formatMeetings, buildBlockedMask, combinedScheduleMask, longestGapMinutes, emptyFilteredRow, passesFilters } from './schedule'
 import { Analytics } from "@vercel/analytics/react"
 
 // course colors in weekly grid render
@@ -213,8 +213,9 @@ function App() {
 
   // .reduce iterates elements of an array into one output
   const totalCredits = creditList.reduce((sum, c) => sum + c, 0)
+  const blockedMask = buildBlockedMask(filters)
   const totalEligibleSections = rows.reduce((sum, row) => sum + getEligibleSections(row, subjects).length, 0)
-  const excludedSections = totalEligibleSections - orderedEligibleLists(rows, subjects, buildBlockedMask(filters), filters).reduce((sum, list) => sum + list.length, 0)
+  const excludedSections = totalEligibleSections - orderedEligibleLists(rows, subjects, blockedMask, filters).reduce((sum, list) => sum + list.length, 0)
 
   const activeFilterCount = [
     filters.excludedDays.length > 0,
@@ -222,6 +223,7 @@ function App() {
     filters.nothingAfter !== "",
     filters.busyBlocks.length > 0,
     filters.instructorAssigned,
+    filters.fullSections,
     filters.longestGap !== ""
   ].filter(Boolean).length
 
@@ -352,7 +354,19 @@ function App() {
             showError(`Courses can't both start after ${to12Hour(filters.nothingBefore)} and end before ${to12Hour(filters.nothingAfter)}.`)
 
           } else if (row) {
-            showError(`No sections of ${row.subject} ${row.code} fit your filters.`)
+            const rowEligible = getEligibleSections(row, subjects)
+
+            // the student ticked sections, and every one of them is filtered out
+            if (row.sections.length > 0) {
+              showError(`Your selected sections of ${row.subject} ${row.code} are excluded by your filters.`)
+
+            // nothing ticked, and the whole course is full
+            } else if (!filters.fullSections && rowEligible.every((s) => s.available_seats === 0)) {
+              showError(`All sections of ${row.subject} ${row.code} are full.`)
+
+            } else {
+              showError(`No sections of ${row.subject} ${row.code} fit your filters.`)
+            }
 
           } else {
             const pairs = findIncompatiblePairs(eligibleLists)
@@ -445,6 +459,7 @@ function App() {
           const courses = currentSubject ? currentSubject.courses : []
           const rowCourse = courses.find((c) => c.code === row.code)
           const isInProgress = row.subject !== "" && row.code === ""
+          const usableCount = getEligibleSections(row, subjects).filter((s) => passesFilters(s, blockedMask, filters)).length
 
           return (
 
@@ -477,7 +492,7 @@ function App() {
                     <button className="btn-secondary" aria-label={`Edit sections for ${row.subject} ${row.code}`}
                       onClick={() => setCustomizingID(row.id)}>EDIT</button>
                     <span className={`sec-text ${row.sections.length !== 0 ? "sec-text-accent" : ""} ${row.locked ? "lock-toggle-active" : ""}`} onClick={() => row.locked ? updateRow(row.id, { locked: null }) : {}}>
-                      {row.locked ? <LockIcon locked={true} /> : (row.sections.length === 0 || row.sections.length === rowCourse.sections.length ? "ALL" : `${row.sections.length}/${rowCourse.sections.length}`)}</span>
+                      {row.locked ? <LockIcon locked={true} /> : (usableCount === rowCourse.sections.length ? "ALL" : `${usableCount}/${rowCourse.sections.length}`)}</span>
                   </>
                 )}
               </div>
@@ -527,9 +542,11 @@ function App() {
           const isSelected = customizingRow.sections.includes(s.section_number)
           const isLockedSection = customizingRow.locked === s.section_number
           const otherLocked = customizingRow.locked && !isLockedSection
+          const isTBA = s.instructor === "TBA" && filters.instructorAssigned && !isLockedSection
+          const isFull = s.available_seats === 0 && !filters.fullSections && !isLockedSection
           return (
-            <label key={s.section_number} className={`section-row${isSelected ? " section-row-selected" : ""}${otherLocked ? " section-row-disabled" : ""}${isLockedSection ? " section-row-locked" : ""}`}>
-              <input type="checkbox" checked={isSelected} disabled={otherLocked || isLockedSection} onChange={() => {
+            <label key={s.section_number} className={`section-row${isSelected ? " section-row-selected" : ""}${(otherLocked || isFull || isTBA) ? " section-row-disabled" : ""}${isLockedSection ? " section-row-locked" : ""}`}>
+              <input type="checkbox" checked={isSelected} disabled={otherLocked || isLockedSection || isFull || isTBA} onChange={() => {
                 const alreadyIn = customizingRow.sections.includes(s.section_number)
                 const newSections = alreadyIn
                   ? customizingRow.sections.filter((sec) => sec !== s.section_number)
@@ -538,7 +555,7 @@ function App() {
               }} />
               <span className="section-num">{s.section_number.length === 1 ? "0" + s.section_number : s.section_number}</span>
               <span className="section-instructor">{s.instructor}</span>
-              {isSelected && !otherLocked && (
+              {isSelected && !otherLocked && !isFull && !isTBA && (
                 <button type="button" className={isLockedSection ? "lock-toggle lock-toggle-active" : "lock-toggle"} aria-label={isLockedSection ? "Unlock section" : "Lock section"}
                   onClick={() => {
                     updateRow(customizingID, { locked: isLockedSection ? null : s.section_number })
@@ -546,6 +563,7 @@ function App() {
                   <LockIcon locked={isLockedSection} />
                 </button>
               )}
+              <span className="section-seats">{s.available_seats === 0 ? "FULL" : s.available_seats + (s.available_seats === 1 ? " SEAT" : " SEATS")}</span>
               <span className="section-meeting">{formatMeetings(s.meetings)}</span>
 
             </label>
@@ -635,10 +653,9 @@ function App() {
           <input type="checkbox" checked={filters.instructorAssigned} onChange={() => updateFilters({ instructorAssigned: !filters.instructorAssigned })} />
           <span className="filter-row-text">Only sections with an assigned instructor</span>
         </label>
-        <label className="filter-row filter-row-end filter-row-disabled">
-          <input type="checkbox" disabled={true} />
+        <label className={`filter-row ${filters.fullSections ? "filter-row-selected" : ""}`}>
+          <input type="checkbox" checked={filters.fullSections} onChange={() => updateFilters({ fullSections: !filters.fullSections })} />
           <span className="filter-row-text">Include full sections</span>
-          <span className="chip-soon">SOON</span>
         </label>
 
         <div className="filter-block filter-block-tight">
