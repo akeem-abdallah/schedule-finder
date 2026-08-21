@@ -968,6 +968,12 @@ select {
   display: none;
 }
 
+.block-room {
+  font-family: var(--font-data);
+  font-size: 11px;
+  color: var(--muted);
+}
+
 /* ── Toast ── */
 
 .toast {

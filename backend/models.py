@@ -22,6 +22,7 @@ class Section(Base):
     course_id = Column(Integer, ForeignKey("courses.id"), nullable=False)
     section_number = Column(String, nullable=False)
     instructor = Column(String, nullable=False)
+    available_seats = Column(Integer, nullable=True)
     course = relationship("Course", back_populates="sections")
     meetings = relationship("Meeting", back_populates="section")
 
@@ -34,6 +35,7 @@ class Meeting(Base):
     day = Column(String, nullable=False)
     start_time = Column(String, nullable=False)
     end_time = Column(String, nullable=False)
+    room = Column(String, nullable=True)
     section = relationship("Section", back_populates="meetings")
 
 

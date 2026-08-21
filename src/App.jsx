@@ -129,7 +129,7 @@ function App() {
 
   // fetches courses + last updated in one request
   useEffect(() => {
-    fetch('https://aurak-schedule-finder.onrender.com/initial-data')
+    fetch('http://localhost:8000/initial-data')
       .then(r => r.json())
       .then(data => {
         console.log(data)
@@ -740,6 +740,7 @@ function App() {
                     <div className="block-code">{section.courseSubject} {section.courseCode}-{section.section_number}</div>
                     <div className="block-instructor">{section.instructor}</div>
                     <div className="block-time">{to12Hour(meeting.start_time).slice(0, -3)}–{to12Hour(meeting.end_time).slice(0, -3)}</div>
+                    {meeting.room && durationSlots >= 12 && <div className="block-room">{meeting.room}</div>}
                   </div>
                 )
               })

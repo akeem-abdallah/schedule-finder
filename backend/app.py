@@ -41,12 +41,14 @@ class MeetingOut(BaseModel):
     day: str
     start_time: str
     end_time: str
+    room: str | None
 
 class SectionOut(BaseModel):
     model_config = {"from_attributes": True}
     section_number: str
     instructor: str
     meetings: list[MeetingOut]
+    available_seats: int
 
 class CourseOut(BaseModel):
     model_config = {"from_attributes": True}

@@ -20,7 +20,7 @@ def parse_row(row):
         available_seats = int(seats_text)
 
     teacher = cells[6].get_text().strip()
-    if teacher == "To Be Announced": 
+    if teacher == "To Be Announced":
         teacher = "TBA"
     else:
         teacher = teacher.title()
@@ -57,7 +57,8 @@ def parse_meetings(cell):
         day = parts[0]
         time_range = parts[1]
         start, end = time_range.split("-")
-        meetings.append({"day": day, "start": to_24_hour(start), "end": to_24_hour(end)})
+        room = parts[3] if len(parts) == 4 else None
+        meetings.append({"day": day, "start": to_24_hour(start), "end": to_24_hour(end), "room": room})
     return meetings
 
 def parse_section(row):
@@ -149,12 +150,14 @@ if __name__ == "__main__":
                     section = Section(
                         section_number=section_data["section"],
                         instructor=section_data["instructor"],
+                        available_seats=section_data["available_seats"],
                     )
                     for meeting_data in section_data["meetings"]:
                         meeting = Meeting(
                             day=meeting_data["day"],
                             start_time=meeting_data["start"],
                             end_time=meeting_data["end"],
+                            room=meeting_data["room"],
                         )
                         section.meetings.append(meeting)
                     course.sections.append(section)
