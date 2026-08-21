@@ -129,7 +129,7 @@ function App() {
 
   // fetches courses + last updated in one request
   useEffect(() => {
-    fetch('http://localhost:8000/initial-data')
+    fetch('https://aurak-schedule-finder.onrender.com/initial-data')
       .then(r => r.json())
       .then(data => {
         console.log(data)
