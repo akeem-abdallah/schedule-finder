@@ -893,7 +893,7 @@ select {
 .class-block {
   display: block;
   box-sizing: border-box;
-  margin: 2px;
+  margin: 2px 5px 2px 0;
   padding: 4px 5px;
   overflow: hidden;
   border-radius: 0;
@@ -1876,7 +1876,7 @@ select {
 
     .class-block {
       padding: 3px 4px;
-      margin: 1.5px;
+      margin: 1.5px 3px 1.5px 0;
     }
 
     .block-instructor {

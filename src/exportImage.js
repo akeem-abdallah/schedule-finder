@@ -621,6 +621,7 @@ export function drawBlocks(ctx, layout, palette, schedule, activeDays, activeHou
   const hues = huesFor(design, palette)
   const isFill = design.block === "fill"
   const isEdge = design.block === "edge"
+  const hasBar = !isFill && !isEdge
   const radius = Math.round((design.radius ?? 0) * s)
   const tintAlpha = palette.isDark ? design.tint.dark : design.tint.light
   const f = design.fonts
@@ -648,9 +649,9 @@ export function drawBlocks(ctx, layout, palette, schedule, activeDays, activeHou
       const durationSlots =
         (timeToMinutes(meeting.end_time) - timeToMinutes(meeting.start_time)) / 5
 
-      const x = colsX + dayIndex * colW + gap
+      const x = colsX + dayIndex * colW + (hasBar ? 0 : gap / 2)
       const y = bodyY + startSlot * slotH
-      const bw = colW - gap * 2
+      const bw = colW - gap
       const bh = durationSlots * slotH
 
       // Never let a block escape the card, whatever the data says
