@@ -783,8 +783,7 @@ export function saveCanvas(canvas, { basename = "schedule", preferShare = true }
       clearTimeout(bail)
       if (!blob) return done("failed")
 
-      const ext = blob.type === "image/webp" ? "webp" : "png"
-      const filename = `${basename}.${ext}`
+      const filename = `${basename}.png`
 
       let file = null
       try {
@@ -814,10 +813,7 @@ export function saveCanvas(canvas, { basename = "schedule", preferShare = true }
       }
     }
 
-    encode("image/webp", 0.92).then((blob) => {
-      if (blob && blob.type === "image/webp") return deliver(blob)
-      return encode("image/png").then(deliver)
-    })
+    encode("image/png").then(deliver)
   })
 }
 

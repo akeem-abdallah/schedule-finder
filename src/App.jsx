@@ -529,6 +529,27 @@ function App() {
 
   useEffect(() => {
     if (!exportOpen) return
+    const body = document.body
+    const previousOverflow = body.style.overflow
+    const previousTop = body.style.top
+    const scrollY = window.scrollY
+
+    body.style.overflow = "hidden"
+    body.style.position = "fixed"
+    body.style.top = `-${scrollY}px`
+    body.style.width = "100%"
+
+    return () => {
+      body.style.overflow = previousOverflow
+      body.style.position = ""
+      body.style.top = previousTop
+      body.style.width = ""
+      window.scrollTo(0, scrollY)
+    }
+  }, [exportOpen])
+
+  useEffect(() => {
+    if (!exportOpen) return
 
     const opener = exportOpenBtnRef.current
     const popup = exportPopupRef.current

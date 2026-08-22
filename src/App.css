@@ -1044,12 +1044,15 @@ select {
 .export-backdrop {
   position: fixed;
   inset: 0;
+  height: 100vh;
+  height: 100dvh;
   background: rgba(0, 0, 0, .62);
   display: flex;
   align-items: center;
   justify-content: center;
   padding: 20px;
   z-index: 200;
+  overscroll-behavior: contain;
 }
 
 .export-popup {
@@ -1058,7 +1061,10 @@ select {
   width: 100%;
   max-width: 900px;
   max-height: calc(100vh - 40px);
+  max-height: calc(100dvh - 40px);
   overflow-y: auto;
+  overscroll-behavior: contain;
+  -webkit-overflow-scrolling: touch;
   background-color: var(--surface);
   border: 1px solid var(--rule-med);
 }
@@ -1300,22 +1306,61 @@ select {
 
 @media (max-width: 620px) {
   .export-backdrop {
-    padding: 12px;
+    padding: 10px;
+  }
+
+  .export-popup {
+    max-height: calc(100vh - 20px);
+    max-height: calc(100dvh - 20px);
+  }
+
+  .export-head {
+    padding: 7px 12px;
   }
 
   .export-body {
     grid-template-columns: 1fr;
-    gap: 18px;
-    padding: 15px 13px;
+    gap: 14px;
+    padding: 12px;
   }
 
   .export-preview-frame {
-    height: 250px;
+    height: 186px;
+    padding: 9px;
+  }
+
+  .export-controls {
+    gap: 14px;
+  }
+
+  .export-field {
+    gap: 7px;
+  }
+
+  .export-presets {
+    gap: 5px;
+  }
+
+  .export-preset {
+    padding: 8px 9px;
+  }
+
+  .export-designs {
+    gap: 5px;
+  }
+
+  .export-design {
+    padding: 5px;
+    gap: 4px;
   }
 
   .export-footer {
     flex-wrap: wrap;
-    gap: 10px;
+    gap: 8px;
+    padding: 10px 12px;
+    position: sticky;
+    bottom: 0;
+    background-color: var(--surface);
   }
 
   .export-count {
@@ -1333,15 +1378,9 @@ select {
     width: 100%;
   }
 
-  .export-footer {
-    position: sticky;
-    bottom: 0;
-    background-color: var(--surface);
-  }
-
   .export-action {
     flex: 1;
-    padding: 18px;
+    padding: 15px;
   }
 }
 
