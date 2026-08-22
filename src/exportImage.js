@@ -625,16 +625,16 @@ export function drawBlocks(ctx, layout, palette, schedule, activeDays, activeHou
   const tintAlpha = palette.isDark ? design.tint.dark : design.tint.light
   const f = design.fonts
 
-  const byWidth = colW * 0.125
+  const byWidth = colW * 0.118
   const byHeight = (hourH * 1.25) / 5.1 // a typical 75-min block, four lines
   const codeSize = Math.max(12, Math.min(46, Math.round(Math.min(byWidth, byHeight))))
   const bodySize = Math.max(11, Math.round(codeSize * 0.76))
   const lineCode = Math.round(codeSize * 1.3)
   const lineBody = Math.round(bodySize * 1.36)
 
-  const gap = Math.max(1, Math.round(2 * s))
+  const gap = Math.max(2, Math.min(12, Math.round(colW * 0.035)))
   const barW = Math.max(3, Math.round(colW * 0.022))
-  const padX = Math.round(codeSize * 0.45)
+  const padX = Math.round(codeSize * 0.34)
   const padY = Math.round(codeSize * 0.36)
 
   schedule.forEach((section, sectionIndex) => {
