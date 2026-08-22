@@ -505,9 +505,11 @@ function App() {
   useEffect(() => {
     if (!exportOpen) return
     let alive = true
-    ensureExportFonts().then(() => {
-      if (alive) setFontsReady(true)
-    })
+    ensureExportFonts()
+      .catch(() => null)
+      .then(() => {
+        if (alive) setFontsReady(true)
+      })
     return () => { alive = false }
   }, [exportOpen])
 

@@ -218,18 +218,58 @@ export function readPalette(theme) {
   }
 }
 
+let colorProbe = null
+
+function normalizeColor(value) {
+  if (typeof value !== "string" || value.trim() === "") return null
+  if (!colorProbe) {
+    const cv = document.createElement("canvas")
+    cv.width = 1
+    cv.height = 1
+    colorProbe = cv.getContext("2d")
+  }
+  colorProbe.fillStyle = "#000000"
+  colorProbe.fillStyle = value
+  const onBlack = colorProbe.fillStyle
+  colorProbe.fillStyle = "#ffffff"
+  colorProbe.fillStyle = value
+  const onWhite = colorProbe.fillStyle
+  return onBlack === onWhite ? onBlack : null
+}
+
+function toRgb(value, fallback) {
+  const normalized = normalizeColor(value)
+  if (!normalized) return fallback
+
+  if (normalized[0] === "#") {
+    const hex = normalized.length === 4
+      ? "#" + normalized.slice(1).split("").map((ch) => ch + ch).join("")
+      : normalized
+    const parts = [1, 3, 5].map((i) => parseInt(hex.slice(i, i + 2), 16))
+    return parts.some((n) => Number.isNaN(n)) ? fallback : parts
+  }
+
+  const match = normalized.match(/rgba?\(([^)]+)\)/i)
+  if (!match) return fallback
+  const nums = match[1].split(/[,\s/]+/).map(parseFloat).filter((n) => !Number.isNaN(n))
+  return nums.length >= 3 ? [nums[0], nums[1], nums[2]] : fallback
+}
+
 function mixHex(a, b, t) {
-  const pa = [1, 3, 5].map((i) => parseInt(a.slice(i, i + 2), 16))
-  const pb = [1, 3, 5].map((i) => parseInt(b.slice(i, i + 2), 16))
+  const pa = toRgb(a, [0, 0, 0])
+  const pb = toRgb(b, [255, 255, 255])
   const out = pa.map((v, i) => Math.round(v + (pb[i] - v) * t))
   return `rgb(${out[0]}, ${out[1]}, ${out[2]})`
 }
 
 function hexToRgba(hex, alpha) {
-  const r = parseInt(hex.slice(1, 3), 16)
-  const g = parseInt(hex.slice(3, 5), 16)
-  const b = parseInt(hex.slice(5, 7), 16)
+  const [r, g, b] = toRgb(hex, [0, 0, 0])
   return `rgba(${r}, ${g}, ${b}, ${alpha})`
+}
+
+function addStop(gradient, offset, color) {
+  const safe = normalizeColor(color)
+  if (safe) gradient.addColorStop(offset, safe)
 }
 
 function fitText(ctx, text, maxWidth) {
@@ -242,10 +282,8 @@ function fitText(ctx, text, maxWidth) {
 }
 
 function luminance(hex) {
-  const c = [1, 3, 5]
-    .map((i) => parseInt(hex.slice(i, i + 2), 16) / 255)
-    .map((v) => (v <= 0.03928 ? v / 12.92 : Math.pow((v + 0.055) / 1.055, 2.4)))
-  return 0.2126 * c[0] + 0.7152 * c[1] + 0.0722 * c[2]
+  const [r, g, b] = toRgb(hex, [0, 0, 0])
+  return luminanceRgb(r, g, b)
 }
 
 function textOn(hex) {
@@ -294,8 +332,8 @@ function drawBackground(ctx, layout, palette, design) {
     const g = ctx.createRadialGradient(w / 2, h * 0.38, 0, w / 2, h * 0.38, Math.max(w, h) * 0.75)
     const near = mixHex(palette.bg, palette.surface, 0.5 * (bg.strength ?? 0.5))
     const far = mixHex(palette.bg, palette.isDark ? "#000000" : palette.ruleMed, 0.18 * (bg.strength ?? 0.5))
-    g.addColorStop(0, near)
-    g.addColorStop(1, far)
+    addStop(g, 0, near)
+    addStop(g, 1, far)
     ctx.fillStyle = g
     ctx.fillRect(0, 0, w, h)
     return
@@ -303,8 +341,8 @@ function drawBackground(ctx, layout, palette, design) {
 
   if (bg.type === "accentWash") {
     const g = ctx.createLinearGradient(0, 0, w * 0.5, h)
-    g.addColorStop(0, mixHex(palette.bg, palette.accent, 0.14))
-    g.addColorStop(1, mixHex(palette.bg, palette.accent, 0.03))
+    addStop(g, 0, mixHex(palette.bg, palette.accent, 0.14))
+    addStop(g, 1, mixHex(palette.bg, palette.accent, 0.03))
     ctx.fillStyle = g
     ctx.fillRect(0, 0, w, h)
     return
@@ -319,8 +357,8 @@ function drawBackground(ctx, layout, palette, design) {
       bg.angle === "vertical"
         ? ctx.createLinearGradient(0, 0, 0, h)
         : ctx.createLinearGradient(0, 0, w * 0.55, h)
-    g.addColorStop(0, from)
-    g.addColorStop(1, to)
+    addStop(g, 0, from)
+    addStop(g, 1, to)
     ctx.fillStyle = g
     ctx.fillRect(0, 0, w, h)
     return
@@ -338,8 +376,8 @@ function drawBackground(ctx, layout, palette, design) {
       const cy = h * fy
       const rad = Math.max(w, h) * fr
       const g = ctx.createRadialGradient(cx, cy, 0, cx, cy, rad)
-      g.addColorStop(0, hexToRgba(stops[i % stops.length], alpha))
-      g.addColorStop(1, hexToRgba(stops[i % stops.length], 0))
+      addStop(g, 0, hexToRgba(stops[i % stops.length], alpha))
+      addStop(g, 1, hexToRgba(stops[i % stops.length], 0))
       ctx.fillStyle = g
       ctx.fillRect(0, 0, w, h)
     })
