@@ -1,10 +1,10 @@
 import './App.css'
-import { useState, Fragment, useEffect, useMemo } from 'react'
-import { DAYS, generateSchedules, getEligibleSections, orderedEligibleLists, findIncompatiblePairs, scheduledLists, timeToMinutes, to12Hour, formatMeetings, buildBlockedMask, combinedScheduleMask, longestGapMinutes, emptyFilteredRow, passesFilters } from './schedule'
+import { useState, Fragment, useEffect, useMemo, useRef } from 'react'
+import { DAYS, COURSE_HUES, SEMESTER, generateSchedules, getEligibleSections, orderedEligibleLists, findIncompatiblePairs, scheduledLists, timeToMinutes, to12Hour, formatMeetings, buildBlockedMask, combinedScheduleMask, longestGapMinutes, emptyFilteredRow, passesFilters } from './schedule'
 import { Analytics } from "@vercel/analytics/react"
+import { renderSchedule, saveCanvas, canShareFiles, ensureExportFonts, EXPORT_PRESETS, DESIGNS } from './exportImage'
 
-// course colors in weekly grid render
-const COURSE_HUES = ["#2f6bff", "#e0561f", "#17a06a", "#9d4edd", "#c9910d", "#00a0b8", "#e0447f", "#7cb518"]
+
 
 // lock icon svg
 function LockIcon({ locked, className }) {
@@ -35,6 +35,17 @@ function groupBySubject(courses) {
   grouped.forEach((s) => s.courses.sort((a, b) => a.code.localeCompare(b.code)))
   return grouped
 }
+
+const LONGEST_GAP_OPTIONS = [
+  { label: "15 MIN", minutes: 15 },
+  { label: "30 MIN", minutes: 30 },
+  { label: "1 HR", minutes: 60 },
+  { label: "2 HR", minutes: 120 },
+  { label: "3 HR", minutes: 180 },
+  { label: "ANY", minutes: "" },
+]
+
+const GAP_VALUES = LONGEST_GAP_OPTIONS.map((option) => option.minutes)
 
 const DEFAULT_FILTERS = {
   excludedDays: [],
@@ -88,10 +99,16 @@ function loadFromStorage(type) {
         isTimeValue(merged.nothingBefore) && isTimeValue(merged.nothingAfter) &&
         typeof merged.instructorAssigned === "boolean" &&
         typeof merged.fullSections === "boolean" &&
-        (merged.longestGap === "" || typeof merged.longestGap === "number") &&
+        GAP_VALUES.includes(merged.longestGap) &&
         Array.isArray(merged.busyBlocks) && merged.busyBlocks.every(isValidBusyBlock)
 
       return isValid ? merged : null
+
+    } else if (type === "theme") {
+
+      isValid = parsed === "system" || parsed === "light" || parsed === "dark"
+
+      return isValid ? parsed : null
     }
 
     return null
@@ -125,16 +142,30 @@ function App() {
 
   const [lastUpdated, setLastUpdated] = useState(null)
 
+  const [theme, setTheme] = useState("system")
+  const [exportOpen, setExportOpen] = useState(false)
+  const [exportPreset, setExportPreset] = useState("story")
+  const [exportTheme, setExportTheme] = useState("dark")
+  const [exportDesign, setExportDesign] = useState("classic")
+  const [exportBusy, setExportBusy] = useState(false)
+  const [fontsReady, setFontsReady] = useState(false)
+
   // EFFECT HOOKS
 
   // fetches courses + last updated in one request
   useEffect(() => {
     fetch('https://aurak-schedule-finder.onrender.com/initial-data')
-      .then(r => r.json())
+      .then(r => {
+        if (!r.ok) throw new Error(`HTTP ${r.status}`)
+        return r.json()
+      })
       .then(data => {
-        console.log(data)
+        if (!data || !Array.isArray(data.courses)) throw new Error("bad payload")
         setCourses(data.courses)
         setLastUpdated(data.fetched_at)
+      })
+      .catch(() => {
+        showError("Couldn't load course data. The server may be waking up — please refresh in a moment.")
       })
   }, [])
 
@@ -174,7 +205,7 @@ function App() {
 
   }, [courses])
 
-  // loads courses from localStorage
+  // loads from localStorage
   useEffect(() => {
     const loaded = loadFromStorage("rows")
     if (loaded) {
@@ -189,6 +220,14 @@ function App() {
     }
   }, [])
 
+  useEffect(() => {
+    const loaded = loadFromStorage("theme")
+    if (loaded) {
+      setTheme(loaded)
+    }
+  }, [])
+
+
   // saves courses to localStorage
   useEffect(() => {
     localStorage.setItem("rows", JSON.stringify(rows))
@@ -197,6 +236,11 @@ function App() {
   useEffect(() => {
     localStorage.setItem("filters", JSON.stringify(filters))
   }, [filters])
+
+  useEffect(() => {
+    localStorage.setItem("theme", JSON.stringify(theme))
+    document.documentElement.setAttribute("data-theme", theme)
+  }, [theme])
 
   // creates an array of credits for each re-render
   const creditList = rows.map((row) => {
@@ -289,13 +333,9 @@ function App() {
 
   const START_TIMES = ["", "08:00", "09:00", "10:30", "12:00", "13:30"]
   const END_TIMES = ["11:45", "13:15", "14:45", "16:15", "17:45", ""]
-  const LONGEST_GAP_OPTIONS = [
-    { label: "NONE", minutes: 15 },
-    { label: "1 HR", minutes: 60 },
-    { label: "2 HR", minutes: 120 },
-    { label: "3 HR", minutes: 180 },
-    { label: "ANY", minutes: "" },
-  ]
+  const canvasRef = useRef(null)
+  const exportPopupRef = useRef(null)
+  const exportOpenBtnRef = useRef(null)
 
   function removeBusyBlock(id) {
     updateFilters({ busyBlocks: filters.busyBlocks.filter((block) => block.id !== id) })
@@ -345,7 +385,7 @@ function App() {
             showError("None of your courses have scheduled meeting times.")
 
           } else if (generated.length > 0) {
-            showError(`No schedules match LONGEST BREAK: ${gapOption.label}. Try a longer one.`)
+            showError(`No schedules match LONGEST BREAK: ${gapOption ? gapOption.label : "your limit"}. Try a longer one.`)
 
           } else if (filters.excludedDays.length === DAYS.length) {
             showError("Every day is marked as a day off.")
@@ -383,6 +423,26 @@ function App() {
         setLoading(false)
 
       }, 0) // the delay until function runs (0 means instant)
+    }
+  }
+
+  // The preview canvas IS the export canvas — drawn at full resolution and
+  // scaled down by CSS — so what's on screen is exactly the file you get.
+  async function handleSave(preferShare) {
+    if (!canvasRef.current || exportBusy) return
+    setExportBusy(true)
+    // try/finally so a throw can't leave the buttons disabled forever.
+    try {
+      const name = `aurak-schedule-${currentIndex + 1}`
+      const result = await saveCanvas(canvasRef.current, { basename: name, preferShare })
+      // "cancelled" is the student dismissing the share sheet — stay quiet.
+      if (result === "failed") {
+        showError("Couldn't save the image. Try a smaller size, or use Download instead.")
+      }
+    } catch {
+      showError("Couldn't save the image. Try a smaller size, or use Download instead.")
+    } finally {
+      setExportBusy(false)
     }
   }
 
@@ -439,6 +499,72 @@ function App() {
     activeHours.push(hour)
   }
 
+  const exportSize = EXPORT_PRESETS.find((p) => p.id === exportPreset) ?? EXPORT_PRESETS[0]
+  const shareSupported = useMemo(() => canShareFiles(), [])
+
+  useEffect(() => {
+    if (!exportOpen) return
+    let alive = true
+    ensureExportFonts().then(() => {
+      if (alive) setFontsReady(true)
+    })
+    return () => { alive = false }
+  }, [exportOpen])
+
+  useEffect(() => {
+    if (!exportOpen || !canvasRef.current) return
+    renderSchedule(canvasRef.current, {
+      schedule: results ? results[currentIndex] : [],
+      activeDays,
+      activeHours,
+      theme: exportTheme,
+      design: exportDesign,
+      credits: totalCredits,
+      width: exportSize.width,
+      height: exportSize.height,
+    })
+  }, [exportOpen, fontsReady, exportPreset, exportTheme, exportDesign, totalCredits, results, currentIndex])
+
+  useEffect(() => {
+    if (!exportOpen) return
+
+    const opener = exportOpenBtnRef.current
+    const popup = exportPopupRef.current
+    const focusables = () =>
+      popup
+        ? [...popup.querySelectorAll('button, [href], input, select, [tabindex]:not([tabindex="-1"])')]
+            .filter((el) => !el.disabled && el.offsetParent !== null)
+        : []
+
+    focusables()[0]?.focus()
+
+    const onKey = (e) => {
+      if (e.key === "Escape") {
+        setExportOpen(false)
+        return
+      }
+      if (e.key !== "Tab") return
+
+      const items = focusables()
+      if (items.length === 0) return
+      const first = items[0]
+      const last = items[items.length - 1]
+
+      if (e.shiftKey && document.activeElement === first) {
+        e.preventDefault()
+        last.focus()
+      } else if (!e.shiftKey && document.activeElement === last) {
+        e.preventDefault()
+        first.focus()
+      }
+    }
+
+    window.addEventListener("keydown", onKey)
+    return () => {
+      window.removeEventListener("keydown", onKey)
+      if (opener && typeof opener.focus === "function") opener.focus()
+    }
+  }, [exportOpen])
 
   function courseSelectionView() {
 
@@ -703,6 +829,8 @@ function App() {
         <div className="sub-strip">
           <button onClick={() => setResults(null)}>← BACK</button>
           <span className="spacer"></span>
+          <button className="export-open-btn" ref={exportOpenBtnRef} onClick={() => setExportOpen(true)}>SHARE / EXPORT</button>
+          <span className="spacer export-gap"></span>
           <div className="pager-group" aria-live="polite">
             <button className="pager" aria-label="Previous schedule" disabled={currentIndex === 0} onClick={() => setIndex(-1)}>‹</button>
             <span className="counter-current">{String(currentIndex + 1).padStart(3, "0")}</span>
@@ -711,6 +839,115 @@ function App() {
             <button className="pager" aria-label="Next schedule" disabled={currentIndex === results.length - 1} onClick={() => setIndex(1)}>›</button>
           </div>
         </div>
+
+        {exportOpen && (
+          <div
+            className="export-backdrop"
+            onClick={() => setExportOpen(false)}
+            role="presentation"
+          >
+            <div
+              className="export-popup"
+              ref={exportPopupRef}
+              role="dialog"
+              aria-modal="true"
+              aria-label="Save your schedule as an image"
+              onClick={(e) => e.stopPropagation()}
+            >
+              <div className="export-head">
+                <h2 className="export-title">SAVE YOUR SCHEDULE</h2>
+                <button
+                  className="export-close"
+                  onClick={() => setExportOpen(false)}
+                  aria-label="Close"
+                >×</button>
+              </div>
+
+              <div className="export-body">
+                <div className="export-field">
+                  <span className="export-label">PREVIEW</span>
+                  <div className="export-preview-frame">
+                    <canvas ref={canvasRef} className="export-preview"></canvas>
+                  </div>
+                </div>
+
+                <div className="export-controls">
+                  <div className="export-field">
+                    <span className="export-label">SIZE</span>
+                    <div className="export-presets">
+                      {EXPORT_PRESETS.map((preset) => (
+                        <button
+                          key={preset.id}
+                          className={preset.id === exportPreset ? "export-preset export-preset-active" : "export-preset"}
+                          onClick={() => setExportPreset(preset.id)}
+                        >
+                          <span className="export-preset-label">{preset.label}</span>
+                          <span className="export-preset-sub">{preset.sub}</span>
+                        </button>
+                      ))}
+                    </div>
+                  </div>
+
+                  <div className="export-field">
+                    <span className="export-label">DESIGN</span>
+                    <div className="export-designs">
+                      {DESIGNS.map((design) => (
+                        <button
+                          key={design.id}
+                          className={design.id === exportDesign ? "export-design export-design-active" : "export-design"}
+                          onClick={() => setExportDesign(design.id)}
+                          title={design.label}
+                        >
+                          <span className="export-swatch" aria-hidden="true">
+                            {design.swatch.map((color, i) => (
+                              <i key={i} style={{ background: color }}></i>
+                            ))}
+                          </span>
+                          <span className="export-design-label">{design.label}</span>
+                        </button>
+                      ))}
+                    </div>
+                  </div>
+
+                  <div className="export-field">
+                    <span className="export-label">THEME</span>
+                    <div className="export-segment">
+                      <button
+                        className={exportTheme === "light" ? "export-seg-active" : ""}
+                        onClick={() => setExportTheme("light")}
+                      >LIGHT</button>
+                      <button
+                        className={exportTheme === "dark" ? "export-seg-active" : ""}
+                        onClick={() => setExportTheme("dark")}
+                      >DARK</button>
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              <div className="export-footer">
+                <div className="export-count">
+                  SCHEDULE <b>{String(currentIndex + 1).padStart(3, "0")}</b> OF <b>{String(results.length).padStart(3, "0")}</b>
+                </div>
+                <span className="spacer"></span>
+                <div className="export-actions">
+                  {shareSupported && (
+                    <button
+                      className="btn-secondary export-action"
+                      disabled={exportBusy || !fontsReady}
+                      onClick={() => handleSave(true)}
+                    >SHARE</button>
+                  )}
+                  <button
+                    className="btn-primary export-action"
+                    disabled={exportBusy || !fontsReady}
+                    onClick={() => handleSave(false)}
+                  >DOWNLOAD PNG</button>
+                </div>
+              </div>
+            </div>
+          </div>
+        )}
 
         <div className="grid-scroll">
           <div className="weekly-grid" style={{
@@ -764,6 +1001,10 @@ function App() {
             )}
           </div>
         </div>
+
+
+
+
       </>
     )
   }
@@ -781,7 +1022,7 @@ function App() {
             <span className="spacer"></span>
             <div className="chip-row">
               <a className="chip" href="https://eums.aurak.ac.ae/Public/Schedule?h42blu9ygNZPnBJmMbXuWAu8XR3hS4tcKtMIP6xFd2U="
-                target="_blank" rel="noopener noreferrer">Fall 2026 · Updated {formatLastUpdated(lastUpdated)}</a>
+                target="_blank" rel="noopener noreferrer">{SEMESTER} · Updated {formatLastUpdated(lastUpdated)}</a>
             </div>
           </div>
 
@@ -818,7 +1059,22 @@ function App() {
         <p>Developed by <a href="https://github.com/akeem-abdallah" target="_blank" rel="noopener noreferrer">Akeem Abdallah</a> · © 2026</p>
         <p>Unofficial student tool — not affiliated with or endorsed by AURAK. By using this site, you take full responsibility for any consequences of relying on this data.</p>
         <p className="footer-feedback">Found a bug or have feedback? <a href="https://forms.gle/zvn9hKr27aUjvTMXA" target="_blank" rel="noopener noreferrer">Let me know</a>.</p>
+        <div className="theme-toggle">
+          <button
+            className={theme === "system" ? "theme-btn-active" : ""}
+            onClick={() => setTheme("system")}
+          >SYSTEM</button>
+          <button
+            className={theme === "light" ? "theme-btn-active" : ""}
+            onClick={() => setTheme("light")}
+          >LIGHT</button>
+          <button
+            className={theme === "dark" ? "theme-btn-active" : ""}
+            onClick={() => setTheme("dark")}
+          >DARK</button>
+        </div>
       </div>
+
     </>
   )
 }

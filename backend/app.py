@@ -60,23 +60,20 @@ class CourseOut(BaseModel):
 
 class FetchLogOut(BaseModel):
     model_config = {"from_attributes": True}
-    fetched_at: datetime
+    fetched_at: datetime | None
 
 class InitialDataOut(BaseModel):
     courses: list[CourseOut]
-    fetched_at: datetime
+    fetched_at: datetime | None
 
-
-@app.get("/courses", response_model=list[CourseOut])
-def get_courses(db=Depends(get_db)):
-    return db.query(Course).options(selectinload(Course.sections).selectinload(Section.meetings)).all()
 
 @app.get("/initial-data", response_model=InitialDataOut)
 def get_initial_data(db=Depends(get_db)):
     courses = db.query(Course).options(selectinload(Course.sections).selectinload(Section.meetings)).all()
     log = db.query(FetchLog).first()
-    return {"courses": courses, "fetched_at": log.fetched_at}
+    return {"courses": courses, "fetched_at": log.fetched_at if log else None}
 
 @app.get("/fetch_log", response_model=FetchLogOut)
 def get_log(db=Depends(get_db)):
-    return db.query(FetchLog).first()
+    log = db.query(FetchLog).first()
+    return {"fetched_at": log.fetched_at if log else None}

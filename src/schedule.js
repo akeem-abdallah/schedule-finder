@@ -1,6 +1,9 @@
+export const SEMESTER = "Fall 2026"
+
 export const DAYS = ["Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"]
-export const DAY_START = 480
-export const SLOTS_PER_DAY = 156
+export const DAY_START = 420
+export const SLOTS_PER_DAY = 192
+export const COURSE_HUES = ["#2f6bff", "#e0561f", "#17a06a", "#9d4edd", "#c9910d", "#00a0b8", "#e0447f", "#7cb518"]
 
 export function to12Hour(time) {
 
@@ -12,7 +15,7 @@ export function to12Hour(time) {
     hour = hour % 12 === 0 ? 12 : hour % 12
     time = `${hour}:${parts[1]} PM`
 
-  } else { time = `${Number(parts[0])}:${parts[1]} AM` }
+  } else { time = `${hour === 0 ? 12 : hour}:${parts[1]} AM` }
 
   return time
 }
@@ -73,15 +76,14 @@ export function timeToMinutes(time) {
   return (Number(parts[0]) * 60) + Number(parts[1])
 }
 
-// converts minutes to slot (156 slots per day, day starts at 8:00) each slot is 5 min, formula: 1(Tue) * 156 + (780 - 480) / 5 = 216
+// converts minutes to slot (192 slots per day, day starts at 7:00) each slot is 5 min, formula: 1(Tue) * 192 + (780 - 420) / 5 = 264
 export function timeToSlot(day, time) {
   const dayIndex = DAYS.indexOf(day)
   const offset = Math.floor((timeToMinutes(time) - DAY_START) / 5)
   return dayIndex * SLOTS_PER_DAY + Math.max(0, Math.min(SLOTS_PER_DAY, offset))
 }
 
-// js stores each number with 32 bits, so 32 x 35 = 1120, 156 x 7 = 1092
-export const MASK_WORDS = 35
+export const MASK_WORDS = 42
 
 // sets one slot in a mask
 export function setSlot(mask, slot) {
@@ -99,7 +101,7 @@ export function isSlotSet(mask, slot) {
 
 // converts a section to a mask, so 9:00 to 10:15 would create 5 slots in a mask
 export function sectionToMask(section) {
-  const mask = new Array(MASK_WORDS).fill(0) // 35 words x 32 bits = 1120 bits, enough for 156 slots x 7 days
+  const mask = new Array(MASK_WORDS).fill(0) // 42 words x 32 bits = 1344 bits, enough for 192 slots x 7 days
 
   for (const meeting of section.meetings) {
     const startSlot = timeToSlot(meeting.day, meeting.start_time)
@@ -239,22 +241,32 @@ export function combinedScheduleMask(schedule) {
 export function longestGapMinutes(mask) {
 
   let largestGap = 0
+
   for (let dayIndex = 0; dayIndex < DAYS.length; dayIndex++) {
+    const dayStart = dayIndex * SLOTS_PER_DAY
+    const dayEnd = dayStart + SLOTS_PER_DAY
+
     let firstSlot = null
     let lastSlot = null
-    let occupiedSlots = 0
-    let gap = 0
 
-    for (let slot = dayIndex * SLOTS_PER_DAY; slot < dayIndex * SLOTS_PER_DAY + SLOTS_PER_DAY; slot++) {
-      if (firstSlot === null && isSlotSet(mask, slot)) firstSlot = slot
-      if (isSlotSet(mask, slot)) { lastSlot = slot, occupiedSlots++ }
+    for (let slot = dayStart; slot < dayEnd; slot++) {
+      if (isSlotSet(mask, slot)) {
+        if (firstSlot === null) firstSlot = slot
+        lastSlot = slot
+      }
     }
 
-    if (occupiedSlots === 0) { continue } else {
-      gap = ((lastSlot - firstSlot + 1) - occupiedSlots) * 5
-    }
-    largestGap = Math.max(largestGap, gap)
+    if (firstSlot === null) continue
 
+    let run = 0
+    for (let slot = firstSlot; slot <= lastSlot; slot++) {
+      if (isSlotSet(mask, slot)) {
+        run = 0
+      } else {
+        run++
+        largestGap = Math.max(largestGap, run * 5)
+      }
+    }
   }
 
   return largestGap

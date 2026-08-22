@@ -4,11 +4,14 @@
   color-scheme: light;
   --bg: #f2f1ee;
   --surface: #ffffff;
-  --surface-alt: #f4f3f0;
+  --surface-alt: #f1efe8;
   --text: #16150f;
   --muted: #787369;
-  --faint: #b8b3a8;
-  --rule: #e9e7e1;
+  /* Darkened for legibility, but held to the original palette's warmth
+     (R–B spread ~8 for rules, ~14 for faint). Earlier values doubled the
+     warmth and gave every border a muddy tan cast. */
+  --faint: #928e84;
+  --rule: #d7d5cf;
   --rule-med: #97927f;
   --rule-strong: #16150f;
   --accent: #a3560c;
@@ -17,8 +20,14 @@
   --danger: #a8321a;
   --focus: rgba(184,96,13,.35);
   --row-active-bg: #fffdf7;
-  --section-selected-bg: rgba(163,86,12,.12);
-  --chip-active-bg: rgba(163,86,12,.12);
+  /* Stronger than dark's alpha on purpose. Dark tints toward a luminous amber
+     against near-black, which pops; light tints toward dark brown against
+     white, which just reads as beige. Equal alpha is NOT equal visibility. */
+  --section-selected-bg: rgba(163,86,12,.20);
+  --chip-active-bg: rgba(163,86,12,.22);
+  /* The export modal's own selected-card tint. Deliberately its own token so
+     retuning the FILTERS page's chips never silently recolours the modal. */
+  --export-active-bg: rgba(163,86,12,.18);
   --font-ui: system-ui, "Segoe UI", -apple-system, sans-serif;
   --font-data: ui-monospace, "Cascadia Mono", "Segoe UI Mono", "SF Mono", Consolas, monospace;
   --sec-w: 40px;
@@ -26,15 +35,15 @@
 
 @media (prefers-color-scheme: dark) {
 
-  :root {
+  :root:not([data-theme="light"]) {
     color-scheme: dark;
     --bg: #000000;
     --surface: #141413;
     --surface-alt: #1c1b19;
     --text: #e8e6df;
     --muted: #8a867c;
-    --faint: #5c5a55;
-    --rule: #2c2b29;
+    --faint: #6b6862;
+    --rule: #3a3835;
     --rule-med: #66635c;
     --rule-strong: #e4e1d9;
     --accent: #ffb020;
@@ -45,11 +54,33 @@
     --row-active-bg: #241d10;
     --section-selected-bg: rgba(255,176,32,.18);
     --chip-active-bg: rgba(255,176,32,.14);
+    --export-active-bg: rgba(255,176,32,.14);
   }
 }
 
-/* ── Base ── */
+:root[data-theme="dark"] {
+  color-scheme: dark;
+  --bg: #000000;
+  --surface: #141413;
+  --surface-alt: #1c1b19;
+  --text: #e8e6df;
+  --muted: #8a867c;
+  --faint: #6b6862;
+  --rule: #3a3835;
+  --rule-med: #66635c;
+  --rule-strong: #e4e1d9;
+  --accent: #ffb020;
+  --accent-hover: #ffc247;
+  --accent-fg: #16150f;
+  --danger: #ff6b4a;
+  --focus: rgba(255,176,32,.35);
+  --row-active-bg: #241d10;
+  --section-selected-bg: rgba(255,176,32,.18);
+  --chip-active-bg: rgba(255,176,32,.14);
+  --export-active-bg: rgba(255,176,32,.14);
+}
 
+/* ── Base ── */
 body {
   background-color: var(--bg);
   color: var(--text);
@@ -475,9 +506,13 @@ select {
   }
 
 @media (prefers-color-scheme: dark) {
-  .section-row input[type="checkbox"]:checked {
+  .section-row input[type="checkbox"]:checked:not([data-theme="light"]) {
     background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 12 10' fill='none'%3E%3Cpath d='M1 5l3.5 3.5L11 1.5' stroke='%2316150f' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E");
   }
+}
+
+:root[data-theme="dark"] .section-row input[type="checkbox"]:checked {
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 12 10' fill='none'%3E%3Cpath d='M1 5l3.5 3.5L11 1.5' stroke='%2316150f' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E");
 }
 
 .section-row-selected .section-num {
@@ -580,6 +615,9 @@ select {
 
 .filter-chip-active {
   border-color: var(--accent);
+  /* Doubles the border weight without changing the box size, so selection
+     reads structurally and not only as a fill tint. */
+  box-shadow: inset 0 0 0 1px var(--accent);
   background: var(--chip-active-bg);
   color: var(--accent);
 }
@@ -768,9 +806,13 @@ select {
 }
 
 @media (prefers-color-scheme: dark) {
-  .filter-row input[type="checkbox"]:checked {
+  .filter-row input[type="checkbox"]:checked:not([data-theme="light"]) {
     background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 12 10' fill='none'%3E%3Cpath d='M1 5l3.5 3.5L11 1.5' stroke='%2316150f' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E");
   }
+}
+
+:root[data-theme="dark"] .filter-row input[type="checkbox"]:checked {
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 12 10' fill='none'%3E%3Cpath d='M1 5l3.5 3.5L11 1.5' stroke='%2316150f' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E");
 }
 
 .filter-row-disabled {
@@ -854,9 +896,13 @@ select {
 }
 
 @media (prefers-color-scheme: dark) {
-  .class-block {
+  .class-block:not([data-theme="light"]) {
     background-color: color-mix(in srgb, var(--hue) 24%, transparent);
   }
+}
+
+:root[data-theme="dark"] .class-block {
+  background-color: color-mix(in srgb, var(--hue) 24%, transparent);
 }
 
 .pager-group {
@@ -982,13 +1028,354 @@ select {
   color: var(--muted);
 }
 
+/* Mobile spreads BACK / SHARE / pager evenly across the strip. On desktop
+   this second spacer collapses, so SHARE sits directly left of the pager. */
+@media (min-width: 641px) {
+  .export-gap {
+    display: none;
+  }
+
+  /* Without this it sits flush against the pager's ‹ button. */
+  .export-open-btn {
+    margin-right: 16px;
+  }
+}
+
+.export-open-btn {
+  border: 1px solid var(--rule-med);
+  color: var(--text);
+  padding: 5px 10px !important;
+}
+
+.export-open-btn:hover {
+  border-color: var(--accent);
+  color: var(--accent);
+}
+
+/* ── Export / share modal ── */
+
+.export-backdrop {
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, .62);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 20px;
+  z-index: 200;
+}
+
+.export-popup {
+  display: flex;
+  flex-direction: column;
+  width: 100%;
+  max-width: 900px;
+  max-height: calc(100vh - 40px);
+  overflow-y: auto;
+  background-color: var(--surface);
+  border: 1px solid var(--rule-med);
+}
+
+.export-head {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 5px 13px;
+  border-bottom: 3px solid var(--rule-strong);
+}
+
+.export-title {
+  flex: 1;
+  margin: 0;
+  font-family: var(--font-ui);
+  font-size: 12px;
+  font-weight: 800;
+  letter-spacing: .12em;
+  color: var(--text);
+}
+
+.export-close {
+  padding: 0;
+  width: 26px;
+  height: 26px;
+  font-family: var(--font-data);
+  font-size: 19px;
+  line-height: 1;
+  color: var(--muted);
+}
+
+.export-close:hover {
+  color: var(--text);
+}
+
+.export-body {
+  display: grid;
+  grid-template-columns: 264px 1fr;
+  align-items: start;
+  gap: 26px;
+  padding: 20px 13px;
+}
+
+/* The preview is the real export canvas, scaled down by CSS. The frame has a
+   FIXED height so switching a portrait preset for a landscape one doesn't
+   collapse it and shove everything below it up the screen. */
+.export-preview-frame {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  height: 330px;
+  padding: 14px;
+  background-color: var(--surface-alt);
+  border: 1px solid var(--rule);
+}
+
+.export-preview {
+  display: block;
+  max-width: 100%;
+  max-height: 100%;
+  width: auto;
+  height: auto;
+  border: 1px solid var(--rule);
+}
+
+.export-controls {
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+
+.export-field {
+  display: flex;
+  flex-direction: column;
+  gap: 9px;
+}
+
+.export-label {
+  font-family: var(--font-ui);
+  font-size: 9px;
+  font-weight: 800;
+  letter-spacing: .14em;
+  color: var(--muted);
+}
+
+.export-presets {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 6px;
+}
+
+.export-preset {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 3px;
+  padding: 10px 11px;
+  text-align: left;
+  background: none;
+  border: 1px solid var(--rule-med);
+  color: var(--text);
+}
+
+.export-preset:hover {
+  border-color: var(--accent);
+}
+
+.export-preset-active {
+  border-color: var(--accent);
+  background-color: var(--export-active-bg);
+}
+
+.export-preset-label {
+  font-family: var(--font-ui);
+  font-size: 10px;
+  font-weight: 800;
+  letter-spacing: .1em;
+  color: var(--text);
+}
+
+.export-preset-active .export-preset-label {
+  color: var(--accent);
+}
+
+.export-preset-sub {
+  font-family: var(--font-data);
+  font-size: 10px;
+  letter-spacing: 0;
+  text-transform: none;
+  color: var(--muted);
+}
+
+/* Design picker — swatch chips, so you see the palette rather than read a name */
+.export-designs {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 6px;
+}
+
+.export-design {
+  display: flex;
+  flex-direction: column;
+  align-items: stretch;
+  gap: 5px;
+  padding: 6px;
+  background: none;
+  border: 1px solid var(--rule-med);
+  color: var(--muted);
+}
+
+.export-design:hover {
+  border-color: var(--accent);
+}
+
+.export-design-active {
+  border-color: var(--accent);
+  box-shadow: inset 0 0 0 1px var(--accent);
+  background-color: var(--export-active-bg);
+}
+
+.export-design-active .export-design-label {
+  color: var(--accent);
+}
+
+.export-swatch {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  height: 16px;
+  border: 1px solid var(--rule);
+}
+
+.export-swatch i {
+  display: block;
+  height: 100%;
+}
+
+.export-design-label {
+  font-family: var(--font-ui);
+  font-size: 8px;
+  font-weight: 800;
+  letter-spacing: .08em;
+  color: var(--muted);
+  text-align: center;
+}
+
+.export-segment {
+  display: inline-flex;
+  border: 1px solid var(--rule-med);
+  width: fit-content;
+}
+
+.export-segment button {
+  padding: 6px 16px;
+  font-size: 9px;
+  color: var(--muted);
+}
+
+.export-segment button:hover {
+  color: var(--text);
+}
+
+.export-seg-active {
+  background-color: var(--accent);
+  color: var(--accent-fg) !important;
+}
+
+/* Mirrors .table-footer — same rhythm as every other action bar in the app */
+.export-footer {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 11px 13px;
+  border-top: 1px solid var(--rule);
+}
+
+.export-count {
+  font-family: var(--font-data);
+  font-size: 11px;
+  letter-spacing: .06em;
+  color: var(--muted);
+  white-space: nowrap;
+}
+
+.export-count b {
+  color: var(--accent);
+  font-weight: 700;
+}
+
+.export-actions {
+  display: flex;
+  gap: 8px;
+}
+
+/* No padding override — inherits the base button box so its height matches
+   GENERATE / DONE / + ADD COURSE exactly. */
+.export-action {
+  min-width: 96px;
+}
+
+.export-action:disabled {
+  opacity: .5;
+  cursor: default;
+}
+
+@media (max-width: 620px) {
+  .export-backdrop {
+    padding: 12px;
+  }
+
+  .export-body {
+    grid-template-columns: 1fr;
+    gap: 18px;
+    padding: 15px 13px;
+  }
+
+  .export-preview-frame {
+    height: 250px;
+  }
+
+  .export-footer {
+    flex-wrap: wrap;
+    gap: 10px;
+  }
+
+  .export-count {
+    order: 1;
+    width: 100%;
+    text-align: center;
+  }
+
+  .export-footer .spacer {
+    display: none;
+  }
+
+  .export-actions {
+    order: 2;
+    width: 100%;
+  }
+
+  .export-footer {
+    position: sticky;
+    bottom: 0;
+    background-color: var(--surface);
+  }
+
+  /* Matches .table-footer button on mobile, so these are the same height as
+     GENERATE and DONE rather than visibly shorter. */
+  .export-action {
+    flex: 1;
+    padding: 18px;
+  }
+}
+
 /* ── Toast ── */
 
 .toast {
   position: fixed;
   top: 20px;
   right: 20px;
-  z-index: 100;
+  /* Above the export modal (200). An error raised while the modal is open —
+     an export that failed — must not render behind it. */
+  z-index: 300;
   display: flex;
   align-items: center;
   gap: 12px;
@@ -1045,6 +1432,29 @@ select {
 .footer-feedback {
   font-size: 10px;
   opacity: 0.8;
+}
+
+.theme-toggle {
+  display: inline-flex;
+  border: 1px solid var(--rule);
+  border-radius: 4px;
+  overflow: hidden;
+}
+
+.theme-toggle button {
+  font-family: var(--font-data);
+  font-size: 9px;
+  letter-spacing: .07em;
+  padding: 4px 8px;
+  border: none;
+  background: transparent;
+  color: var(--muted);
+  cursor: pointer;
+}
+
+.theme-btn-active {
+  background: var(--accent) !important;
+  color: var(--accent-fg) !important;
 }
 
 /* ── Responsive (mobile) ── */

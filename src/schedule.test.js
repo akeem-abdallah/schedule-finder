@@ -1,5 +1,5 @@
 import { describe, it, expect } from "vitest"
-import { timeToMinutes, masksConflict, sectionToMask, generateSchedules, buildBlockedMask, findIncompatiblePairs, timeToSlot, SLOTS_PER_DAY } from "./schedule"
+import { timeToMinutes, masksConflict, sectionToMask, generateSchedules, buildBlockedMask, findIncompatiblePairs, timeToSlot, longestGapMinutes, combinedScheduleMask, to12Hour, SLOTS_PER_DAY } from "./schedule"
 
 const withMask = (section) => ({ ...section, mask: sectionToMask(section) })
 const noFilters = { excludedDays: [], nothingBefore: "", nothingAfter: "", busyBlocks: [] }
@@ -72,12 +72,23 @@ describe("generateSchedules", () => {
 })
 
 describe("timeToSlot", () => {
-  it("clamps a time before 08:00 to the start of its own day", () => {
-    expect(timeToSlot("Tue", "06:00")).toBe(SLOTS_PER_DAY)
+  it("clamps a time before the window to the start of its own day", () => {
+    expect(timeToSlot("Tue", "05:00")).toBe(SLOTS_PER_DAY)
   })
 
-  it("clamps a time after 21:00 to the end of its own day", () => {
-    expect(timeToSlot("Mon", "23:00")).toBe(SLOTS_PER_DAY)
+  it("clamps a time after the window to the end of its own day", () => {
+    expect(timeToSlot("Mon", "23:30")).toBe(SLOTS_PER_DAY)
+  })
+
+  it("maps an evening class inside the window instead of clamping it", () => {
+    expect(timeToSlot("Mon", "21:30")).toBe((21 * 60 + 30 - 420) / 5)
+    expect(timeToSlot("Mon", "21:30")).toBeLessThan(SLOTS_PER_DAY)
+  })
+
+  it("masks a late class without losing its tail", () => {
+    const late = { meetings: [{ day: "Mon", start_time: "20:00", end_time: "22:30" }] }
+    const overlapping = { meetings: [{ day: "Mon", start_time: "22:00", end_time: "22:20" }] }
+    expect(masksConflict(sectionToMask(late), sectionToMask(overlapping))).toBe(true)
   })
 })
 
@@ -138,5 +149,47 @@ describe("buildBlockedMask", () => {
   it("does not conflict with a section that ends before nothingAfter", () => {
     const early = { meetings: [{ day: "Mon", start_time: "09:00", end_time: "10:15" }] }
     expect(masksConflict(sectionToMask(early), buildBlockedMask({ excludedDays: [], nothingBefore: "", nothingAfter: "15:00", busyBlocks: [] }))).toBe(false)
+  })
+})
+
+describe("to12Hour", () => {
+  it("renders midnight as 12:00 AM, not 0:00 AM", () => {
+    expect(to12Hour("00:00")).toBe("12:00 AM")
+  })
+
+  it("renders noon as 12:00 PM", () => {
+    expect(to12Hour("12:00")).toBe("12:00 PM")
+  })
+
+  it("renders a normal morning time unchanged", () => {
+    expect(to12Hour("09:30")).toBe("9:30 AM")
+  })
+})
+
+describe("longestGapMinutes", () => {
+  it("reports the longest single break, not the total idle time", () => {
+    // 9-10, 11-12, 13-14 => two separate 60-minute breaks, never a 120 one
+    const schedule = [
+      { mask: sectionToMask({ meetings: [{ day: "Mon", start_time: "09:00", end_time: "10:00" }] }) },
+      { mask: sectionToMask({ meetings: [{ day: "Mon", start_time: "11:00", end_time: "12:00" }] }) },
+      { mask: sectionToMask({ meetings: [{ day: "Mon", start_time: "13:00", end_time: "14:00" }] }) },
+    ]
+    expect(longestGapMinutes(combinedScheduleMask(schedule))).toBe(60)
+  })
+
+  it("is zero for back-to-back classes", () => {
+    const schedule = [
+      { mask: sectionToMask({ meetings: [{ day: "Tue", start_time: "09:00", end_time: "10:00" }] }) },
+      { mask: sectionToMask({ meetings: [{ day: "Tue", start_time: "10:00", end_time: "11:00" }] }) },
+    ]
+    expect(longestGapMinutes(combinedScheduleMask(schedule))).toBe(0)
+  })
+
+  it("measures each day separately rather than across days", () => {
+    const schedule = [
+      { mask: sectionToMask({ meetings: [{ day: "Mon", start_time: "09:00", end_time: "10:00" }] }) },
+      { mask: sectionToMask({ meetings: [{ day: "Wed", start_time: "16:00", end_time: "17:00" }] }) },
+    ]
+    expect(longestGapMinutes(combinedScheduleMask(schedule))).toBe(0)
   })
 })
