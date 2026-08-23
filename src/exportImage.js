@@ -315,7 +315,6 @@ function roundRectPath(ctx, x, y, w, h, r) {
 function huesFor(design, palette) {
   if (design.hues) return design.hues
   if (design.mono) return new Array(8).fill(palette.accent)
-  // MINIMAL: neutral steps between --faint and --muted
   return new Array(8).fill(palette.muted)
 }
 
@@ -518,19 +517,17 @@ function drawHeader(ctx, layout, palette, schedule, ink, design, credits) {
 export function drawGrid(ctx, layout, palette, activeDays, activeHours, design) {
   const {
     s, cardX, cardY, cardW, cardH,
-    gutterW, dayHeaderH, colsX, colW, bodyY, hourH,
+    dayHeaderH, colsX, colW, bodyY, hourH,
   } = layout
 
   const alpha = design.cardAlpha ?? 1
 
-  // card surface and outer border, mirroring .card in the app
   if (design.cardFill !== false && alpha > 0) {
     ctx.save()
     ctx.globalAlpha = alpha
     ctx.fillStyle = palette.surface
     ctx.fillRect(cardX, cardY, cardW, cardH)
 
-    // day-header band, mirroring .day-header's
     if (design.dayBand !== false) {
       ctx.fillStyle = palette.surfaceAlt
       ctx.fillRect(cardX, cardY, cardW, dayHeaderH)
@@ -538,14 +535,11 @@ export function drawGrid(ctx, layout, palette, activeDays, activeHours, design) 
     ctx.restore()
   }
 
-  // Grid weight per design: 'none' skips the interior rules entirely.
   const gridStyle = design.grid ?? "full"
   const strength = gridStyle === "hairline" ? 0.35 : gridStyle === "faint" ? 0.28 : 0.62
   const lineW =
     gridStyle === "hairline" ? Math.max(1, Math.round(s)) : Math.max(2, Math.round(2 * s))
 
-  // Hour lines and day dividers: blended from the card surface toward
-  // --rule-med, and thick enough to survive being scaled down.
   ctx.strokeStyle = mixHex(palette.surface, palette.ruleMed, strength)
   ctx.lineWidth = lineW
   for (let i = 1; gridStyle !== "none" && i < activeHours.length; i++) {
@@ -556,7 +550,6 @@ export function drawGrid(ctx, layout, palette, activeDays, activeHours, design) 
     ctx.stroke()
   }
 
-  // day column dividers
   for (let i = 1; gridStyle !== "none" && gridStyle !== "faint" && i < activeDays.length; i++) {
     const x = Math.round(colsX + i * colW) + 0.5
     ctx.beginPath()
@@ -565,7 +558,6 @@ export function drawGrid(ctx, layout, palette, activeDays, activeHours, design) 
     ctx.stroke()
   }
 
-  // under the day headers, and right of the time gutter
   if (design.cardBorder !== false) {
     ctx.strokeStyle = palette.ruleMed
     ctx.beginPath()
@@ -579,7 +571,6 @@ export function drawGrid(ctx, layout, palette, activeDays, activeHours, design) 
     ctx.stroke()
   }
 
-  // day labels
   const f = design.fonts
   const caps = design.caps !== false
   const track = design.tracking ?? 1
@@ -593,7 +584,6 @@ export function drawGrid(ctx, layout, palette, activeDays, activeHours, design) 
   })
   if ("letterSpacing" in ctx) ctx.letterSpacing = "0px"
 
-  // hour labels down the gutter
   ctx.fillStyle = palette.faint
   ctx.font = `${Math.round(19 * s)}px ${f.mono}`
   ctx.textAlign = "right"
@@ -602,7 +592,6 @@ export function drawGrid(ctx, layout, palette, activeDays, activeHours, design) 
     ctx.fillText(formatHour(hour), colsX - Math.round(12 * s), bodyY + i * hourH + Math.round(8 * s))
   })
 
-  // card border last, so it sits cleanly over every fill
   if (design.cardBorder !== false) {
     ctx.strokeStyle = palette.ruleMed
     ctx.lineWidth = Math.max(2, Math.round(2.5 * s))
@@ -627,7 +616,7 @@ export function drawBlocks(ctx, layout, palette, schedule, activeDays, activeHou
   const f = design.fonts
 
   const byWidth = colW * 0.118
-  const byHeight = (hourH * 1.25) / 5.1 // a typical 75-min block, four lines
+  const byHeight = (hourH * 1.25) / 5.1
   const codeSize = Math.max(12, Math.min(46, Math.round(Math.min(byWidth, byHeight))))
   const bodySize = Math.max(11, Math.round(codeSize * 0.76))
   const lineCode = Math.round(codeSize * 1.3)
@@ -654,7 +643,6 @@ export function drawBlocks(ctx, layout, palette, schedule, activeDays, activeHou
       const bw = colW - gap
       const bh = durationSlots * slotH
 
-      // Never let a block escape the card, whatever the data says
       if (y + bh < cardY || y > cardY + cardH) return
 
       ctx.save()
@@ -748,8 +736,6 @@ export function renderSchedule(
 
   drawBackground(ctx, layout, palette, design)
 
-  // With a background painted, the header and watermark sit on it rather than
-  // on --bg, so their ink is read off the pixels instead of the theme.
   const headerInk = design.background ? inkAt(ctx, layout.cardX + 4, layout.headerY + 30 * layout.s) : null
   const markInk = design.background ? inkAt(ctx, width / 2, height - layout.pad) : null
 

@@ -47,6 +47,9 @@ const LONGEST_GAP_OPTIONS = [
 
 const GAP_VALUES = LONGEST_GAP_OPTIONS.map((option) => option.minutes)
 
+// the pager counter is three digits wide, and nobody pages past a few dozen anyway
+const MAX_RESULTS = 999
+
 const DEFAULT_FILTERS = {
   excludedDays: [],
   nothingBefore: "",
@@ -149,12 +152,13 @@ function App() {
   const [exportDesign, setExportDesign] = useState("classic")
   const [exportBusy, setExportBusy] = useState(false)
   const [fontsReady, setFontsReady] = useState(false)
+  const [loadFailed, setLoadFailed] = useState(false)
+  const [toastTone, setToastTone] = useState("error")
 
-  // EFFECT HOOKS
+  function loadCourses() {
+    setLoadFailed(false)
 
-  // fetches courses + last updated in one request
-  useEffect(() => {
-    fetch('https://aurak-schedule-finder.onrender.com/initial-data')
+    return fetch('https://aurak-schedule-finder.onrender.com/initial-data')
       .then(r => {
         if (!r.ok) throw new Error(`HTTP ${r.status}`)
         return r.json()
@@ -164,9 +168,16 @@ function App() {
         setCourses(data.courses)
         setLastUpdated(data.fetched_at)
       })
-      .catch(() => {
-        showError("Couldn't load course data. The server may be waking up — please refresh in a moment.")
-      })
+  }
+
+  // EFFECT HOOKS
+
+  // fetches courses + last updated in one request
+  useEffect(() => {
+    // the server sleeps when idle, so a first attempt can fail while it wakes up
+    loadCourses()
+      .catch(() => new Promise((resolve) => setTimeout(resolve, 4000)).then(loadCourses))
+      .catch(() => setLoadFailed(true))
   }, [])
 
   // sets error toast
@@ -281,6 +292,14 @@ function App() {
 
   // sets error, triggers error useEffect toast
   function showError(message) {
+    setToastTone("error")
+    setError(message)
+    setErrorId((n) => n + 1)
+  }
+
+  // same toast, but for things that went right and just need saying
+  function showNotice(message) {
+    setToastTone("notice")
     setError(message)
     setErrorId((n) => n + 1)
   }
@@ -311,7 +330,6 @@ function App() {
     setFilters({ ...filters, ...changes })
   }
 
-  //
   function toggleExcludedDay(day) {
     const alreadyIn = filters.excludedDays.includes(day)
     alreadyIn ? updateFilters({ excludedDays: filters.excludedDays.filter((d) => d !== day) }) :
@@ -396,11 +414,9 @@ function App() {
           } else if (row) {
             const rowEligible = getEligibleSections(row, subjects)
 
-            // the student ticked sections, and every one of them is filtered out
             if (row.sections.length > 0) {
               showError(`Your selected sections of ${row.subject} ${row.code} are excluded by your filters.`)
 
-            // nothing ticked, and the whole course is full
             } else if (!filters.fullSections && rowEligible.every((s) => s.available_seats === 0)) {
               showError(`All sections of ${row.subject} ${row.code} are full.`)
 
@@ -417,8 +433,21 @@ function App() {
 
         } else {
           setError("")
-          setResults(withinGap)
+          setResults(withinGap.slice(0, MAX_RESULTS))
           setCurrentIndex(0)
+
+          const unscheduled = rows.filter((row) => {
+            const eligible = getEligibleSections(row, subjects)
+            return eligible.length > 0 && eligible.every((section) => section.meetings.length === 0)
+          })
+
+          if (unscheduled.length > 0) {
+            const names = unscheduled.map((row) => `${row.subject} ${row.code}`).join(", ")
+            showNotice(`${names} ${unscheduled.length === 1 ? "has" : "have"} no scheduled meeting times, so ${unscheduled.length === 1 ? "it isn't" : "they aren't"} on the grid.`)
+
+          } else if (withinGap.length > MAX_RESULTS) {
+            showNotice(`Found ${withinGap.length} schedules — showing the first ${MAX_RESULTS}. Add filters to narrow them down.`)
+          }
         }
         setLoading(false)
 
@@ -426,16 +455,14 @@ function App() {
     }
   }
 
-  // The preview canvas IS the export canvas — drawn at full resolution and
-  // scaled down by CSS — so what's on screen is exactly the file you get.
   async function handleSave(preferShare) {
     if (!canvasRef.current || exportBusy) return
     setExportBusy(true)
-    // try/finally so a throw can't leave the buttons disabled forever.
+
     try {
       const name = `aurak-schedule-${currentIndex + 1}`
       const result = await saveCanvas(canvasRef.current, { basename: name, preferShare })
-      // "cancelled" is the student dismissing the share sheet — stay quiet.
+
       if (result === "failed") {
         showError("Couldn't save the image. Try a smaller size, or use Download instead.")
       }
@@ -446,14 +473,19 @@ function App() {
     }
   }
 
-  // turns last updated into readable format
+  // turns last updated into readable format, with the date when it isn't from today
   function formatLastUpdated(iso) {
     if (!iso) return "…"
+
     const date = new Date(iso + "Z")
-    return date.toLocaleString('en-US', { hour: 'numeric', minute: '2-digit' })
+    if (Number.isNaN(date.getTime())) return "…"
+
+    const time = date.toLocaleString('en-US', { hour: 'numeric', minute: '2-digit' })
+    if (date.toDateString() === new Date().toDateString()) return time
+
+    return `${date.toLocaleString('en-US', { month: 'short', day: 'numeric' })}, ${time}`
   }
 
-  //
   const customizingRow = rows.find((row) => row.id === customizingID)
 
   function getCustomizingCourse() {
@@ -499,6 +531,16 @@ function App() {
     activeHours.push(hour)
   }
 
+  // only the courses actually drawn on the image, so its "N courses · X credits" line agrees with itself
+  function creditsFor(schedule) {
+    return schedule.reduce((sum, section) => {
+      const subj = subjects.find((s) => s.subject === section.courseSubject)
+      const course = subj ? subj.courses.find((c) => c.code === section.courseCode) : null
+      return sum + (course ? course.credits : 0)
+    }, 0)
+  }
+
+  const exportCredits = results ? creditsFor(results[currentIndex]) : 0
   const exportSize = EXPORT_PRESETS.find((p) => p.id === exportPreset) ?? EXPORT_PRESETS[0]
   const shareSupported = useMemo(() => canShareFiles(), [])
 
@@ -521,11 +563,11 @@ function App() {
       activeHours,
       theme: exportTheme,
       design: exportDesign,
-      credits: totalCredits,
+      credits: exportCredits,
       width: exportSize.width,
       height: exportSize.height,
     })
-  }, [exportOpen, fontsReady, exportPreset, exportTheme, exportDesign, totalCredits, results, currentIndex])
+  }, [exportOpen, fontsReady, exportPreset, exportTheme, exportDesign, exportCredits, results, currentIndex])
 
   useEffect(() => {
     if (!exportOpen) return
@@ -640,7 +682,7 @@ function App() {
                   <>
                     <button className="btn-secondary" aria-label={`Edit sections for ${row.subject} ${row.code}`}
                       onClick={() => setCustomizingID(row.id)}>EDIT</button>
-                    <span className={`sec-text ${row.sections.length !== 0 ? "sec-text-accent" : ""} ${row.locked ? "lock-toggle-active" : ""}`} onClick={() => row.locked ? updateRow(row.id, { locked: null }) : {}}>
+                    <span className={`sec-text ${row.locked ? "lock-toggle-active" : ""}`} onClick={() => row.locked ? updateRow(row.id, { locked: null }) : {}}>
                       {row.locked ? <LockIcon locked={true} /> : (usableCount === rowCourse.sections.length ? "ALL" : `${usableCount}/${rowCourse.sections.length}`)}</span>
                   </>
                 )}
@@ -663,7 +705,7 @@ function App() {
           </div>
           <div className="spacer"></div>
           <div className="footer-top-row">
-            <span className="footer-credits">TOTAL CREDITS: <span className="credits-value">{totalCredits}.0</span></span>
+            <span className="footer-credits">TOTAL CREDITS: <span className="credits-value">{totalCredits.toFixed(1)}</span></span>
             <button className="btn-clear-all footer-clear-mobile" onClick={clearRows} disabled={rows.length === 0 || rows.every((row) => row.locked !== null)}
               aria-label="Remove all courses" title="Remove all courses">CLEAR</button>
           </div>
@@ -721,7 +763,7 @@ function App() {
 
         <div className="table-footer">
           <p className="section-note">Leave all sections unchecked to include every one of them.</p>
-          <button className="btn-primary" onClick={() => setFiltersOpen(false)}>DONE →</button>
+          <button className="btn-primary" onClick={() => setCustomizingID(null)}>DONE →</button>
         </div>
       </>
     )
@@ -980,7 +1022,7 @@ function App() {
             <div className="grid-corner" style={{ gridColumn: 1, gridRow: 1 }}></div>
 
             {activeDays.map((day, dayIndex) => (
-              <div key={day} className="day-header" style={{ gridColumn: dayIndex + 2, gridRow: 1 }}>{day.toUpperCase()}</div> // builds the header row
+              <div key={day} className="day-header" style={{ gridColumn: dayIndex + 2, gridRow: 1 }}>{day.toUpperCase()}</div>
             ))}
 
             {activeHours.map((hour, hourIndex) => (
@@ -998,7 +1040,6 @@ function App() {
               </Fragment>
             ))}
 
-            {/*builds every section block using map*/}
             {results[currentIndex].map((section, sectionIndex) =>
               section.meetings.map((meeting) => {
                 const startSlot = (timeToMinutes(meeting.start_time) - startHour * 60) / 5
@@ -1049,6 +1090,13 @@ function App() {
             </div>
           </div>
 
+          {loadFailed && (
+            <div className="load-notice">
+              <span className="load-notice-text">Couldn't reach the course server. It may still be waking up.</span>
+              <button className="btn-secondary" onClick={() => loadCourses().catch(() => setLoadFailed(true))}>RETRY</button>
+            </div>
+          )}
+
           {results ? (
 
             resultsView()
@@ -1068,7 +1116,7 @@ function App() {
           )}
 
           {error && (
-            <div className="toast" role="alert">
+            <div className={toastTone === "notice" ? "toast toast-notice" : "toast"} role={toastTone === "notice" ? "status" : "alert"}>
               <span className="toast-msg">{error}</span>
               <button className="toast-close" onClick={() => setError("")} aria-label="Dismiss error">×</button>
             </div>

@@ -20,15 +20,28 @@ export function to12Hour(time) {
   return time
 }
 
+// groups the meetings that share a time, so a section that meets at two different times shows both
 export function formatMeetings(meetings) {
   if (meetings.length === 0) return ""
 
-  const days = meetings.map(m => m.day.toUpperCase()).join(" ")
-  let s = to12Hour(meetings[0].start_time)
-  let e = to12Hour(meetings[0].end_time)
+  const groups = []
 
-  const time = s.slice(-2) === e.slice(-2) ? `${s.slice(0, -3)}–${e}` : `${s}–${e}`
-  return `${days}\n${time}`
+  for (const meeting of meetings) {
+    const sameTime = groups.find((g) => g.start === meeting.start_time && g.end === meeting.end_time)
+
+    if (sameTime) {
+      sameTime.days.push(meeting.day.toUpperCase())
+    } else {
+      groups.push({ start: meeting.start_time, end: meeting.end_time, days: [meeting.day.toUpperCase()] })
+    }
+  }
+
+  return groups.map((group) => {
+    const s = to12Hour(group.start)
+    const e = to12Hour(group.end)
+    const time = s.slice(-2) === e.slice(-2) ? `${s.slice(0, -3)}–${e}` : `${s}–${e}`
+    return `${group.days.join(" ")}\n${time}`
+  }).join("\n")
 }
 
 // extracts all eligible sections in a row

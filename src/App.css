@@ -330,9 +330,6 @@ select {
   text-align: center;
 }
 
-.sec-text-accent {
-  color: var(--muted);
-}
 
 .sec-text svg {
   vertical-align: middle;
@@ -510,7 +507,7 @@ select {
   }
 
 @media (prefers-color-scheme: dark) {
-  .section-row input[type="checkbox"]:checked:not([data-theme="light"]) {
+  :root:not([data-theme="light"]) .section-row input[type="checkbox"]:checked {
     background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 12 10' fill='none'%3E%3Cpath d='M1 5l3.5 3.5L11 1.5' stroke='%2316150f' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E");
   }
 }
@@ -575,9 +572,6 @@ select {
   border-bottom: 1px solid var(--rule);
 }
 
-.filter-block-end {
-  border-bottom: 1px solid var(--rule-med);
-}
 
 .filter-block-tight {
   border-bottom: none;
@@ -768,15 +762,7 @@ select {
   background: var(--section-selected-bg);
 }
 
-.filter-row-end {
-  border-bottom: 1px solid var(--rule-med);
-}
 
-.filter-footer {
-  display: flex;
-  align-items: center;
-  padding: 13px 14px;
-}
 
 .filter-count {
   font-family: var(--font-data);
@@ -816,7 +802,7 @@ select {
 }
 
 @media (prefers-color-scheme: dark) {
-  .filter-row input[type="checkbox"]:checked:not([data-theme="light"]) {
+  :root:not([data-theme="light"]) .filter-row input[type="checkbox"]:checked {
     background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 12 10' fill='none'%3E%3Cpath d='M1 5l3.5 3.5L11 1.5' stroke='%2316150f' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E");
   }
 }
@@ -825,20 +811,7 @@ select {
   background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 12 10' fill='none'%3E%3Cpath d='M1 5l3.5 3.5L11 1.5' stroke='%2316150f' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E");
 }
 
-.filter-row-disabled {
-  opacity: .35;
-  cursor: default;
-}
 
-.chip-soon {
-  font-family: var(--font-data);
-  font-size: 10px;
-  font-weight: 700;
-  letter-spacing: .08em;
-  border: 1px solid var(--rule-med);
-  color: var(--muted);
-  padding: 2px 6px;
-}
 
 .btn-reset {
   font-size: 10px;
@@ -908,7 +881,7 @@ select {
 }
 
 @media (prefers-color-scheme: dark) {
-  .class-block:not([data-theme="light"]) {
+  :root:not([data-theme="light"]) .class-block {
     background-color: color-mix(in srgb, var(--hue) 24%, transparent);
   }
 }
@@ -1419,6 +1392,25 @@ select {
   }
 }
 
+/* ── Server notice ── */
+
+.load-notice {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 11px 13px;
+  border-bottom: 1px solid var(--rule);
+  border-left: 3px solid var(--danger);
+  background-color: var(--surface-alt);
+}
+
+.load-notice-text {
+  flex: 1;
+  font-size: 13px;
+  line-height: 1.4;
+  color: var(--text);
+}
+
 /* ── Toast ── */
 
 .toast {
@@ -1438,6 +1430,10 @@ select {
   font-size: 13px;
   font-weight: 500;
   line-height: 1.4;
+}
+
+.toast-notice {
+  border-left-color: var(--accent);
 }
 
 .toast-msg {
@@ -1806,21 +1802,12 @@ select {
     padding: 13px 14px 13px 11px;
   }
 
-  .filter-footer {
-    flex-direction: column;
-    align-items: stretch;
-    gap: 11px;
-  }
 
   .filter-count {
     text-align: center;
     padding: 7px 0 2px 0;
   }
 
-  .btn-done {
-    margin-left: 0;
-    padding: 16px 0;
-  }
 
 
   .weekly-grid {
@@ -1855,22 +1842,42 @@ select {
     }
 
     .pager-group {
-      gap: 3px;
+      gap: 2px;
     }
 
     .pager {
-      width: 22px;
-      height: 22px;
-      font-size: 15px;
+      width: 40px;
+      height: 40px;
+      font-size: 21px;
+      margin-left: -8px;
+      margin-right: -8px;
     }
 
     .counter-current,
     .counter-total {
-      font-size: 15px;
+      font-size: 17px;
     }
 
     .counter-sep {
-      font-size: 11px;
+      font-size: 13px;
+    }
+
+    @media (max-width: 349px) {
+
+      .pager {
+        width: 36px;
+        height: 36px;
+        font-size: 19px;
+      }
+
+      .counter-current,
+      .counter-total {
+        font-size: 16px;
+      }
+
+      .counter-sep {
+        font-size: 12px;
+      }
     }
 
 

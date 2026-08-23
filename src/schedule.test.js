@@ -1,5 +1,5 @@
 import { describe, it, expect } from "vitest"
-import { timeToMinutes, masksConflict, sectionToMask, generateSchedules, buildBlockedMask, findIncompatiblePairs, timeToSlot, longestGapMinutes, combinedScheduleMask, to12Hour, SLOTS_PER_DAY } from "./schedule"
+import { timeToMinutes, masksConflict, sectionToMask, generateSchedules, buildBlockedMask, findIncompatiblePairs, timeToSlot, longestGapMinutes, combinedScheduleMask, to12Hour, formatMeetings, SLOTS_PER_DAY } from "./schedule"
 
 const withMask = (section) => ({ ...section, mask: sectionToMask(section) })
 const noFilters = { excludedDays: [], nothingBefore: "", nothingAfter: "", busyBlocks: [] }
@@ -168,7 +168,6 @@ describe("to12Hour", () => {
 
 describe("longestGapMinutes", () => {
   it("reports the longest single break, not the total idle time", () => {
-    // 9-10, 11-12, 13-14 => two separate 60-minute breaks, never a 120 one
     const schedule = [
       { mask: sectionToMask({ meetings: [{ day: "Mon", start_time: "09:00", end_time: "10:00" }] }) },
       { mask: sectionToMask({ meetings: [{ day: "Mon", start_time: "11:00", end_time: "12:00" }] }) },
@@ -191,5 +190,32 @@ describe("longestGapMinutes", () => {
       { mask: sectionToMask({ meetings: [{ day: "Wed", start_time: "16:00", end_time: "17:00" }] }) },
     ]
     expect(longestGapMinutes(combinedScheduleMask(schedule))).toBe(0)
+  })
+})
+
+describe("formatMeetings", () => {
+  it("puts the days that share a time on one line", () => {
+    const out = formatMeetings([
+      { day: "Mon", start_time: "10:30", end_time: "11:45" },
+      { day: "Wed", start_time: "10:30", end_time: "11:45" },
+    ])
+    expect(out).toBe("MON WED\n10:30–11:45 AM")
+  })
+
+  it("keeps a second meeting time on its own line instead of hiding it", () => {
+    const out = formatMeetings([
+      { day: "Mon", start_time: "10:30", end_time: "11:20" },
+      { day: "Wed", start_time: "16:30", end_time: "19:00" },
+    ])
+    expect(out).toBe("MON\n10:30–11:20 AM\nWED\n4:30–7:00 PM")
+  })
+
+  it("spells out both halves when a range crosses noon", () => {
+    const out = formatMeetings([{ day: "Tue", start_time: "11:00", end_time: "13:00" }])
+    expect(out).toBe("TUE\n11:00 AM–1:00 PM")
+  })
+
+  it("returns an empty string when a section has no meetings", () => {
+    expect(formatMeetings([])).toBe("")
   })
 })
