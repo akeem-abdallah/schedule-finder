@@ -786,7 +786,7 @@ function App() {
 
         <div className="filter-block">
           <div className="filter-label">LONGEST BREAK</div>
-          <div className="filter-chips">
+          <div className="filter-chips filter-chips-gap">
             {LONGEST_GAP_OPTIONS.map((option) => (
               <button
                 key={option.label}

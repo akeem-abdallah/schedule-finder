@@ -1070,6 +1070,7 @@ select {
 .export-backdrop {
   position: fixed;
   inset: 0;
+  box-sizing: border-box;
   height: 100vh;
   height: 100dvh;
   background: rgba(0, 0, 0, .62);
@@ -1131,7 +1132,7 @@ select {
 
 .export-body {
   display: grid;
-  grid-template-columns: 264px 1fr;
+  grid-template-columns: 330px 1fr;
   align-items: start;
   gap: 26px;
   padding: 20px 13px;
@@ -1141,7 +1142,7 @@ select {
   display: flex;
   align-items: center;
   justify-content: center;
-  height: 330px;
+  height: min(430px, 52vh);
   padding: 14px;
   background-color: var(--surface-alt);
   border: 1px solid var(--rule);
@@ -1309,6 +1310,9 @@ select {
   gap: 12px;
   padding: 11px 13px;
   border-top: 1px solid var(--rule);
+  position: sticky;
+  bottom: 0;
+  background-color: var(--surface);
 }
 
 .export-count {
@@ -1340,12 +1344,12 @@ select {
 
 @media (max-width: 620px) {
   .export-backdrop {
-    padding: 10px;
+    padding: 12px;
   }
 
   .export-popup {
-    max-height: calc(100vh - 20px);
-    max-height: calc(100dvh - 20px);
+    max-height: calc(100vh - 24px);
+    max-height: calc(100dvh - 24px);
   }
 
   .export-head {
@@ -1354,21 +1358,21 @@ select {
 
   .export-body {
     grid-template-columns: 1fr;
-    gap: 14px;
-    padding: 12px;
+    gap: 12px;
+    padding: 11px 12px;
   }
 
   .export-preview-frame {
-    height: 186px;
-    padding: 9px;
+    height: 300px;
+    padding: 10px;
   }
 
   .export-controls {
-    gap: 14px;
+    gap: 12px;
   }
 
   .export-field {
-    gap: 7px;
+    gap: 6px;
   }
 
   .export-presets {
@@ -1376,7 +1380,7 @@ select {
   }
 
   .export-preset {
-    padding: 8px 9px;
+    padding: 7px 8px;
   }
 
   .export-designs {
@@ -1384,17 +1388,14 @@ select {
   }
 
   .export-design {
-    padding: 5px;
-    gap: 4px;
+    padding: 4px;
+    gap: 3px;
   }
 
   .export-footer {
     flex-wrap: wrap;
     gap: 8px;
     padding: 10px 12px;
-    position: sticky;
-    bottom: 0;
-    background-color: var(--surface);
   }
 
   .export-count {
@@ -1749,6 +1750,11 @@ select {
     grid-template-columns: repeat(3, 1fr);
   }
 
+  .filter-chips-gap {
+    display: grid;
+    grid-template-columns: repeat(6, 1fr);
+  }
+
   .busy-row {
     display: grid;
     grid-template-columns: auto 1fr;
@@ -1838,6 +1844,35 @@ select {
   }
 
   @media (max-width: 480px) {
+
+    .filter-chips-gap {
+      grid-template-columns: repeat(3, 1fr);
+    }
+
+    .export-open-btn {
+      padding: 4px 6px !important;
+      font-size: 8px;
+    }
+
+    .pager-group {
+      gap: 3px;
+    }
+
+    .pager {
+      width: 22px;
+      height: 22px;
+      font-size: 15px;
+    }
+
+    .counter-current,
+    .counter-total {
+      font-size: 15px;
+    }
+
+    .counter-sep {
+      font-size: 11px;
+    }
+
 
 
 
