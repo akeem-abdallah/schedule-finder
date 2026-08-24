@@ -2,15 +2,15 @@
   "$schema": "https://openapi.vercel.sh/vercel.json",
   "redirects": [
     {
-      "source": "/:path*",
+      "source": "/(.*)",
       "has": [{ "type": "host", "value": "schedule-finder-delta.vercel.app" }],
-      "destination": "https://aurak-scheduler.com/:path*",
+      "destination": "https://aurak-scheduler.com/$1",
       "permanent": true
     },
     {
-      "source": "/:path*",
+      "source": "/(.*)",
       "has": [{ "type": "host", "value": "www.aurak-scheduler.com" }],
-      "destination": "https://aurak-scheduler.com/:path*",
+      "destination": "https://aurak-scheduler.com/$1",
       "permanent": true
     }
   ],
