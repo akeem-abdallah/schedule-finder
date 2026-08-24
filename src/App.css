@@ -494,6 +494,7 @@ select {
   margin: 0;
   flex: none;
   border: 1px solid var(--rule-med);
+  border-radius: 0;
   background-color: var(--surface);
 }
 
@@ -635,11 +636,18 @@ select {
   display: flex;
   flex-wrap: wrap;
   align-items: center;
-  gap: 8px 13px;
+  gap: 8px 10px;
   padding: 9px 14px 9px 11px;
   border-bottom: 1px solid var(--rule);
   border-left: 3px solid var(--accent);
   background: var(--section-selected-bg);
+}
+
+.busy-day,
+.busy-time,
+.busy-note {
+  box-sizing: border-box;
+  min-height: 32px;
 }
 
 .busy-day {
@@ -657,15 +665,15 @@ select {
 .busy-time-pair {
   display: flex;
   align-items: center;
-  gap: 4px;
+  gap: 6px;
   flex: none;
 }
 
 .busy-time-sep {
   font-family: var(--font-data);
   font-size: 13px;
-  color: var(--text);
-  margin: 5px;
+  color: var(--muted);
+  margin: 0;
 }
 
 .busy-time {
@@ -674,30 +682,31 @@ select {
   color: var(--text);
   background: none;
   border: 1px solid var(--rule-med);
-  border-radius: 2px;
-  padding: 3px 5px;
+  border-radius: 0;
+  box-sizing: border-box;
+  padding: 5px 6px;
+  min-width: 112px;
   flex: none;
-}
-
-.busy-time:focus-visible {
-  outline: none;
-  border-color: var(--accent);
 }
 
 .busy-note {
   font-family: var(--font-ui);
   font-size: 13px;
-  color: var(--muted);
+  color: var(--text);
   background: none;
-  border: none;
-  padding: 4px 6px;
-  flex: 1 1 120px;
+  border: 1px solid var(--rule-med);
+  border-radius: 0;
+  box-sizing: border-box;
+  padding: 5px 8px;
+  flex: 1 1 140px;
   min-width: 0;
 }
 
+.busy-time:focus-visible,
 .busy-note:focus-visible {
   outline: none;
   border-color: var(--accent);
+  box-shadow: 0 0 0 3px var(--focus);
 }
 
 .busy-note::placeholder {
@@ -712,7 +721,6 @@ select {
   cursor: pointer;
   padding: 0;
   line-height: 1;
-  margin-bottom: 2px;
 }
 
 @media (hover: hover) {
@@ -789,6 +797,7 @@ select {
   margin: 0;
   flex: none;
   border: 1px solid var(--rule-med);
+  border-radius: 0;
   background-color: var(--surface);
 }
 
@@ -1672,7 +1681,6 @@ select {
   .section-row input[type="checkbox"] {
     grid-column: 1;
     grid-row: 1;
-    border-radius: 0;
   }
 
   .section-num {
@@ -1753,19 +1761,24 @@ select {
 
   .busy-row {
     display: grid;
-    grid-template-columns: auto 1fr;
+    grid-template-columns: 1fr auto;
     grid-template-areas:
-      "day remove"
-      "times note";
+      "day   remove"
+      "times times"
+      "note  note";
     row-gap: 8px;
     column-gap: 8px;
-    padding: 12px 14px 12px 11px;
+    padding: 10px 14px 12px 11px;
   }
 
   .busy-day {
     grid-area: day;
     font-size: 13px;
     justify-self: start;
+    border: 1px solid var(--rule-med);
+    box-sizing: border-box;
+    padding: 9px 26px 9px 8px;
+    background-position: right 8px center;
   }
 
   .busy-time-pair {
@@ -1774,17 +1787,28 @@ select {
 
   .busy-time {
     font-size: 14px;
+    padding: 9px 8px;
+    flex: 1;
+    min-width: 0;
+    text-align: center;
   }
 
   .busy-note {
     grid-area: note;
-    padding: 5px 10px;
+    font-size: 14px;
+    padding: 9px 10px;
   }
 
   .busy-remove {
     grid-area: remove;
-    font-size: 15px;
+    font-size: 18px;
     justify-self: end;
+    width: 34px;
+    height: 34px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin: -6px -8px 0 0;
   }
 
   .busy-add-wrap {

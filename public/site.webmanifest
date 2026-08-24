@@ -1,7 +1,7 @@
 {
   "name": "AURAK Schedule Finder",
   "short_name": "Schedule Finder",
-  "description": "Free timetable maker for AURAK students. Pick your courses, block out the times you need free, and get every clash-free schedule that fits.",
+  "description": "Free timetable maker for AURAK students. Pick your courses, block out the times you need free, and get every conflict-free schedule that fits.",
   "start_url": "/",
   "scope": "/",
   "display": "standalone",

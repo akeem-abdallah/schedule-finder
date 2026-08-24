@@ -1,6 +1,6 @@
 # AURAK Schedule Finder
 
-**Pick your courses. Get every timetable where nothing clashes.**
+**Pick your courses. Get every conflict-free timetable.**
 
 A schedule generator for students at the American University of Ras Al Khaimah, built for
 the one week a year that actually matters — registration. Instead of dragging courses
