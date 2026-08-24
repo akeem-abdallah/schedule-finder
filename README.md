@@ -13,7 +13,7 @@ combination at once.
 [![FastAPI](https://img.shields.io/badge/FastAPI-009688?logo=fastapi&logoColor=white)](https://fastapi.tiangolo.com)
 [![PostgreSQL](https://img.shields.io/badge/PostgreSQL-4169E1?logo=postgresql&logoColor=white)](https://www.postgresql.org)
 
-![The generated schedule view](public/screenshot.png)
+![The generated schedule view](docs/screenshot.png)
 
 > [!WARNING]
 > **Unofficial student tool — not affiliated with or endorsed by AURAK.** Course data is
