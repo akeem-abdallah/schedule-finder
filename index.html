@@ -4,19 +4,68 @@
     <meta charset="UTF-8" />
     <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>📅</text></svg>" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <link rel="preconnect" href="https://aurak-schedule-finder.onrender.com" crossorigin />
+    <link rel="dns-prefetch" href="https://aurak-schedule-finder.onrender.com" />
     <meta name="theme-color" content="#f2f1ee" media="(prefers-color-scheme: light)" />
     <meta name="theme-color" content="#000000" media="(prefers-color-scheme: dark)" />
-    <title>AURAK Schedule Finder</title>
-    <meta name="description" content="Pick your AURAK courses, set the days and times you want free, and get every conflict-free schedule that fits. Unofficial student tool." />
+
+    <title>AURAK Schedule Finder — Course Timetable Maker</title>
+    <meta name="description" content="Free timetable maker for AURAK students. Pick your courses, block out the times you need free, and get every clash-free schedule that fits." />
+    <link rel="canonical" href="https://aurak-scheduler.com/" />
+
     <meta property="og:type" content="website" />
-    <meta property="og:url" content="https://aurak-scheduler.com" />
+    <meta property="og:url" content="https://aurak-scheduler.com/" />
     <meta property="og:site_name" content="AURAK Schedule Finder" />
     <meta property="og:title" content="AURAK Schedule Finder" />
-    <meta property="og:description" content="Pick your AURAK courses, set the days and times you want free, and get every conflict-free schedule that fits." />
-    <meta name="twitter:card" content="summary" />
+    <meta property="og:description" content="Pick your courses, block out the times you need free, and get every clash-free schedule that fits." />
+    <meta property="og:image" content="https://aurak-scheduler.com/og.jpg" />
+    <meta property="og:image:width" content="1200" />
+    <meta property="og:image:height" content="630" />
+    <meta property="og:image:alt" content="AURAK Schedule Finder — a weekly timetable with colour-coded classes" />
+    <meta property="og:locale" content="en_AE" />
+
+    <meta name="twitter:card" content="summary_large_image" />
+    <meta name="twitter:title" content="AURAK Schedule Finder" />
+    <meta name="twitter:description" content="Pick your courses, block out the times you need free, and get every clash-free schedule that fits." />
+    <meta name="twitter:image" content="https://aurak-scheduler.com/og.jpg" />
+
+    <script type="application/ld+json">
+    {
+      "@context": "https://schema.org",
+      "@type": "WebApplication",
+      "name": "AURAK Schedule Finder",
+      "url": "https://aurak-scheduler.com/",
+      "applicationCategory": "EducationalApplication",
+      "operatingSystem": "Any",
+      "browserRequirements": "Requires JavaScript",
+      "inLanguage": "en",
+      "description": "Free timetable maker for students at the American University of Ras Al Khaimah. Pick your courses, block out the times you need free, and get every clash-free schedule that fits.",
+      "offers": { "@type": "Offer", "price": "0", "priceCurrency": "AED" },
+      "author": { "@type": "Person", "name": "Akeem Abdallah" },
+      "audience": {
+        "@type": "EducationalAudience",
+        "educationalRole": "student"
+      },
+      "about": {
+        "@type": "CollegeOrUniversity",
+        "name": "American University of Ras Al Khaimah",
+        "alternateName": "AURAK",
+        "url": "https://aurak.ac.ae/"
+      }
+    }
+    </script>
   </head>
   <body>
     <div id="root"></div>
+    <noscript>
+      <h1>AURAK Schedule Finder</h1>
+      <p>
+        A free timetable maker for students at the American University of Ras Al Khaimah. Pick your courses,
+        block out the times you need free, and get every clash-free schedule that fits.
+      </p>
+      <p>This tool needs JavaScript. Please enable it and reload the page.</p>
+      <p>Unofficial student tool &mdash; not affiliated with or endorsed by AURAK.</p>
+    </noscript>
     <script type="module" src="/src/main.jsx"></script>
   </body>
 </html>

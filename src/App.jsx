@@ -2,6 +2,7 @@ import './App.css'
 import { useState, Fragment, useEffect, useMemo, useRef } from 'react'
 import { DAYS, COURSE_HUES, SEMESTER, generateSchedules, getEligibleSections, orderedEligibleLists, findIncompatiblePairs, scheduledLists, timeToMinutes, to12Hour, formatMeetings, buildBlockedMask, combinedScheduleMask, longestGapMinutes, emptyFilteredRow, passesFilters } from './schedule'
 import { Analytics } from "@vercel/analytics/react"
+import { SpeedInsights } from "@vercel/speed-insights/react"
 import { renderSchedule, saveCanvas, canShareFiles, ensureExportFonts, EXPORT_PRESETS, DESIGNS } from './exportImage'
 
 
@@ -1076,7 +1077,8 @@ function App() {
   return (
     <>
 
-      <Analytics></Analytics>
+      <Analytics/>
+      <SpeedInsights/>
       <div className="page-main">
 
         <div className="card">

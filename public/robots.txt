@@ -1,0 +1,4 @@
+User-agent: *
+Allow: /
+
+Sitemap: https://aurak-scheduler.com/sitemap.xml

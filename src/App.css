@@ -1475,11 +1475,11 @@ select {
 .page-footer p {
   max-width: 640px;
   margin: 0 auto 6px;
+  color: color-mix(in srgb, var(--text) 72%, var(--bg));
 }
 
 .footer-feedback {
   font-size: 10px;
-  opacity: 0.8;
 }
 
 .theme-toggle {
