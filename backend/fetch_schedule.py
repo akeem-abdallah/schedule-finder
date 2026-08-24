@@ -137,7 +137,8 @@ if __name__ == "__main__":
         subjects.append(subj_data)
 
     try:
-        session.execute(text("TRUNCATE TABLE meetings, sections, courses, fetch_log RESTART IDENTITY"))
+        for table in ("meetings", "sections", "courses", "fetch_log"):
+            session.execute(text(f"DELETE FROM {table}"))
         for subj_data in subjects:
             for course_data in subj_data["courses"]:
                 course = Course(

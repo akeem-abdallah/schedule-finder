@@ -1,8 +1,8 @@
-name: Daily Course Refresh
+name: Course Refresh
 
 on:
   schedule:
-    - cron: '0 * * * *'
+    - cron: '*/15 * * * *'
   workflow_dispatch:
 
 jobs:
