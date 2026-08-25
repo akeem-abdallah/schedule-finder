@@ -64,6 +64,7 @@ function byTheme(value, isDark) {
 export const DESIGNS = [
   {
     id: "classic",
+    busyHue: "#5f6b7a",
     label: "CLASSIC",
     hues: COURSE_HUES,
     block: "bar", radius: 0, grid: "full", cardAlpha: 1,
@@ -76,6 +77,7 @@ export const DESIGNS = [
   },
   {
     id: "soft",
+    busyHue: "#c3bcd6",
     label: "SOFT",
     hues: ["#f6b3c8", "#a9dcc9", "#c9bcec", "#f9cfa8", "#aed2ee", "#f5bfbf", "#c8e8bb", "#e6ccf3"],
     block: "fill", radius: 18, grid: "none", cardAlpha: 0.88,
@@ -92,6 +94,7 @@ export const DESIGNS = [
   },
   {
     id: "minimal",
+    busyHue: "#9c988f",
     label: "MINIMAL",
     hues: null,
     block: "edge", radius: 0, grid: "hairline", cardAlpha: 1,
@@ -104,6 +107,7 @@ export const DESIGNS = [
   },
   {
     id: "vivid",
+    busyHue: "#3d4a63",
     label: "VIVID",
     hues: ["#1e5eff", "#ff4d1a", "#00b371", "#8b2fe0", "#ffa000", "#00a8c4", "#ff2d78", "#5ea800"],
     block: "fill", radius: 0, grid: "full", cardAlpha: 0.96,
@@ -120,6 +124,7 @@ export const DESIGNS = [
   },
   {
     id: "mono",
+    busyHue: "#7a7568",
     label: "MONO",
     hues: null,
     block: "bar", radius: 0, grid: "full", cardAlpha: 1,
@@ -133,6 +138,7 @@ export const DESIGNS = [
   },
   {
     id: "aurora",
+    busyHue: "#7d84a8",
     label: "AURORA",
     hues: ["#4f7cff", "#ff5fa2", "#3ddc97", "#b06cff", "#ffb340", "#33c9e0", "#ff7a5c", "#8ee063"],
     block: "fill", radius: 14, grid: "none", cardAlpha: 0,
@@ -151,6 +157,7 @@ export const DESIGNS = [
   },
   {
     id: "dusk",
+    busyHue: "#7e6f92",
     label: "DUSK",
     hues: ["#8fb0ff", "#ffb094", "#93e0c0", "#d3b0ff", "#ffdc94", "#93d9e8", "#ffb0cc", "#c3e89c"],
     block: "bar", radius: 8, grid: "faint", cardAlpha: 0.8,
@@ -167,6 +174,7 @@ export const DESIGNS = [
   },
   {
     id: "paper",
+    busyHue: "#8d8672",
     label: "PAPER",
     hues: ["#4f7391", "#9c6249", "#547f60", "#726094", "#9c8646", "#4f818c", "#985d76", "#6d8a46"],
     block: "bar", radius: 0, grid: "hairline", cardAlpha: 0.94,
@@ -659,10 +667,22 @@ export function drawBlocks(ctx, layout, palette, schedule, activeDays, activeHou
     roundRectPath(ctx, x, y, bw, bh, radius)
     ctx.clip()
 
-    ctx.fillStyle = hexToRgba(mixHex(palette.surface, palette.ruleMed, 0.25), 0.88)
-    ctx.fillRect(x, y, bw, bh)
+    const busyHue = design.busyHue ?? palette.ruleMed
+    let busyHead = palette.text
+    let busyBody = hexToRgba(palette.text, 0.7)
 
-    ctx.strokeStyle = hexToRgba(palette.ruleMed, 0.4)
+    if (isFill) {
+      ctx.fillStyle = busyHue
+      ctx.fillRect(x, y, bw, bh)
+      busyHead = textOn(busyHue)
+      busyBody = hexToRgba(busyHead, 0.72)
+    } else {
+      const busyTint = Math.max(0.24, tintAlpha)
+      ctx.fillStyle = hexToRgba(mixHex(palette.surface, busyHue, busyTint), 0.85)
+      ctx.fillRect(x, y, bw, bh)
+    }
+
+    ctx.strokeStyle = hexToRgba(busyHead, 0.16)
     ctx.lineWidth = Math.max(1, Math.round(1.6 * s))
     const step = Math.max(6, Math.round(15 * s))
     ctx.beginPath()
@@ -673,10 +693,10 @@ export function drawBlocks(ctx, layout, palette, schedule, activeDays, activeHou
     ctx.stroke()
 
     if (hasBar) {
-      ctx.fillStyle = palette.ruleMed
+      ctx.fillStyle = busyHue
       ctx.fillRect(x, y, barW, bh)
     } else if (isEdge) {
-      ctx.strokeStyle = hexToRgba(palette.ruleMed, 0.55)
+      ctx.strokeStyle = hexToRgba(busyHue, 0.6)
       ctx.lineWidth = Math.max(1, Math.round(1.5 * s))
       ctx.strokeRect(x + 0.5, y + 0.5, bw - 1, bh - 1)
     }
@@ -700,9 +720,9 @@ export function drawBlocks(ctx, layout, palette, schedule, activeDays, activeHou
     }
 
     const label = block.note || "Busy"
-    lineBusy(caps ? label.toUpperCase() : label, `${wHeadBusy} ${codeSize}px ${f.body}`, palette.text, lineCode)
+    lineBusy(caps ? label.toUpperCase() : label, `${wHeadBusy} ${codeSize}px ${f.body}`, busyHead, lineCode)
     lineBusy(formatTimeRange(block.start_time, block.end_time),
-      `${wBodyBusy} ${bodySize}px ${f.mono}`, hexToRgba(palette.text, 0.7), lineBody)
+      `${wBodyBusy} ${bodySize}px ${f.mono}`, busyBody, lineBody)
 
     ctx.restore()
   })

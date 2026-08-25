@@ -21,6 +21,7 @@
   --chip-active-bg: rgba(163,86,12,.22);
   --export-active-bg: rgba(163,86,12,.18);
   --block-sub: #57534a;
+  --busy: #8b93a5;
   --font-ui: system-ui, "Segoe UI", -apple-system, sans-serif;
   --font-data: ui-monospace, "Cascadia Mono", "Segoe UI Mono", "SF Mono", Consolas, monospace;
   --sec-w: 40px;
@@ -49,6 +50,7 @@
     --chip-active-bg: rgba(255,176,32,.14);
     --export-active-bg: rgba(255,176,32,.14);
     --block-sub: #b8b4aa;
+    --busy: #7c839a;
   }
 }
 
@@ -73,6 +75,7 @@
   --chip-active-bg: rgba(255,176,32,.14);
   --export-active-bg: rgba(255,176,32,.14);
   --block-sub: #b8b4aa;
+  --busy: #7c839a;
 }
 
 /* ── Base ── */
@@ -909,13 +912,13 @@ select {
   margin: 2px 5px 2px 0;
   padding: 4px 5px;
   overflow: hidden;
-  background-color: color-mix(in srgb, var(--rule) 40%, var(--surface));
+  background-color: color-mix(in srgb, var(--busy) 22%, var(--surface));
   background-image: repeating-linear-gradient(
     -45deg,
     transparent 0 6px,
-    color-mix(in srgb, var(--rule-med) 40%, transparent) 6px 7px
+    color-mix(in srgb, var(--busy) 42%, transparent) 6px 7px
   );
-  border-left: 4px solid var(--rule-med);
+  border-left: 4px solid var(--busy);
 }
 
 .busy-block-label {
