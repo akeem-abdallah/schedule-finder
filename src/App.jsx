@@ -1,6 +1,6 @@
 import './App.css'
 import { useState, Fragment, useEffect, useMemo, useRef } from 'react'
-import { DAYS, COURSE_HUES, SEMESTER, generateSchedules, getEligibleSections, orderedEligibleLists, findIncompatiblePairs, scheduledLists, timeToMinutes, to12Hour, formatMeetings, buildBlockedMask, combinedScheduleMask, longestGapMinutes, emptyFilteredRow, passesFilters } from './schedule'
+import { DAYS, COURSE_HUES, SEMESTER, DAY_START, SLOTS_PER_DAY, generateSchedules, getEligibleSections, orderedEligibleLists, findIncompatiblePairs, scheduledLists, timeToMinutes, to12Hour, formatMeetings, buildBlockedMask, combinedScheduleMask, longestGapMinutes, emptyFilteredRow, passesFilters } from './schedule'
 import { Analytics } from "@vercel/analytics/react"
 import { SpeedInsights } from "@vercel/speed-insights/react"
 import { renderSchedule, saveCanvas, canShareFiles, ensureExportFonts, EXPORT_PRESETS, DESIGNS } from './exportImage'
@@ -63,6 +63,19 @@ const DEFAULT_FILTERS = {
 
 function isTimeValue(value) {
   return value === "" || (typeof value === "string" && /^\d{1,2}:\d{2}$/.test(value))
+}
+
+// a busy block only reaches the grid if it has a real, forward range that the
+// mask can actually act on — outside DAY_START..DAY_END it filters nothing
+const DAY_END = DAY_START + SLOTS_PER_DAY * 5
+
+function isDrawableBusy(block) {
+  if (block.start_time === "" || block.end_time === "") return false
+
+  const start = timeToMinutes(block.start_time)
+  const end = timeToMinutes(block.end_time)
+
+  return start < end && end > DAY_START && start < DAY_END
 }
 
 function isValidBusyBlock(block) {
@@ -532,6 +545,33 @@ function App() {
     activeHours.push(hour)
   }
 
+  // the grid has to fit the student's busy times too, which can sit outside class hours
+  const shownBusy = results
+    ? filters.busyBlocks.filter((block) => isDrawableBusy(block) && !filters.excludedDays.includes(block.day))
+    : []
+  const busyMinutes = shownBusy.flatMap((block) => [timeToMinutes(block.start_time), timeToMinutes(block.end_time)])
+
+  const gridIndexes = [...usedIndexes]
+  shownBusy.forEach((block) => {
+    if (block.day !== "ALL") gridIndexes.push(DAYS.indexOf(block.day))
+  })
+  const gridDays = DAYS.slice(Math.min(0, ...gridIndexes), Math.max(3, ...gridIndexes) + 1)
+
+  const gridStartHour = Math.floor(Math.min(earliestMinute, ...busyMinutes) / 60)
+  const gridEndHour = Math.ceil(Math.max(latestMinute, ...busyMinutes) / 60)
+  const gridHours = []
+
+  for (let hour = gridStartHour; hour < gridEndHour; hour++) {
+    gridHours.push(hour)
+  }
+
+  // "ALL" means every day the grid is showing, not all seven
+  const busyDrawn = shownBusy.flatMap((block) =>
+    (block.day === "ALL"
+      ? gridDays.filter((day) => !filters.excludedDays.includes(day))
+      : [block.day]
+    ).map((day) => ({ ...block, day })))
+
   // only the courses actually drawn on the image, so its "N courses · X credits" line agrees with itself
   function creditsFor(schedule) {
     return schedule.reduce((sum, section) => {
@@ -542,6 +582,7 @@ function App() {
   }
 
   const exportCredits = results ? creditsFor(results[currentIndex]) : 0
+  const busySignature = busyDrawn.map((b) => `${b.day}|${b.start_time}|${b.end_time}|${b.note}`).join("~")
   const exportSize = EXPORT_PRESETS.find((p) => p.id === exportPreset) ?? EXPORT_PRESETS[0]
   const shareSupported = useMemo(() => canShareFiles(), [])
 
@@ -560,15 +601,16 @@ function App() {
     if (!exportOpen || !canvasRef.current) return
     renderSchedule(canvasRef.current, {
       schedule: results ? results[currentIndex] : [],
-      activeDays,
-      activeHours,
+      activeDays: gridDays,
+      activeHours: gridHours,
+      busy: busyDrawn,
       theme: exportTheme,
       design: exportDesign,
       credits: exportCredits,
       width: exportSize.width,
       height: exportSize.height,
     })
-  }, [exportOpen, fontsReady, exportPreset, exportTheme, exportDesign, exportCredits, results, currentIndex])
+  }, [exportOpen, fontsReady, exportPreset, exportTheme, exportDesign, exportCredits, busySignature, results, currentIndex])
 
   useEffect(() => {
     if (!exportOpen) return
@@ -1017,22 +1059,22 @@ function App() {
 
         <div className="grid-scroll">
           <div className="weekly-grid" style={{
-            gridTemplateColumns: `var(--gutter-w, 70px) repeat(${activeDays.length}, var(--day-w, minmax(0, 1fr)))`,
-            gridTemplateRows: `auto repeat(${activeHours.length * 12}, var(--slot-h, 5px))`
+            gridTemplateColumns: `var(--gutter-w, 70px) repeat(${gridDays.length}, var(--day-w, minmax(0, 1fr)))`,
+            gridTemplateRows: `auto repeat(${gridHours.length * 12}, var(--slot-h, 5px))`
           }}>
             <div className="grid-corner" style={{ gridColumn: 1, gridRow: 1 }}></div>
 
-            {activeDays.map((day, dayIndex) => (
+            {gridDays.map((day, dayIndex) => (
               <div key={day} className="day-header" style={{ gridColumn: dayIndex + 2, gridRow: 1 }}>{day.toUpperCase()}</div>
             ))}
 
-            {activeHours.map((hour, hourIndex) => (
+            {gridHours.map((hour, hourIndex) => (
               <Fragment key={hour}>
                 <div className={hourIndex === 0 ? "gutter-cell no-rule-top" : "gutter-cell"} style={{ gridColumn: 1, gridRow: `${hourIndex * 12 + 2} / span 12` }}>
                   <span className="gutter-full">{to12Hour(`${hour}:00`)}</span>
                   <span className="gutter-short">{to12Hour(`${hour}:00`).replace(":00", "")}</span>
                 </div>
-                {activeDays.map((day, dayIndex) => {
+                {gridDays.map((day, dayIndex) => {
                   const hourCellClass = ["hour-cell", hourIndex === 0 && "no-rule-top", dayIndex === 0 && "no-rule-left"].filter(Boolean).join(" ")
                   return <div key={day} className={hourCellClass} style={{
                     gridColumn: dayIndex + 2, gridRow: `${hourIndex * 12 + 2} / span 12`
@@ -1041,12 +1083,32 @@ function App() {
               </Fragment>
             ))}
 
+            {busyDrawn.map((block) => {
+              const gridColumn = gridDays.indexOf(block.day) + 2
+              if (gridColumn < 2) return null
+
+              const startSlot = (timeToMinutes(block.start_time) - gridStartHour * 60) / 5
+              const durationSlots = (timeToMinutes(block.end_time) - timeToMinutes(block.start_time)) / 5
+
+              return (
+                <div
+                  key={`busy-${block.id}-${block.day}`}
+                  className={durationSlots < 12 ? "busy-block busy-block-short" : "busy-block"}
+                  title={`${block.note || "Busy"} · ${to12Hour(block.start_time)}–${to12Hour(block.end_time)}`}
+                  style={{ gridColumn, gridRow: `${startSlot + 2} / span ${durationSlots}` }}
+                >
+                  <div className="busy-block-label">{block.note || "BUSY"}</div>
+                  <div className="busy-block-time">{to12Hour(block.start_time).slice(0, -3)}–{to12Hour(block.end_time).slice(0, -3)}</div>
+                </div>
+              )
+            })}
+
             {results[currentIndex].map((section, sectionIndex) =>
               section.meetings.map((meeting) => {
-                const startSlot = (timeToMinutes(meeting.start_time) - startHour * 60) / 5
+                const startSlot = (timeToMinutes(meeting.start_time) - gridStartHour * 60) / 5
                 const durationSlots = (timeToMinutes(meeting.end_time) - timeToMinutes(meeting.start_time)) / 5
                 const gridRowStart = startSlot + 2
-                const gridColumn = activeDays.indexOf(meeting.day) + 2
+                const gridColumn = gridDays.indexOf(meeting.day) + 2
                 const hue = COURSE_HUES[sectionIndex % COURSE_HUES.length]
 
                 return (

@@ -423,12 +423,15 @@ function formatTimeRange(start, end) {
     : `${short(start)} ${startHalf}–${short(end)} ${endHalf}`
 }
 
-function hoursForSchedule(schedule, fallback) {
+function hoursForSchedule(schedule, busy, fallback) {
   const minutes = []
   schedule.forEach((section) => {
     section.meetings.forEach((m) => {
       minutes.push(timeToMinutes(m.start_time), timeToMinutes(m.end_time))
     })
+  })
+  busy.forEach((block) => {
+    minutes.push(timeToMinutes(block.start_time), timeToMinutes(block.end_time))
   })
   if (minutes.length === 0) return fallback
 
@@ -604,7 +607,7 @@ export function drawGrid(ctx, layout, palette, activeDays, activeHours, design) 
   }
 }
 
-export function drawBlocks(ctx, layout, palette, schedule, activeDays, activeHours, design) {
+export function drawBlocks(ctx, layout, palette, schedule, activeDays, activeHours, design, busy = []) {
   const { s, colsX, colW, bodyY, slotH, hourH, cardY, cardH } = layout
 
   const hues = huesFor(design, palette)
@@ -627,23 +630,90 @@ export function drawBlocks(ctx, layout, palette, schedule, activeDays, activeHou
   const padX = Math.round(codeSize * 0.34)
   const padY = Math.round(codeSize * 0.36)
 
+  const place = (day, start, end) => {
+    const dayIndex = activeDays.indexOf(day)
+    if (dayIndex === -1) return null
+
+    const startSlot = (timeToMinutes(start) - activeHours[0] * 60) / 5
+    const durationSlots = (timeToMinutes(end) - timeToMinutes(start)) / 5
+
+    const x = colsX + dayIndex * colW + (hasBar ? 0 : gap / 2)
+    const y = bodyY + startSlot * slotH
+    const bw = colW - gap
+    const bh = durationSlots * slotH
+
+    if (y + bh < cardY || y > cardY + cardH) return null
+    return { x, y, bw, bh }
+  }
+
+  const caps = design.caps !== false
+  const wHeadBusy = design.weightDisplay ?? 700
+  const wBodyBusy = design.weightBody ?? 400
+
+  busy.forEach((block) => {
+    const box = place(block.day, block.start_time, block.end_time)
+    if (!box) return
+    const { x, y, bw, bh } = box
+
+    ctx.save()
+    roundRectPath(ctx, x, y, bw, bh, radius)
+    ctx.clip()
+
+    ctx.fillStyle = hexToRgba(mixHex(palette.surface, palette.ruleMed, 0.25), 0.88)
+    ctx.fillRect(x, y, bw, bh)
+
+    ctx.strokeStyle = hexToRgba(palette.ruleMed, 0.4)
+    ctx.lineWidth = Math.max(1, Math.round(1.6 * s))
+    const step = Math.max(6, Math.round(15 * s))
+    ctx.beginPath()
+    for (let i = -bh; i < bw; i += step) {
+      ctx.moveTo(x + i, y + bh)
+      ctx.lineTo(x + i + bh, y)
+    }
+    ctx.stroke()
+
+    if (hasBar) {
+      ctx.fillStyle = palette.ruleMed
+      ctx.fillRect(x, y, barW, bh)
+    } else if (isEdge) {
+      ctx.strokeStyle = hexToRgba(palette.ruleMed, 0.55)
+      ctx.lineWidth = Math.max(1, Math.round(1.5 * s))
+      ctx.strokeRect(x + 0.5, y + 0.5, bw - 1, bh - 1)
+    }
+
+    const insetBusy = hasBar ? barW + padX : padX
+    const textXBusy = x + insetBusy
+    const textWBusy = bw - insetBusy - padX
+    let cursorBusy = y + padY
+    const bottomBusy = y + bh - Math.round(2 * s)
+
+    ctx.textAlign = "left"
+    ctx.textBaseline = "top"
+
+    const lineBusy = (text, font, color, lineH) => {
+      if (cursorBusy + lineH > bottomBusy) return
+      ctx.font = font
+      ctx.fillStyle = color
+      const shown = fitText(ctx, text, textWBusy)
+      if (shown) ctx.fillText(shown, textXBusy, cursorBusy)
+      cursorBusy += lineH
+    }
+
+    const label = block.note || "Busy"
+    lineBusy(caps ? label.toUpperCase() : label, `${wHeadBusy} ${codeSize}px ${f.body}`, palette.text, lineCode)
+    lineBusy(formatTimeRange(block.start_time, block.end_time),
+      `${wBodyBusy} ${bodySize}px ${f.mono}`, hexToRgba(palette.text, 0.7), lineBody)
+
+    ctx.restore()
+  })
+
   schedule.forEach((section, sectionIndex) => {
     const hue = hues[sectionIndex % hues.length]
 
     section.meetings.forEach((meeting) => {
-      const dayIndex = activeDays.indexOf(meeting.day)
-      if (dayIndex === -1) return
-
-      const startSlot = (timeToMinutes(meeting.start_time) - activeHours[0] * 60) / 5
-      const durationSlots =
-        (timeToMinutes(meeting.end_time) - timeToMinutes(meeting.start_time)) / 5
-
-      const x = colsX + dayIndex * colW + (hasBar ? 0 : gap / 2)
-      const y = bodyY + startSlot * slotH
-      const bw = colW - gap
-      const bh = durationSlots * slotH
-
-      if (y + bh < cardY || y > cardY + cardH) return
+      const box = place(meeting.day, meeting.start_time, meeting.end_time)
+      if (!box) return
+      const { x, y, bw, bh } = box
 
       ctx.save()
       roundRectPath(ctx, x, y, bw, bh, radius)
@@ -658,13 +728,13 @@ export function drawBlocks(ctx, layout, palette, schedule, activeDays, activeHou
         headColor = textOn(hue)
         bodyColor = hexToRgba(headColor === "#ffffff" ? "#ffffff" : "#16150f", 0.72)
       } else if (isEdge) {
-        ctx.fillStyle = hexToRgba(hue, tintAlpha)
+        ctx.fillStyle = hexToRgba(mixHex(palette.surface, hue, tintAlpha), 0.7)
         ctx.fillRect(x, y, bw, bh)
         ctx.strokeStyle = hexToRgba(hue, 0.55)
         ctx.lineWidth = Math.max(1, Math.round(1.5 * s))
         ctx.strokeRect(x + 0.5, y + 0.5, bw - 1, bh - 1)
       } else {
-        ctx.fillStyle = hexToRgba(hue, tintAlpha)
+        ctx.fillStyle = hexToRgba(mixHex(palette.surface, hue, tintAlpha), 0.7)
         ctx.fillRect(x, y, bw, bh)
         ctx.fillStyle = hue
         ctx.fillRect(x, y, barW, bh)
@@ -723,7 +793,7 @@ export function drawWatermark(ctx, layout, palette, ink, design) {
 
 export function renderSchedule(
   canvas,
-  { schedule, activeDays, activeHours, theme, width, height, design: designId, credits = 0 },
+  { schedule, activeDays, activeHours, theme, width, height, design: designId, credits = 0, busy = [] },
 ) {
   canvas.width = width
   canvas.height = height
@@ -731,7 +801,7 @@ export function renderSchedule(
   const design = DESIGNS.find((d) => d.id === designId) ?? DESIGNS[0]
   const ctx = canvas.getContext("2d")
   const palette = readPalette(theme)
-  const hours = hoursForSchedule(schedule, activeHours)
+  const hours = hoursForSchedule(schedule, busy, activeHours)
   const layout = computeLayout(canvas, activeDays, hours)
 
   drawBackground(ctx, layout, palette, design)
@@ -741,7 +811,7 @@ export function renderSchedule(
 
   drawHeader(ctx, layout, palette, schedule, headerInk, design, credits)
   drawGrid(ctx, layout, palette, activeDays, hours, design)
-  drawBlocks(ctx, layout, palette, schedule, activeDays, hours, design)
+  drawBlocks(ctx, layout, palette, schedule, activeDays, hours, design, busy)
   drawWatermark(ctx, layout, palette, markInk, design)
 }
 

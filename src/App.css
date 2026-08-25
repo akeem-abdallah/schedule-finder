@@ -20,6 +20,7 @@
   --section-selected-bg: rgba(163,86,12,.20);
   --chip-active-bg: rgba(163,86,12,.22);
   --export-active-bg: rgba(163,86,12,.18);
+  --block-sub: #57534a;
   --font-ui: system-ui, "Segoe UI", -apple-system, sans-serif;
   --font-data: ui-monospace, "Cascadia Mono", "Segoe UI Mono", "SF Mono", Consolas, monospace;
   --sec-w: 40px;
@@ -47,6 +48,7 @@
     --section-selected-bg: rgba(255,176,32,.18);
     --chip-active-bg: rgba(255,176,32,.14);
     --export-active-bg: rgba(255,176,32,.14);
+    --block-sub: #b8b4aa;
   }
 }
 
@@ -70,6 +72,7 @@
   --section-selected-bg: rgba(255,176,32,.18);
   --chip-active-bg: rgba(255,176,32,.14);
   --export-active-bg: rgba(255,176,32,.14);
+  --block-sub: #b8b4aa;
 }
 
 /* ── Base ── */
@@ -369,7 +372,7 @@ select {
 }
 
 .credits-value {
-  color: var(--accent);
+  color: var(--text);
   font-weight: 700;
 }
 
@@ -484,6 +487,7 @@ select {
   .sub-strip > button:not(.btn-reset) {
     padding: 0;
     font-size: 9px;
+    color: var(--text);
   }
 
 .section-row input[type="checkbox"] {
@@ -780,7 +784,7 @@ select {
 }
 
 .filter-count b {
-  color: var(--accent);
+  color: var(--text);
   font-weight: 700;
 }
 
@@ -879,7 +883,7 @@ select {
   padding: 4px 5px;
   overflow: hidden;
   border-radius: 0;
-  background-color: color-mix(in srgb, var(--hue) 20%, transparent);
+  background-color: color-mix(in srgb, color-mix(in srgb, var(--hue) 20%, var(--surface)) 70%, transparent);
   border-left: 4px solid var(--hue);
 }
 
@@ -891,12 +895,49 @@ select {
 
 @media (prefers-color-scheme: dark) {
   :root:not([data-theme="light"]) .class-block {
-    background-color: color-mix(in srgb, var(--hue) 24%, transparent);
+    background-color: color-mix(in srgb, color-mix(in srgb, var(--hue) 24%, var(--surface)) 70%, transparent);
   }
 }
 
 :root[data-theme="dark"] .class-block {
-  background-color: color-mix(in srgb, var(--hue) 24%, transparent);
+  background-color: color-mix(in srgb, color-mix(in srgb, var(--hue) 24%, var(--surface)) 70%, transparent);
+}
+
+.busy-block {
+  display: block;
+  box-sizing: border-box;
+  margin: 2px 5px 2px 0;
+  padding: 4px 5px;
+  overflow: hidden;
+  background-color: color-mix(in srgb, var(--rule) 40%, var(--surface));
+  background-image: repeating-linear-gradient(
+    -45deg,
+    transparent 0 6px,
+    color-mix(in srgb, var(--rule-med) 40%, transparent) 6px 7px
+  );
+  border-left: 4px solid var(--rule-med);
+}
+
+.busy-block-label {
+  font-family: var(--font-ui);
+  font-size: 11px;
+  font-weight: 800;
+  letter-spacing: .06em;
+  text-transform: uppercase;
+  color: var(--text);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.busy-block-time {
+  font-family: var(--font-data);
+  font-size: 11px;
+  color: var(--block-sub);
+}
+
+.busy-block-short .busy-block-time {
+  display: none;
 }
 
 .pager-group {
@@ -932,7 +973,7 @@ select {
   font-size: 18px;
   font-weight: 700;
   letter-spacing: -.02em;
-  color: var(--text);
+  color: var(--accent);
 }
 
 .counter-sep {
@@ -946,7 +987,7 @@ select {
   font-size: 18px;
   font-weight: 700;
   letter-spacing: -.02em;
-  color: var(--accent);
+  color: var(--text);
 }
 
 .grid-corner {
@@ -984,7 +1025,7 @@ select {
 
 .hour-cell {
   border-top: 1px solid var(--rule);
-  border-left: 1px solid var(--rule);
+  border-left: 1px solid var(--rule-med);
 }
 
 .no-rule-top {
@@ -1005,13 +1046,13 @@ select {
 .block-instructor {
   font-family: var(--font-ui);
   font-size: 11px;
-  color: var(--muted);
+  color: var(--block-sub);
 }
 
 .block-time {
   font-family: var(--font-data);
   font-size: 11px;
-  color: var(--muted);
+  color: var(--block-sub);
 }
 
 .class-block-short .block-time {
@@ -1021,7 +1062,7 @@ select {
 .block-room {
   font-family: var(--font-data);
   font-size: 11px;
-  color: var(--muted);
+  color: var(--block-sub);
 }
 
 @media (min-width: 641px) {
@@ -1306,7 +1347,7 @@ select {
 }
 
 .export-count b {
-  color: var(--accent);
+  color: var(--text);
   font-weight: 700;
 }
 
@@ -1521,6 +1562,10 @@ select {
 
   .page-main {
     padding: 12px 8px;
+  }
+
+  .page-footer {
+    margin-top: 28px;
   }
 
   .status-strip {
@@ -1943,6 +1988,21 @@ select {
     .class-block {
       padding: 3px 4px;
       margin: 1.5px 3px 1.5px 0;
+    }
+
+    .busy-block {
+      padding: 3px 4px;
+      margin: 1.5px 3px 1.5px 0;
+    }
+
+    .busy-block-label {
+      font-size: 10px;
+      line-height: 1.25;
+    }
+
+    .busy-block-time {
+      font-size: 9px;
+      line-height: 1.2;
     }
 
     .block-instructor {
