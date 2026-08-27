@@ -3,13 +3,23 @@
   "redirects": [
     {
       "source": "/(.*)",
-      "has": [{ "type": "host", "value": "schedule-finder-delta.vercel.app" }],
+      "has": [
+        {
+          "type": "host",
+          "value": "schedule-finder-delta.vercel.app"
+        }
+      ],
       "destination": "https://aurak-scheduler.com/$1",
       "permanent": true
     },
     {
       "source": "/(.*)",
-      "has": [{ "type": "host", "value": "www.aurak-scheduler.com" }],
+      "has": [
+        {
+          "type": "host",
+          "value": "www.aurak-scheduler.com"
+        }
+      ],
       "destination": "https://aurak-scheduler.com/$1",
       "permanent": true
     }
@@ -18,9 +28,21 @@
     {
       "source": "/(.*)",
       "headers": [
-        { "key": "X-Content-Type-Options", "value": "nosniff" },
-        { "key": "Referrer-Policy", "value": "strict-origin-when-cross-origin" }
+        {
+          "key": "X-Content-Type-Options",
+          "value": "nosniff"
+        },
+        {
+          "key": "Referrer-Policy",
+          "value": "strict-origin-when-cross-origin"
+        }
       ]
+    }
+  ],
+  "rewrites": [
+    {
+      "source": "/faq",
+      "destination": "/faq.html"
     }
   ]
 }

@@ -487,7 +487,8 @@ select {
   border-bottom: 1px solid var(--rule);
 }
 
-  .sub-strip > button:not(.btn-reset) {
+  .sub-strip > button:not(.btn-reset),
+  .sub-strip > .faq-nav {
     padding: 0;
     font-size: 9px;
     color: var(--text);
@@ -563,6 +564,10 @@ select {
   font-size: 13px;
   color: var(--muted);
   margin: 0;
+}
+
+.section-note a {
+  color: var(--accent);
 }
 
 
@@ -1514,6 +1519,89 @@ select {
 
 /* ── Footer ── */
 
+/* faq page */
+
+.faq-item {
+  padding: 9px 12px;
+  background-color: color-mix(in srgb, var(--hue) 7%, var(--surface));
+  border-left: 3px solid var(--hue);
+}
+
+.faq-item + .faq-item {
+  margin-top: 7px;
+}
+
+.faq-q {
+  font-family: var(--font-ui);
+  font-size: 13px;
+  font-weight: 700;
+  line-height: 1.4;
+  color: var(--text);
+  margin: 0;
+}
+
+.faq-a {
+  font-family: var(--font-ui);
+  font-size: 13px;
+  line-height: 1.6;
+  color: var(--block-sub);
+  margin: 4px 0 0;
+  text-wrap: pretty;
+}
+
+.faq-a a {
+  color: var(--accent);
+}
+
+.faq-nav {
+  font-family: var(--font-ui);
+  font-weight: 800;
+  letter-spacing: .12em;
+  text-transform: uppercase;
+  text-decoration: none;
+  white-space: nowrap;
+  cursor: pointer;
+}
+
+@media (hover: hover) {
+  .faq-nav:hover {
+    color: var(--accent);
+  }
+}
+
+.faq-done {
+  text-align: center;
+  font-family: var(--font-ui);
+  font-size: 10px;
+  font-weight: 800;
+  letter-spacing: .12em;
+  text-transform: uppercase;
+  padding: 8px 14px;
+  text-decoration: none;
+  white-space: nowrap;
+  cursor: pointer;
+}
+
+.page-footer .footer-faq {
+  display: inline-block;
+  font-family: var(--font-ui);
+  font-size: 10px;
+  font-weight: 700;
+  letter-spacing: .10em;
+  text-transform: uppercase;
+  color: color-mix(in srgb, var(--text) 72%, var(--bg));
+  border: 1px solid var(--muted);
+  padding: 5px 11px;
+  margin-bottom: 12px;
+  text-decoration: none;
+}
+
+@media (hover: hover) {
+  .page-footer .footer-faq:hover {
+    border-color: var(--accent);
+    color: var(--accent);
+  }
+}
 .page-footer {
   margin-top: 50px;
   padding: 20px;
@@ -1531,9 +1619,7 @@ select {
   color: color-mix(in srgb, var(--text) 72%, var(--bg));
 }
 
-.footer-feedback {
-  font-size: 10px;
-}
+
 
 .theme-toggle {
   display: inline-flex;
@@ -1690,7 +1776,8 @@ select {
     font-size: 10px;
   }
 
-  .table-footer button {
+  .table-footer button,
+  .table-footer .faq-done {
     padding: 18px;
   }
 
@@ -1704,7 +1791,8 @@ select {
     padding: 4px 13px 0 13px;
   }
 
-    .sub-strip > button:not(.btn-reset) {
+    .sub-strip > button:not(.btn-reset),
+    .sub-strip > .faq-nav {
       padding: 16px 0;
       min-width: 44px;
     }

@@ -1,0 +1,247 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <link rel="icon" href="/favicon.ico" sizes="48x48" />
+    <link rel="icon" href="/favicon.svg" type="image/svg+xml" />
+    <link rel="icon" href="/icon-192.png" type="image/png" sizes="192x192" />
+    <link rel="apple-touch-icon" href="/apple-touch-icon.png" />
+    <link rel="manifest" href="/site.webmanifest" />
+    <meta name="theme-color" content="#f2f1ee" media="(prefers-color-scheme: light)" />
+    <meta name="theme-color" content="#000000" media="(prefers-color-scheme: dark)" />
+
+    <title>Common Questions — AURAK Schedule Finder</title>
+    <meta name="description" content="How to build a conflict-free AURAK class schedule for Fall 2026: picking courses, avoiding time conflicts, keeping days free, and where the course data comes from." />
+    <link rel="canonical" href="https://aurak-scheduler.com/faq" />
+
+    <meta property="og:type" content="article" />
+    <meta property="og:url" content="https://aurak-scheduler.com/faq" />
+    <meta property="og:site_name" content="AURAK Schedule Finder" />
+    <meta property="og:title" content="Common Questions — AURAK Schedule Finder" />
+    <meta property="og:description" content="How to build a conflict-free AURAK class schedule for Fall 2026." />
+    <meta property="og:image" content="https://aurak-scheduler.com/og.jpg" />
+    <meta property="og:image:width" content="1200" />
+    <meta property="og:image:height" content="630" />
+    <meta property="og:locale" content="en_AE" />
+
+    <meta name="twitter:card" content="summary_large_image" />
+    <meta name="twitter:title" content="Common Questions — AURAK Schedule Finder" />
+    <meta name="twitter:image" content="https://aurak-scheduler.com/og.jpg" />
+
+    <script>
+      try {
+        var t = JSON.parse(localStorage.getItem("theme"))
+        if (t === "light" || t === "dark" || t === "system") {
+          document.documentElement.setAttribute("data-theme", t)
+        }
+      } catch (e) {}
+    </script>
+
+    <script>
+      fetch("https://aurak-schedule-finder.onrender.com/initial-data")
+        .then(function (r) { return r.json() })
+        .then(function (d) {
+          var date = new Date(d.fetched_at + "Z")
+          if (isNaN(date.getTime())) return
+          var time = date.toLocaleString("en-US", { hour: "numeric", minute: "2-digit" })
+          var stamp = date.toDateString() === new Date().toDateString()
+            ? time
+            : date.toLocaleString("en-US", { month: "short", day: "numeric" }) + ", " + time
+          document.getElementById("semester-chip").textContent = "Fall 2026 · Updated " + stamp
+        })
+        .catch(function () {})
+    </script>
+
+    <script type="application/ld+json">
+{
+          "@context": "https://schema.org",
+          "@type": "FAQPage",
+          "mainEntity": [
+                {
+                      "@type": "Question",
+                      "name": "How do I build my class schedule at AURAK?",
+                      "acceptedAnswer": {
+                            "@type": "Answer",
+                            "text": "Open the schedule finder, add the courses you plan to register for, set any days or times you need kept free, then press GENERATE. Every possible combination of sections is checked for you, and only the timetables that actually work are shown — no lining up meeting times by hand."
+                      }
+                },
+                {
+                      "@type": "Question",
+                      "name": "How do I avoid time conflicts when registering?",
+                      "acceptedAnswer": {
+                            "@type": "Answer",
+                            "text": "Every schedule the tool produces is conflict-free by construction: two sections that overlap are never placed in the same timetable. If a course cannot fit alongside the others, you get a message naming the two courses that clash instead of an empty result."
+                      }
+                },
+                {
+                      "@type": "Question",
+                      "name": "Can I keep certain days or mornings free?",
+                      "acceptedAnswer": {
+                            "@type": "Answer",
+                            "text": "Yes. Under FILTERS you can take whole days off, set an earliest start or a latest end, block out busy times like a job or a commute, and cap how long a gap between classes is allowed to get."
+                      }
+                },
+                {
+                      "@type": "Question",
+                      "name": "What happens if a section is full?",
+                      "acceptedAnswer": {
+                            "@type": "Answer",
+                            "text": "Full sections are included by default, since seats open up during registration. If you would rather not see them, tick Exclude full sections under FILTERS and any section with no seats left is dropped from the results."
+                      }
+                },
+                {
+                      "@type": "Question",
+                      "name": "Where does the course data come from?",
+                      "acceptedAnswer": {
+                            "@type": "Answer",
+                            "text": "Directly from the official AURAK EUMS class schedule for Fall 2026. It refreshes automatically every 15 minutes, so section times and seat counts stay close to live. The timestamp at the top of the tool shows the last update."
+                      }
+                },
+                {
+                      "@type": "Question",
+                      "name": "Is this an official AURAK tool?",
+                      "acceptedAnswer": {
+                            "@type": "Answer",
+                            "text": "No. It is a free tool made by a student and is not affiliated with or endorsed by AURAK. Always confirm your final choices against the official EUMS portal before you register."
+                      }
+                },
+                {
+                      "@type": "Question",
+                      "name": "Can I save or share my schedule?",
+                      "acceptedAnswer": {
+                            "@type": "Answer",
+                            "text": "Yes. Any generated schedule can be exported as an image in a range of designs — useful as a phone wallpaper, or to send to friends while you are all picking courses."
+                      }
+                },
+                {
+                      "@type": "Question",
+                      "name": "Can I use it on my phone?",
+                      "acceptedAnswer": {
+                            "@type": "Answer",
+                            "text": "Yes — it runs in any mobile browser and can be installed to your home screen like an app. Nothing needs to be downloaded and there is no account to create."
+                      }
+                }
+          ]
+    }
+    </script>
+
+    <link rel="stylesheet" href="/src/App.css" />
+  </head>
+  <body>
+    <div class="page-main">
+
+      <div class="card">
+
+        <div class="status-strip">
+          <h1 class="strip-title">AURAK Schedule Finder</h1>
+          <span class="spacer"></span>
+          <div class="chip-row">
+            <a class="chip" id="semester-chip" href="https://eums.aurak.ac.ae/Public/Schedule?h42blu9ygNZPnBJmMbXuWAu8XR3hS4tcKtMIP6xFd2U="
+              target="_blank" rel="noopener noreferrer">Fall 2026</a>
+          </div>
+        </div>
+
+        <div class="sub-strip">
+          <a class="faq-nav" href="/">&larr; BACK</a>
+          <span class="spacer"></span>
+          <span class="section-code">COMMON QUESTIONS</span>
+        </div>
+
+        <div class="filter-block">
+          <div class="filter-label">BUILDING A SCHEDULE</div>
+
+          <div class="faq-item" style="--hue: #2f6bff">
+            <h2 class="faq-q">How do I build my class schedule at AURAK?</h2>
+            <p class="faq-a">Open the <a href="/">schedule finder</a>, add the courses you plan to register for, set any days or times you need kept free, then press GENERATE. Every possible combination of sections is checked for you, and only the timetables that actually work are shown &mdash; no lining up meeting times by hand.</p>
+          </div>
+
+          <div class="faq-item" style="--hue: #e0561f">
+            <h2 class="faq-q">How do I avoid time conflicts when registering?</h2>
+            <p class="faq-a">Every schedule the tool produces is conflict-free by construction: two sections that overlap are never placed in the same timetable. If a course cannot fit alongside the others, you get a message naming the two courses that clash instead of an empty result.</p>
+          </div>
+
+          <div class="faq-item" style="--hue: #17a06a">
+            <h2 class="faq-q">Can I keep certain days or mornings free?</h2>
+            <p class="faq-a">Yes. Under FILTERS you can take whole days off, set an earliest start or a latest end, block out busy times like a job or a commute, and cap how long a gap between classes is allowed to get.</p>
+          </div>
+
+          <div class="faq-item" style="--hue: #9d4edd">
+            <h2 class="faq-q">What happens if a section is full?</h2>
+            <p class="faq-a">Full sections are included by default, since seats open up during registration. If you would rather not see them, tick <em>Exclude full sections</em> under FILTERS and any section with no seats left is dropped from the results.</p>
+          </div>
+        </div>
+
+        <div class="filter-block">
+          <div class="filter-label">COURSE DATA</div>
+
+          <div class="faq-item" style="--hue: #c9910d">
+            <h2 class="faq-q">Where does the course data come from?</h2>
+            <p class="faq-a">Directly from the official AURAK EUMS class schedule for Fall 2026. It refreshes automatically every 15 minutes, so section times and seat counts stay close to live. The timestamp at the top of the tool shows the last update.</p>
+          </div>
+
+          <div class="faq-item" style="--hue: #00a0b8">
+            <h2 class="faq-q">Is this an official AURAK tool?</h2>
+            <p class="faq-a">No. It is a free tool made by a student and is not affiliated with or endorsed by AURAK. Always confirm your final choices against the official EUMS portal before you register.</p>
+          </div>
+        </div>
+
+        <div class="filter-block">
+          <div class="filter-label">USING IT</div>
+
+          <div class="faq-item" style="--hue: #e0447f">
+            <h2 class="faq-q">Can I save or share my schedule?</h2>
+            <p class="faq-a">Yes. Any generated schedule can be exported as an image in a range of designs &mdash; useful as a phone wallpaper, or to send to friends while you are all picking courses.</p>
+          </div>
+
+          <div class="faq-item" style="--hue: #7cb518">
+            <h2 class="faq-q">Can I use it on my phone?</h2>
+            <p class="faq-a">Yes &mdash; it runs in any mobile browser and can be installed to your home screen like an app. Nothing needs to be downloaded and there is no account to create.</p>
+          </div>
+        </div>
+
+        <div class="table-footer">
+          <p class="section-note">Found a bug or have feedback? <a href="https://forms.gle/zvn9hKr27aUjvTMXA" target="_blank" rel="noopener noreferrer">Let me know</a>.</p>
+          <a class="btn-primary faq-done" href="/">DONE &rarr;</a>
+        </div>
+
+      </div>
+
+    </div>
+
+    <div class="page-footer">
+      <p>Developed by <a href="https://github.com/akeem-abdallah" target="_blank" rel="noopener noreferrer">Akeem Abdallah</a> &middot; &copy; 2026</p>
+      <p>Unofficial student tool &mdash; not affiliated with or endorsed by AURAK. By using this site, you take full responsibility for any consequences of relying on this data.</p>
+      <div class="theme-toggle">
+        <button data-theme-btn="system">SYSTEM</button>
+        <button data-theme-btn="light">LIGHT</button>
+        <button data-theme-btn="dark">DARK</button>
+      </div>
+    </div>
+
+    <script>
+      (function () {
+        var buttons = document.querySelectorAll("[data-theme-btn]")
+
+        function apply(theme) {
+          document.documentElement.setAttribute("data-theme", theme)
+          try { localStorage.setItem("theme", JSON.stringify(theme)) } catch (e) {}
+          buttons.forEach(function (b) {
+            b.classList.toggle("theme-btn-active", b.dataset.themeBtn === theme)
+          })
+        }
+
+        var saved = "system"
+        try {
+          var parsed = JSON.parse(localStorage.getItem("theme"))
+          if (parsed === "light" || parsed === "dark" || parsed === "system") saved = parsed
+        } catch (e) {}
+
+        apply(saved)
+        buttons.forEach(function (b) {
+          b.addEventListener("click", function () { apply(b.dataset.themeBtn) })
+        })
+      })()
+    </script>
+  </body>
+</html>
