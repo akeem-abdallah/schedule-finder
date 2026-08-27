@@ -57,7 +57,7 @@ const DEFAULT_FILTERS = {
   nothingAfter: "",
   busyBlocks: [],
   instructorAssigned: false,
-  fullSections: false,
+  fullSections: true,
   longestGap: ""
 }
 
@@ -292,7 +292,7 @@ function App() {
     filters.nothingAfter !== "",
     filters.busyBlocks.length > 0,
     filters.instructorAssigned,
-    filters.fullSections,
+    !filters.fullSections,
     filters.longestGap !== ""
   ].filter(Boolean).length
 
@@ -780,7 +780,7 @@ function App() {
           const isFull = s.available_seats === 0 && !filters.fullSections && !isLockedSection
           return (
             <label key={s.section_number} className={`section-row${isSelected ? " section-row-selected" : ""}${(otherLocked || isFull || isTBA) ? " section-row-disabled" : ""}${isLockedSection ? " section-row-locked" : ""}`}>
-              <input type="checkbox" checked={isSelected} disabled={otherLocked || isLockedSection || isFull || isTBA} onChange={() => {
+              <input type="checkbox" checked={isSelected} disabled={otherLocked || isLockedSection || ((isFull || isTBA) && !isSelected)} onChange={() => {
                 const alreadyIn = customizingRow.sections.includes(s.section_number)
                 const newSections = alreadyIn
                   ? customizingRow.sections.filter((sec) => sec !== s.section_number)
@@ -887,9 +887,9 @@ function App() {
           <input type="checkbox" checked={filters.instructorAssigned} onChange={() => updateFilters({ instructorAssigned: !filters.instructorAssigned })} />
           <span className="filter-row-text">Only sections with an assigned instructor</span>
         </label>
-        <label className={`filter-row ${filters.fullSections ? "filter-row-selected" : ""}`}>
-          <input type="checkbox" checked={filters.fullSections} onChange={() => updateFilters({ fullSections: !filters.fullSections })} />
-          <span className="filter-row-text">Include full sections</span>
+        <label className={`filter-row ${!filters.fullSections ? "filter-row-selected" : ""}`}>
+          <input type="checkbox" checked={!filters.fullSections} onChange={() => updateFilters({ fullSections: !filters.fullSections })} />
+          <span className="filter-row-text">Exclude full sections</span>
         </label>
 
         <div className="filter-block filter-block-tight">
