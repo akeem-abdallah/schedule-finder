@@ -1,4 +1,4 @@
-export const SEMESTER = "Fall 2026"
+export const SEMESTER = "Spring 2027"
 
 export const DAYS = ["Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"]
 export const DAY_START = 420

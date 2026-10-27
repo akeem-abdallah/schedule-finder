@@ -1149,7 +1149,7 @@ function App() {
             <h1 className="strip-title">AURAK Schedule Finder</h1>
             <span className="spacer"></span>
             <div className="chip-row">
-              <a className="chip" href="https://eums.aurak.ac.ae/Public/Schedule?h42blu9ygNZPnBJmMbXuWAu8XR3hS4tcKtMIP6xFd2U="
+              <a className="chip" href="https://eums.aurak.ac.ae/Public/Schedule?TgiWfjGJ8fPM4Nea7hgbcdrxHerQo3hAQzDKahDlcCuBken6CeDIySgZ5lV9GHte"
                 target="_blank" rel="noopener noreferrer">{SEMESTER} · Updated {formatLastUpdated(lastUpdated)}</a>
             </div>
           </div>

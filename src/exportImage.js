@@ -12,7 +12,7 @@ const FACES_TO_AWAIT = [
 ]
 
 const SAMPLE_TEXT =
-  "FALL 2026 COURSES ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789:·–"
+  "SPRING 2027 COURSES ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789:·–"
 
 let fontPromise = null
 

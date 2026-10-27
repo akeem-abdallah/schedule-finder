@@ -79,7 +79,7 @@ def load_rows(path):
 if __name__ == "__main__":
 
     # AURAK EUMS URL
-    URL = "https://eums.aurak.ac.ae/Public/Schedule?h42blu9ygNZPnBJmMbXuWAu8XR3hS4tcKtMIP6xFd2U="
+    URL = "https://eums.aurak.ac.ae/Public/Schedule?TgiWfjGJ8fPM4Nea7hgbcdrxHerQo3hAQzDKahDlcCuBken6CeDIySgZ5lV9GHte"
     response = requests.get(URL)
 
     # checks for error response
