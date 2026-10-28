@@ -17,7 +17,7 @@ combination at once.
 
 > [!WARNING]
 > **Unofficial student tool — not affiliated with or endorsed by AURAK.** Course data is
-> pulled from AURAK's public schedule page and refreshed daily, but it can lag reality.
+> pulled from AURAK's public schedule page and refreshed every 15 minutes, but it can lag reality.
 > Always confirm on the official system before you register. Seat counts are deliberately
 > not shown: stale seat data is worse than no seat data.
 
@@ -31,7 +31,7 @@ lets you page through them on a weekly grid.
 Courses with no meeting times (senior projects, independent study) are handled properly
 rather than multiplying the results by every invisible section.
 
-The course data refreshes itself every morning, so nobody has to remember to update
+The course data refreshes itself every 15 minutes, so nobody has to remember to update
 anything.
 
 ## How it's built
@@ -41,10 +41,10 @@ anything.
 | Frontend | React + Vite | Vercel |
 | API | FastAPI + SQLAlchemy + Alembic | Render |
 | Database | PostgreSQL | Supabase |
-| Daily refresh | Python scraper + GitHub Actions cron | GitHub |
+| Refresh (every 15 min) | Python scraper on GitHub Actions, started by cron-job.org | GitHub + cron-job.org |
 
 ```
-GitHub Actions (daily cron)
+cron-job.org (every 15 min) → GitHub Actions
         │
         ▼
 fetch_schedule.py ──── scrapes AURAK's public schedule page

@@ -1,13 +1,20 @@
 name: Course Refresh
 
+# started every 15 minutes by an external cron-job.org job through the GitHub API,
+# because GitHub's own schedule trigger ran hours late; no schedule trigger here
+# also means GitHub can't auto-disable this workflow after 60 days without commits
 on:
-  schedule:
-    - cron: '*/15 * * * *'
   workflow_dispatch:
+
+# never run two refreshes at once; a new trigger waits for the current run
+concurrency:
+  group: course-refresh
+  cancel-in-progress: false
 
 jobs:
   refresh:
     runs-on: ubuntu-latest
+    timeout-minutes: 5
     defaults:
       run:
         working-directory: backend
